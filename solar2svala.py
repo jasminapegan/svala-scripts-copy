@@ -180,6 +180,8 @@ def process_file(et, args):
         output_folder_loc = os.path.join(args.output_folder, file_name)
         error_folder_loc = os.path.join(args.error_folder, file_name)
 
+        essay_problematic = False
+
         paragraphs = div.findall('p')
         for paragraph in paragraphs:
             sentences = paragraph.findall('s')
@@ -206,13 +208,21 @@ def process_file(et, args):
             if not paragraph_error:
                 if not os.path.exists(output_folder_loc):
                     os.mkdir(output_folder_loc)
-                with open(os.path.join(output_folder_loc, paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'] + '.json'), 'w') as wf:
-                    json.dump(dictionary, wf, ensure_ascii=False, indent="")
-            else:
                 if not os.path.exists(error_folder_loc):
                     os.mkdir(error_folder_loc)
+                with open(os.path.join(output_folder_loc, paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'] + '.json'), 'w') as wf:
+                    json.dump(dictionary, wf, ensure_ascii=False, indent="")
                 with open(os.path.join(error_folder_loc, paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'] + '.json'), 'w') as wf:
                     json.dump(dictionary, wf, ensure_ascii=False, indent="")
+            else:
+                essay_problematic = True
+                if not os.path.exists(error_folder_loc):
+                    os.mkdir(error_folder_loc)
+                with open(os.path.join(error_folder_loc, paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'] + '_problem.json'), 'w') as wf:
+                    json.dump(dictionary, wf, ensure_ascii=False, indent="")
+
+        if not essay_problematic:
+            shutil.rmtree(error_folder_loc)
 
 
 def main(args):
