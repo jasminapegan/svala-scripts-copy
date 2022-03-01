@@ -12,8 +12,8 @@ class Sentence:
         self.links = []
         self.no_ud = no_ud
 
-    def add_item(self, token, lemma, upos, upos_other, xpos, misc):
-        self.items.append([token, lemma, upos, upos_other, xpos, "SpaceAfter=No" in misc.split('|')])
+    def add_item(self, word_id, token, lemma, upos, upos_other, xpos, misc):
+        self.items.append([word_id, token, lemma, upos, upos_other, xpos, "SpaceAfter=No" in misc.split('|')])
 
     def add_link(self, link_ref, link_type):
         self.links.append([link_ref, link_type])
@@ -25,10 +25,9 @@ class Sentence:
             xml_id = self._id
         base = etree.Element('s')
         set_xml_attr(base, 'id', xml_id)
-        id_counter = 1
 
         for item in self.items:
-            token, lemma, upos, upos_other, xpos, no_space_after = item
+            word_id, token, lemma, upos, upos_other, xpos, no_space_after = item
 
             if xpos in {'U', 'Z'}:  # hmm, safe only as long as U is unused in English tagset and Z in Slovenian one
                 to_add = etree.Element('pc')
@@ -43,10 +42,8 @@ class Sentence:
                 else:
                     to_add.set('msd', f'UposTag={upos}')
 
-            set_xml_attr(to_add, 'id', "{}.{}".format(xml_id, id_counter))
+            set_xml_attr(to_add, 'id', word_id)
             to_add.text = token
-
-            id_counter += 1
 
             if no_space_after:
                 to_add.set('join', 'right')
@@ -57,8 +54,9 @@ class Sentence:
 
 
 class Paragraph:
-    def __init__(self, _id):
+    def __init__(self, _id, _doc_id):
         self._id = _id if _id is not None else 'no-id'
+        self._doc_id = _doc_id if _doc_id is not None else ''
         self.sentences = []
 
     def add_sentence(self, sentence):
@@ -68,7 +66,10 @@ class Paragraph:
         if id_prefix:
             xml_id = id_prefix + '.' + self._id
         else:
-            xml_id = self._id
+            if self._doc_id:
+                xml_id = self._doc_id + '.' + self._id
+            else:
+                xml_id = self._id
 
         p = etree.Element('p')
         set_xml_attr(p, 'id', xml_id)
@@ -97,7 +98,7 @@ class TeiDocument:
         text = etree.SubElement(root, 'text')
         body = etree.SubElement(text, 'body')
         for para in self.paragraphs:
-            body.append(para.as_xml(id_prefix=xml_id))
+            body.append(para.as_xml())
 
         encoding_desc = etree.SubElement(tei_header, 'encodingDesc')
         tags_decl = etree.SubElement(encoding_desc, 'tagsDecl')
@@ -119,6 +120,36 @@ def build_tei_etrees(documents):
     for document in documents:
         elements.append(document.as_xml())
     return elements
+
+
+def build_links(all_edges):
+    root = etree.Element('TEI')
+    root.set('xmlns', 'http://www.tei-c.org/ns/1.0')
+    set_xml_attr(root, 'lang', 'sl')
+
+    # elements = []
+    for document_edges in all_edges:
+        d = etree.Element('linkGrp')
+        for paragraph_edges in document_edges:
+            p = etree.Element('linkGrp')
+            for sentence_edges in paragraph_edges:
+                s = etree.Element('linkGrp')
+                random_id = ''
+                for token_edges in sentence_edges:
+                    link = etree.Element('link')
+                    link.set('labels', ' '.join(token_edges['labels']))
+                    link.set('sources', ' '.join(['#' + source for source in token_edges['source_ids']]))
+                    link.set('targets', ' '.join(['#' + source for source in token_edges['target_ids']]))
+                    if not random_id:
+                        random_id = token_edges['source_ids'][0] if len(token_edges['source_ids']) > 0 else token_edges['target_ids'][0]
+                    s.append(link)
+                set_xml_attr(s, 'sentence_id', '.'.join(random_id.split('.')[:3]))
+                p.append(s)
+            set_xml_attr(p, 'paragraph_id', '.'.join(random_id.split('.')[:2]))
+            d.append(p)
+        set_xml_attr(d, 'document_id', random_id.split('.')[0])
+        root.append(d)
+    return root
 
 
 def set_xml_attr(node, attribute, value):
@@ -173,7 +204,7 @@ def construct_tei_documents_from_list(object_list):
     #             para_buffer.append(line)
 
     if len(object_list) > 0:
-        document_paragraphs.append(construct_paragraph(para_id, object_list))
+        document_paragraphs.append(construct_paragraph(doc_id, para_id, object_list))
 
     if len(document_paragraphs) > 0:
         documents.append(
@@ -196,7 +227,7 @@ def construct_tei_documents(conllu_lines):
             key, val = parse_metaline(line)
             if key == 'newdoc id':
                 if len(para_buffer) > 0:
-                    document_paragraphs.append(construct_paragraph(para_id, para_buffer))
+                    document_paragraphs.append(construct_paragraph(doc_id, para_id, para_buffer))
                 if len(document_paragraphs) > 0:
                     documents.append(
                         TeiDocument(doc_id, document_paragraphs))
@@ -204,7 +235,7 @@ def construct_tei_documents(conllu_lines):
                 doc_id = val
             elif key == 'newpar id':
                 if len(para_buffer) > 0:
-                    document_paragraphs.append(construct_paragraph(para_id, para_buffer))
+                    document_paragraphs.append(construct_paragraph(doc_id, para_id, para_buffer))
                     para_buffer = []
                 para_id = val
             elif key == 'sent_id':
@@ -214,7 +245,7 @@ def construct_tei_documents(conllu_lines):
                 para_buffer.append(line)
 
     if len(para_buffer) > 0:
-        document_paragraphs.append(construct_paragraph(para_id, para_buffer))
+        document_paragraphs.append(construct_paragraph(doc_id, para_id, para_buffer))
 
     if len(document_paragraphs) > 0:
         documents.append(
@@ -223,8 +254,8 @@ def construct_tei_documents(conllu_lines):
     return documents
 
 
-def construct_paragraph_from_list(para_id, etree_source_sentences):
-    para = Paragraph(para_id)
+def construct_paragraph_from_list(doc_id, para_id, etree_source_sentences):
+    para = Paragraph(para_id, doc_id)
 
     for sentence in etree_source_sentences:
         para.add_sentence(sentence)
@@ -232,8 +263,8 @@ def construct_paragraph_from_list(para_id, etree_source_sentences):
     return para
 
 
-def construct_paragraph(para_id, conllu_lines):
-    para = Paragraph(para_id)
+def construct_paragraph(doc_id, para_id, conllu_lines):
+    para = Paragraph(para_id, doc_id)
 
     sent_id = None
     sent_buffer = []
@@ -267,6 +298,7 @@ def construct_sentence_from_list(sent_id, object_list):
         misc = '_' if tokens['space_after'] else 'SpaceAfter=No'
 
         sentence.add_item(
+            word_id,
             token,
             lemma,
             upos,

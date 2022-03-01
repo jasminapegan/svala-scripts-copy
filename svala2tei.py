@@ -9,17 +9,17 @@ from xml.etree import ElementTree
 from lxml import etree
 
 from src.create_tei import construct_tei_etrees, construct_tei_documents_from_list, construct_sentence_from_list, \
-    construct_paragraph_from_list, TeiDocument, build_tei_etrees
+    construct_paragraph_from_list, TeiDocument, build_tei_etrees, build_links
 
 logging.basicConfig(level=logging.INFO)
 
 
-def add_token(svala_i, source_i, target_i, el, source, target, edges, svala_data, sentence_string_source_id, sentence_string_target_id):
+def add_token(svala_i, source_i, target_i, el, source, target, edges, svala_data, sentence_string_id):
     source_id = "s" + svala_i
     target_id = "t" + svala_i
     edge_id = "e-" + source_id + "-" + target_id
-    source_token_id = sentence_string_source_id + f'.{source_i}'
-    target_token_id = sentence_string_target_id + f'.{target_i}'
+    source_token_id = sentence_string_id + f'.s{source_i}'
+    target_token_id = sentence_string_id + f'.t{target_i}'
     token_tag = 'w' if el.tag.startswith('w') else 'pc'
     lemma = el.attrib['lemma'] if token_tag == 'w' else el.text
     source.append({'token': el.text, 'tag': token_tag, 'ana': el.attrib['ana'], 'lemma': lemma, 'id': source_token_id, 'space_after': False})
@@ -27,15 +27,15 @@ def add_token(svala_i, source_i, target_i, el, source, target, edges, svala_data
     edges.append({'source_ids': [source_token_id], 'target_ids': [target_token_id], 'labels': svala_data['edges'][edge_id]['labels']})
 
 
-def add_error_token(el, out_list, sentence_string_id, out_list_i, out_list_ids):
-    source_token_id = sentence_string_id + f'.{out_list_i}'
+def add_error_token(el, out_list, sentence_string_id, out_list_i, out_list_ids, is_source):
+    source_token_id = sentence_string_id + f'.s{out_list_i}' if is_source else sentence_string_id + f'.t{out_list_i}'
     token_tag = 'w' if el.tag.startswith('w') else 'pc'
     lemma = el.attrib['lemma'] if token_tag == 'w' else el.text
     out_list.append({'token': el.text, 'tag': token_tag, 'ana': el.attrib['ana'], 'lemma': lemma, 'id': source_token_id, 'space_after': False})
     out_list_ids.append(source_token_id)
 
 
-def add_errors(svala_i, source_i, target_i, error, source, target, edges, svala_data, sentence_string_source_id, sentence_string_target_id):
+def add_errors(svala_i, source_i, target_i, error, source, target, edges, svala_data, sentence_string_id):
     source_edge_ids = []
     target_edge_ids = []
     source_ids = []
@@ -49,7 +49,7 @@ def add_errors(svala_i, source_i, target_i, error, source, target, edges, svala_
             source_id = "s" + ind
             source_edge_ids.append(source_id)
 
-            add_error_token(el, source, sentence_string_source_id, source_i, source_ids)
+            add_error_token(el, source, sentence_string_id, source_i, source_ids, True)
 
             source_i += 1
             svala_i += 1
@@ -65,7 +65,7 @@ def add_errors(svala_i, source_i, target_i, error, source, target, edges, svala_
                     target_id = "t" + ind
                     target_edge_ids.append(target_id)
 
-                    add_error_token(p_el, target, sentence_string_target_id, target_i, target_ids)
+                    add_error_token(p_el, target, sentence_string_id, target_i, target_ids, False)
 
                     target_i += 1
                     svala_i += 1
@@ -81,7 +81,7 @@ def add_errors(svala_i, source_i, target_i, error, source, target, edges, svala_
                     source_id = "s" + ind
                     source_edge_ids.append(source_id)
 
-                    add_error_token(el_l2, source, sentence_string_source_id, source_i, source_ids)
+                    add_error_token(el_l2, source, sentence_string_id, source_i, source_ids, True)
 
                     source_i += 1
                     svala_i += 1
@@ -97,7 +97,7 @@ def add_errors(svala_i, source_i, target_i, error, source, target, edges, svala_
                             source_id = "s" + ind
                             source_edge_ids.append(source_id)
 
-                            add_error_token(el_l3, source, sentence_string_source_id, source_i, source_ids)
+                            add_error_token(el_l3, source, sentence_string_id, source_i, source_ids, True)
 
                             source_i += 1
                             svala_i += 1
@@ -113,7 +113,7 @@ def add_errors(svala_i, source_i, target_i, error, source, target, edges, svala_
                                     source_id = "s" + ind
                                     source_edge_ids.append(source_id)
 
-                                    add_error_token(el_l4, source, sentence_string_source_id, source_i, source_ids)
+                                    add_error_token(el_l4, source, sentence_string_id, source_i, source_ids, True)
 
                                     source_i += 1
                                     svala_i += 1
@@ -128,7 +128,7 @@ def add_errors(svala_i, source_i, target_i, error, source, target, edges, svala_
                                             source_id = "s" + ind
                                             source_edge_ids.append(source_id)
 
-                                            add_error_token(el_l5, source, sentence_string_source_id, source_i, source_ids)
+                                            add_error_token(el_l5, source, sentence_string_id, source_i, source_ids, True)
 
                                             source_i += 1
                                             svala_i += 1
@@ -142,13 +142,12 @@ def add_errors(svala_i, source_i, target_i, error, source, target, edges, svala_
                     target_id = "t" + ind
                     target_edge_ids.append(target_id)
 
-                    add_error_token(p_el, target, sentence_string_target_id, target_i, target_ids)
+                    add_error_token(p_el, target, sentence_string_id, target_i, target_ids, False)
 
                     target_i += 1
                     svala_i += 1
                 elif p_el.tag.startswith('c'):
                     target[-1]['space_after'] = True
-
 
     edge_ids = sorted(source_edge_ids) + sorted(target_edge_ids)
     edge_id = "e-" + "-".join(edge_ids)
@@ -161,6 +160,12 @@ def process_file(et, args):
     if os.path.exists(args.results_folder):
         shutil.rmtree(args.results_folder)
     os.mkdir(args.results_folder)
+    etree_source_documents = []
+    etree_target_documents = []
+    etree_source_paragraphs = []
+    etree_target_paragraphs = []
+
+    document_edges = []
     for div in et.iter('div'):
         bibl = div.find('bibl')
         file_name = bibl.get('n')
@@ -174,12 +179,12 @@ def process_file(et, args):
         svala_list = [[fname[:-13], fname] if 'problem' in fname else [fname[:-5], fname] for fname in os.listdir(svala_path)]
         svala_dict = {e[0]: e[1] for e in svala_list}
 
+        paragraph_edges = []
+
         paragraphs = div.findall('p')
         for paragraph in paragraphs:
             sentences = paragraph.findall('s')
             svala_i = 1
-
-
 
             # read json
             svala_file = os.path.join(svala_path, svala_dict[paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id']])
@@ -189,54 +194,68 @@ def process_file(et, args):
 
             etree_source_sentences = []
             etree_target_sentences = []
-            edges = []
+
+            sentence_edges = []
+
             for sentence_id, sentence in enumerate(sentences):
                 source = []
                 target = []
+                edges = []
 
                 sentence_id += 1
                 source_i = 1
                 target_i = 1
-                sentence_string_source_id = paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'] + f's.{sentence_id}'
-                sentence_string_target_id = paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'] + f't.{sentence_id}'
+                sentence_string_id = paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'] + f'.{sentence_id}'
                 for el in sentence:
                     if el.tag.startswith('w'):
-                        add_token(str(svala_i), source_i, target_i, el, source, target, edges, svala_data, sentence_string_source_id, sentence_string_target_id)
+                        add_token(str(svala_i), source_i, target_i, el, source, target, edges, svala_data, sentence_string_id)
                         svala_i += 1
                         source_i += 1
                         target_i += 1
                     elif el.tag.startswith('pc'):
-                        add_token(str(svala_i), source_i, target_i, el, source, target, edges, svala_data, sentence_string_source_id, sentence_string_target_id)
+                        add_token(str(svala_i), source_i, target_i, el, source, target, edges, svala_data, sentence_string_id)
                         svala_i += 1
                         source_i += 1
                         target_i += 1
                     elif el.tag.startswith('u'):
-                        svala_i, source_i, target_i = add_errors(svala_i, source_i, target_i, el, source, target, edges, svala_data, sentence_string_source_id, sentence_string_target_id)
+                        svala_i, source_i, target_i = add_errors(svala_i, source_i, target_i, el, source, target, edges, svala_data, sentence_string_id)
                     elif el.tag.startswith('c'):
-                        source[-1]['space_after'] = True
-                        target[-1]['space_after'] = True
+                        if len(source) > 0:
+                            source[-1]['space_after'] = True
+                        if len(target) > 0:
+                            target[-1]['space_after'] = True
+
+                sentence_edges.append(edges)
 
                 etree_source_sentences.append(construct_sentence_from_list(str(sentence_id), source))
                 etree_target_sentences.append(construct_sentence_from_list(str(sentence_id), target))
 
-            etree_source_paragraph = construct_paragraph_from_list(paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[1] + 's', etree_source_sentences)
-            etree_source_document = TeiDocument(paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[0], [etree_source_paragraph])
-            etree_source = build_tei_etrees([etree_source_document])
+            etree_source_paragraphs.append(construct_paragraph_from_list(paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[0], paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[1], etree_source_sentences))
+            etree_target_paragraphs.append(construct_paragraph_from_list(paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[0], paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[1], etree_target_sentences))
+            paragraph_edges.append(sentence_edges)
 
-            etree_target_paragraph = construct_paragraph_from_list(paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[1] + 't', etree_target_sentences)
-            etree_target_document = TeiDocument(paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[0], [etree_target_paragraph])
-            etree_target = build_tei_etrees([etree_target_document])
+        document_edges.append(paragraph_edges)
 
-            with open(os.path.join(args.results_folder, f"{paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id']}_source"), 'w') as sf:
-                sf.write(etree.tostring(etree_source[0], pretty_print=True, encoding='utf-8').decode())
+    etree_source_documents.append(TeiDocument(paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[0], etree_source_paragraphs))
+    etree_target_documents.append(TeiDocument(paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[0], etree_target_paragraphs))
 
-            with open(os.path.join(args.results_folder, f"{paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id']}_target"), 'w') as tf:
-                tf.write(etree.tostring(etree_target[0], pretty_print=True, encoding='utf-8').decode())
+    etree_source = build_tei_etrees(etree_source_documents)
+    etree_target = build_tei_etrees(etree_target_documents)
 
-            with open(os.path.join(args.results_folder, f"{paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id']}_errors"), 'w') as jf:
-                json.dump(edges, jf, ensure_ascii=False, indent="  ")
+    # TODO FIX THIS
+    etree_links = build_links(document_edges)
 
-        break
+    with open(os.path.join(args.results_folder, f"source.xml"), 'w') as sf:
+        sf.write(etree.tostring(etree_source[0], pretty_print=True, encoding='utf-8').decode())
+
+    with open(os.path.join(args.results_folder, f"target.xml"), 'w') as tf:
+        tf.write(etree.tostring(etree_target[0], pretty_print=True, encoding='utf-8').decode())
+
+    with open(os.path.join(args.results_folder, f"links.xml"), 'w') as tf:
+        tf.write(etree.tostring(etree_links, pretty_print=True, encoding='utf-8').decode())
+
+    with open(os.path.join(args.results_folder, f"links.json"), 'w') as jf:
+        json.dump(document_edges, jf, ensure_ascii=False, indent="  ")
 
 
 def main(args):
