@@ -121,11 +121,25 @@ def build_tei_etrees(documents):
         elements.append(document.as_xml())
     return elements
 
+def build_complete_tei(etree_source, etree_target, etree_links):
+    root = etree.Element('text')
+    group = etree.Element('group')
+    group.append(list(etree_source[0])[1])
+    group.append(list(etree_target[0])[1])
+    # link_text = etree.Element('text')
+    # link_body = etree.Element('body')
+    # link_body.append(etree_links)
+    # link_text.append(link_body)
+    group.append(etree_links)
+    root.append(group)
+
+    return root
 
 def build_links(all_edges):
-    root = etree.Element('TEI')
-    root.set('xmlns', 'http://www.tei-c.org/ns/1.0')
-    set_xml_attr(root, 'lang', 'sl')
+    root = etree.Element('text')
+    body = etree.Element('body')
+    # root.set('xmlns', 'http://www.tei-c.org/ns/1.0')
+    # set_xml_attr(root, 'lang', 'sl')
 
     # elements = []
     for document_edges in all_edges:
@@ -148,7 +162,8 @@ def build_links(all_edges):
             set_xml_attr(p, 'paragraph_id', '.'.join(random_id.split('.')[:2]))
             d.append(p)
         set_xml_attr(d, 'document_id', random_id.split('.')[0])
-        root.append(d)
+        body.append(d)
+    root.append(body)
     return root
 
 

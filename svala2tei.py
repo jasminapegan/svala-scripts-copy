@@ -9,7 +9,7 @@ from xml.etree import ElementTree
 from lxml import etree
 
 from src.create_tei import construct_tei_etrees, construct_tei_documents_from_list, construct_sentence_from_list, \
-    construct_paragraph_from_list, TeiDocument, build_tei_etrees, build_links
+    construct_paragraph_from_list, TeiDocument, build_tei_etrees, build_links, build_complete_tei
 
 logging.basicConfig(level=logging.INFO)
 
@@ -245,6 +245,8 @@ def process_file(et, args):
     # TODO FIX THIS
     etree_links = build_links(document_edges)
 
+    complete_etree = build_complete_tei(etree_source, etree_target, etree_links)
+
     with open(os.path.join(args.results_folder, f"source.xml"), 'w') as sf:
         sf.write(etree.tostring(etree_source[0], pretty_print=True, encoding='utf-8').decode())
 
@@ -253,6 +255,9 @@ def process_file(et, args):
 
     with open(os.path.join(args.results_folder, f"links.xml"), 'w') as tf:
         tf.write(etree.tostring(etree_links, pretty_print=True, encoding='utf-8').decode())
+
+    with open(os.path.join(args.results_folder, f"complete.xml"), 'w') as tf:
+        tf.write(etree.tostring(complete_etree, pretty_print=True, encoding='utf-8').decode())
 
     with open(os.path.join(args.results_folder, f"links.json"), 'w') as jf:
         json.dump(document_edges, jf, ensure_ascii=False, indent="  ")
