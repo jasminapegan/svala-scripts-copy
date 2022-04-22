@@ -1,19 +1,25 @@
 import argparse
 import re
 import sys
+from conversion_utils.jos_msds_and_properties import Converter, Msd
+from conversion_utils.translate_conllu_jos import get_syn_map
 
 from lxml import etree
 
 
 class Sentence:
-    def __init__(self, _id, no_ud=False):
+    def __init__(self, _id, no_ud=False, is_source=None):
         self._id = _id
         self.items = []
         self.links = []
         self.no_ud = no_ud
+        self.is_source = is_source
 
-    def add_item(self, word_id, token, lemma, upos, upos_other, xpos, misc):
-        self.items.append([word_id, token, lemma, upos, upos_other, xpos, "SpaceAfter=No" in misc.split('|')])
+        # JOS-SYN translations from English to Slovene
+        self.syn_map = get_syn_map()
+
+    def add_item(self, word_id, token, lemma, upos, upos_other, xpos, head, deprel, no_space_after, ner):
+        self.items.append([word_id, token, lemma, upos, upos_other, xpos, head, deprel, no_space_after, ner])
 
     def add_link(self, link_ref, link_type):
         self.links.append([link_ref, link_type])
@@ -26,36 +32,75 @@ class Sentence:
         base = etree.Element('s')
         set_xml_attr(base, 'id', xml_id)
 
+        linkGrp = etree.Element(f'linkGrp')
+        linkGrp.attrib[f'corresp'] = f'#{xml_id}'
+        linkGrp.attrib[f'targFunc'] = 'head argument'
+        linkGrp.attrib[f'type'] = 'JOS-SYN'
+
+        ner_seg = None
+
         for item in self.items:
-            word_id, token, lemma, upos, upos_other, xpos, no_space_after = item
+            word_id, token, lemma, upos, upos_other, xpos, head, deprel, no_space_after, ner = item
 
             if xpos in {'U', 'Z'}:  # hmm, safe only as long as U is unused in English tagset and Z in Slovenian one
                 to_add = etree.Element('pc')
             else:
                 to_add = etree.Element('w')
-                to_add.set('lemma', lemma)
 
             to_add.set('ana', 'mte:' + xpos)
             if not self.no_ud:
                 if upos_other != '_':
-                    to_add.set('msd', f'UposTag={upos}|{upos_other}')
+                    to_add.set('msd', f'UPosTag={upos}|{upos_other}')
                 else:
-                    to_add.set('msd', f'UposTag={upos}')
+                    to_add.set('msd', f'UPosTag={upos}')
 
-            set_xml_attr(to_add, 'id', word_id)
+            if xpos not in {'U', 'Z'}:
+                to_add.set('lemma', lemma)
+
+            set_xml_attr(to_add, 'id', "{}.{}".format(xml_id, word_id))
             to_add.text = token
 
             if no_space_after:
                 to_add.set('join', 'right')
 
-            base.append(to_add)
+            # handle ner subclass
+            if ner[0] == 'B':
+                if ner_seg is not None:
+                    base.append(ner_seg)
+                    del ner_seg
+
+                ner_seg = etree.Element('seg')
+                ner_seg.set('type', f'name')
+                ner_seg.set('subtype', f'{ner.split("-")[-1].lower()}')
+            elif ner[0] == 'O':
+                if ner_seg is not None:
+                    base.append(ner_seg)
+                    del ner_seg
+                    ner_seg = None
+
+            if ner_seg is None:
+                base.append(to_add)
+            else:
+                ner_seg.append(to_add)
+
+            # handle links
+            link = etree.Element(f'link')
+            link.attrib['ana'] = f'jos-syn:{self.syn_map[deprel]}'
+            link.attrib['target'] = f'#{xml_id}.{head} #{xml_id}.{word_id}' if head != 0 else f'#{xml_id} #{xml_id}.{word_id}'
+            linkGrp.append(link)
+
+        if ner_seg is not None:
+            base.append(ner_seg)
+
+        base.append(linkGrp)
 
         return base
 
 
 class Paragraph:
-    def __init__(self, _id, _doc_id):
+    def __init__(self, _id, _doc_id, is_source):
         self._id = _id if _id is not None else 'no-id'
+        _doc_id += 's' if is_source else 't'
         self._doc_id = _doc_id if _doc_id is not None else ''
         self.sentences = []
 
@@ -80,9 +125,9 @@ class Paragraph:
 
 
 class TeiDocument:
-    def __init__(self, _id, paragraphs=list()):
+    def __init__(self, _id, divs=list()):
         self._id = _id
-        self.paragraphs = paragraphs
+        self.divs = divs
 
     def as_xml(self):
         root = etree.Element('TEI')
@@ -97,8 +142,13 @@ class TeiDocument:
 
         text = etree.SubElement(root, 'text')
         body = etree.SubElement(text, 'body')
-        for para in self.paragraphs:
-            body.append(para.as_xml())
+        for paras, bibl in self.divs:
+            div = etree.Element('div')
+            set_xml_attr(div, 'id', xml_id)
+            div.append(bibl)
+            for para in paras:
+                div.append(para.as_xml())
+            body.append(div)
 
         encoding_desc = etree.SubElement(tei_header, 'encodingDesc')
         tags_decl = etree.SubElement(encoding_desc, 'tagsDecl')
@@ -115,56 +165,90 @@ class TeiDocument:
         self.paragraphs.append(paragraph)
 
 
+def convert_bibl(bibl):
+    etree_bibl = etree.Element('bibl')
+    etree_bibl.set('corresp', bibl.get('corresp'))
+    etree_bibl.set('n', bibl.get('n'))
+    for bibl_el in bibl:
+        etree_bibl_el = etree.Element(bibl_el.tag)
+        etree_bibl_el.text = bibl_el.text
+        for att, val in bibl_el.attrib.items():
+            if '{http://www.w3.org/XML/1998/namespace}' in att:
+                set_xml_attr(etree_bibl_el, att.split('{http://www.w3.org/XML/1998/namespace}')[-1], val)
+            else:
+                etree_bibl_el.set(att, val)
+        etree_bibl.append(etree_bibl_el)
+    return etree_bibl
+
+
 def build_tei_etrees(documents):
     elements = []
     for document in documents:
         elements.append(document.as_xml())
+        # b = elements[-1]
+        # a = list(b)
+        # c = list(b)[0]
+        # d = list(b)[1]
+        # for e in d:
+        #     for f in e:
+        #         for g in f:
+        #             print(g)
+        # d = list(b)[1]
     return elements
 
+
 def build_complete_tei(etree_source, etree_target, etree_links):
-    root = etree.Element('text')
+    root = etree.Element('TEI')
+    root.set('xmlns', 'http://www.tei-c.org/ns/1.0')
+    tei_header = etree.Element('teiHeader')
+    text = etree.Element('text')
     group = etree.Element('group')
     group.append(list(etree_source[0])[1])
     group.append(list(etree_target[0])[1])
-    # link_text = etree.Element('text')
-    # link_body = etree.Element('body')
-    # link_body.append(etree_links)
-    # link_text.append(link_body)
-    group.append(etree_links)
-    root.append(group)
-
+    text.append(group)
+    root.append(tei_header)
+    root.append(text)
+    # standoff = etree.Element('standOff')
+    # standoff.append(etree_links)
+    # root.append(standoff)
+    root.append(etree_links)
     return root
 
+
 def build_links(all_edges):
-    root = etree.Element('text')
-    body = etree.Element('body')
+    # root = etree.Element('text')
+    # body = etree.Element('body')
+    body = etree.Element('standOff')
     # root.set('xmlns', 'http://www.tei-c.org/ns/1.0')
     # set_xml_attr(root, 'lang', 'sl')
 
     # elements = []
     for document_edges in all_edges:
-        d = etree.Element('linkGrp')
+        # d = etree.Element('linkGrp')
         for paragraph_edges in document_edges:
-            p = etree.Element('linkGrp')
+            # p = etree.Element('linkGrp')
             for sentence_edges in paragraph_edges:
                 s = etree.Element('linkGrp')
+
                 random_id = ''
                 for token_edges in sentence_edges:
-                    link = etree.Element('link')
-                    link.set('labels', ' '.join(token_edges['labels']))
-                    link.set('sources', ' '.join(['#' + source for source in token_edges['source_ids']]))
-                    link.set('targets', ' '.join(['#' + source for source in token_edges['target_ids']]))
                     if not random_id:
                         random_id = token_edges['source_ids'][0] if len(token_edges['source_ids']) > 0 else token_edges['target_ids'][0]
+                        sentence_id = '.'.join(random_id.split('.')[:3])
+                    link = etree.Element('link')
+                    labels = '|'.join(token_edges['labels']) if len(token_edges['labels']) > 0 else 'ID'
+                    link.set('type', labels)
+                    link.set('target', ' '.join(['#' + source for source in token_edges['source_ids']] + ['#' + source for source in token_edges['target_ids']]))
+                    # link.set('target', ' '.join(['#' + source for source in token_edges['target_ids']]))
+
                     s.append(link)
-                set_xml_attr(s, 'sentence_id', '.'.join(random_id.split('.')[:3]))
-                p.append(s)
-            set_xml_attr(p, 'paragraph_id', '.'.join(random_id.split('.')[:2]))
-            d.append(p)
-        set_xml_attr(d, 'document_id', random_id.split('.')[0])
-        body.append(d)
-    root.append(body)
-    return root
+                s.set('type', 'CORR')
+                s.set('targFunc', 'orig reg')
+                s.set('corresp', f'#{sentence_id}')
+                # body.append(s)
+                body.append(s)
+    # root.append(body)
+    return body
 
 
 def set_xml_attr(node, attribute, value):
@@ -187,90 +271,8 @@ def is_metaline(line):
     return False
 
 
-def construct_tei_documents_from_list(object_list):
-    documents = []
-
-    doc_id = None
-    document_paragraphs = []
-
-    para_id = None
-    # para_buffer = []
-
-    # for line in object_list:
-    #     if is_metaline(line):
-    #         key, val = parse_metaline(line)
-    #         if key == 'newdoc id':
-    #             if len(para_buffer) > 0:
-    #                 document_paragraphs.append(construct_paragraph(para_id, para_buffer))
-    #             if len(document_paragraphs) > 0:
-    #                 documents.append(
-    #                     TeiDocument(doc_id, document_paragraphs))
-    #                 document_paragraphs = []
-    #             doc_id = val
-    #         elif key == 'newpar id':
-    #             if len(para_buffer) > 0:
-    #                 document_paragraphs.append(construct_paragraph(para_id, para_buffer))
-    #                 para_buffer = []
-    #             para_id = val
-    #         elif key == 'sent_id':
-    #             para_buffer.append(line)
-    #     else:
-    #         if not line.isspace():
-    #             para_buffer.append(line)
-
-    if len(object_list) > 0:
-        document_paragraphs.append(construct_paragraph(doc_id, para_id, object_list))
-
-    if len(document_paragraphs) > 0:
-        documents.append(
-            TeiDocument(doc_id, document_paragraphs))
-
-    return documents
-
-
-def construct_tei_documents(conllu_lines):
-    documents = []
-
-    doc_id = None
-    document_paragraphs = []
-
-    para_id = None
-    para_buffer = []
-
-    for line in conllu_lines:
-        if is_metaline(line):
-            key, val = parse_metaline(line)
-            if key == 'newdoc id':
-                if len(para_buffer) > 0:
-                    document_paragraphs.append(construct_paragraph(doc_id, para_id, para_buffer))
-                if len(document_paragraphs) > 0:
-                    documents.append(
-                        TeiDocument(doc_id, document_paragraphs))
-                    document_paragraphs = []
-                doc_id = val
-            elif key == 'newpar id':
-                if len(para_buffer) > 0:
-                    document_paragraphs.append(construct_paragraph(doc_id, para_id, para_buffer))
-                    para_buffer = []
-                para_id = val
-            elif key == 'sent_id':
-                para_buffer.append(line)
-        else:
-            if not line.isspace():
-                para_buffer.append(line)
-
-    if len(para_buffer) > 0:
-        document_paragraphs.append(construct_paragraph(doc_id, para_id, para_buffer))
-
-    if len(document_paragraphs) > 0:
-        documents.append(
-            TeiDocument(doc_id, document_paragraphs))
-
-    return documents
-
-
-def construct_paragraph_from_list(doc_id, para_id, etree_source_sentences):
-    para = Paragraph(para_id, doc_id)
+def construct_paragraph_from_list(doc_id, para_id, etree_source_sentences, source_id):
+    para = Paragraph(para_id, doc_id, source_id)
 
     for sentence in etree_source_sentences:
         para.add_sentence(sentence)
@@ -278,8 +280,8 @@ def construct_paragraph_from_list(doc_id, para_id, etree_source_sentences):
     return para
 
 
-def construct_paragraph(doc_id, para_id, conllu_lines):
-    para = Paragraph(para_id, doc_id)
+def construct_paragraph(doc_id, para_id, conllu_lines, is_source):
+    para = Paragraph(para_id, doc_id, is_source)
 
     sent_id = None
     sent_buffer = []
@@ -301,16 +303,20 @@ def construct_paragraph(doc_id, para_id, conllu_lines):
     return para
 
 
-def construct_sentence_from_list(sent_id, object_list):
-    sentence = Sentence(sent_id, no_ud=True)
+def construct_sentence_from_list(sent_id, object_list, is_source):
+    sentence = Sentence(sent_id)
+    converter = Converter()
     for tokens in object_list:
-        word_id = tokens['id']
-        token = tokens['token']
+        word_id = f"{tokens['id']}" if is_source else f"{tokens['id']}"
+        token = tokens['form']
         lemma = tokens['lemma']
-        upos = '_'
-        xpos = tokens['ana'][4:]
-        upos_other = '_'
-        misc = '_' if tokens['space_after'] else 'SpaceAfter=No'
+        upos = tokens['upos']
+        xpos = converter.properties_to_msd(converter.msd_to_properties(Msd(tokens['xpos'], 'en'), 'sl', lemma), 'sl').code
+        upos_other = '|'.join([f'{k}={v}' for k, v in tokens['feats'].items()]) if tokens['feats'] else '_'
+        head = tokens['head']
+        deprel = tokens['deprel']
+        no_space_after = 'SpaceAfter' in tokens['misc'] and tokens['misc']["SpaceAfter"] == "No"
+        ner = tokens['misc']['NER']
 
         sentence.add_item(
             word_id,
@@ -319,7 +325,11 @@ def construct_sentence_from_list(sent_id, object_list):
             upos,
             upos_other,
             xpos,
-            misc)
+            head,
+            deprel,
+            no_space_after,
+            ner
+        )
 
     return sentence
 
@@ -354,49 +364,3 @@ def construct_sentence(sent_id, lines):
             depparse_link_name)
     return sentence
 
-
-def construct_tei_etrees(conllu_lines):
-    documents = construct_tei_documents(conllu_lines)
-    return build_tei_etrees(documents)
-
-
-def convert_file(input_file_name, output_file_name):
-    input_file = open(input_file_name, 'r')
-    root = construct_tei_etrees(input_file)[0]
-    tree = etree.ElementTree(root)
-    tree.write(output_file_name, encoding='UTF-8', pretty_print=True)
-    input_file.close()
-
-    tree = etree.ElementTree(root)
-    tree.write(output_file_name, pretty_print=True, encoding='utf-8')
-
-
-system = 'jos'  # default (TODO: make this cleaner)
-
-if __name__ == '__main__':
-    import argparse
-    from glob import glob
-
-    parser = argparse.ArgumentParser(description='Convert CoNNL-U to TEI.')
-    parser.add_argument('files', nargs='+', help='CoNNL-U file')
-    parser.add_argument('-o', '--out-file', dest='out', default=None,
-                        help='Write output to file instead of stdout.')
-    parser.add_argument('-s', '--system', dest='system', default='jos', choices=['jos', 'ud'])
-
-    args = parser.parse_args()
-
-    if args.out:
-        f_out = open(args.out, 'w')
-    else:
-        f_out = sys.stdout
-
-    system = args.system
-
-    for arg in args.files:
-        filelist = glob(arg)
-        for f in filelist:
-            with open(f, 'r') as conllu_f:
-                tei_etrees = construct_tei_etrees(conllu_f)
-            for tei_etree in tei_etrees:
-                f_out.write(etree.tostring(tei_etree, pretty_print=True, encoding='utf-8').decode())
-                f_out.write('')

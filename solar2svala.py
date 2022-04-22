@@ -134,23 +134,36 @@ def add_errors(i, error, source, target, edges):
                                             for p_el_l5 in el_l5:
                                                 if p_el_l5.tag.startswith('w') or p_el_l5.tag.startswith('pc'):
                                                     word_combination_L5 += p_el_l5.text + " "
-            for p_el in el:
-                if p_el.tag.startswith('w') or p_el.tag.startswith('pc'):
-                    ind = str(i)
-
-                    target_id = "t" + ind
-                    target.append({"id": target_id, "text": p_el.text + " "})
-                    target_edge_ids.append(target_id)
-                    i += 1
+            # TODO NOT SURE IF THIS SHOULD BE COMMENTED! IF IT IS NOT THERE ARE ERRORS ON 2ND lvl of errors, where some words are duplicated
+            # for p_el in el:
+            #     if p_el.tag.startswith('w') or p_el.tag.startswith('pc'):
+            #         ind = str(i)
+            #
+            #         target_id = "t" + ind
+            #         target.append({"id": target_id, "text": p_el.text + " "})
+            #         target_edge_ids.append(target_id)
+            #         i += 1
 
     if word_combination_L1 == word_combination_L2 and word_combination_L2 is not None:
-        labels.append(label_L2)
+        if label_L2 not in labels:
+            labels.append(label_L2)
+        else:
+            print(f"REPEATING LABEL - {label_L2} in {error.attrib['{http://www.w3.org/XML/1998/namespace}id']} - ID {i}")
         if word_combination_L1 == word_combination_L3 and word_combination_L3 is not None:
-            labels.append(label_L3)
+            if label_L3 not in labels:
+                labels.append(label_L3)
+            else:
+                print(f"REPEATING LABEL - {label_L3} in {error.attrib['{http://www.w3.org/XML/1998/namespace}id']} - ID {i}")
             if word_combination_L1 == word_combination_L4 and word_combination_L4 is not None:
-                labels.append(label_L4)
+                if label_L4 not in labels:
+                    labels.append(label_L4)
+                else:
+                    print(f"REPEATING LABEL - {label_L4} in {error.attrib['{http://www.w3.org/XML/1998/namespace}id']} - ID {i}")
                 if word_combination_L1 == word_combination_L5 and word_combination_L5 is not None:
-                    labels.append(label_L5)
+                    if label_L5 not in labels:
+                        labels.append(label_L5)
+                    else:
+                        print(f"REPEATING LABEL - {label_L5} in {error.attrib['{http://www.w3.org/XML/1998/namespace}id']} - ID {i}")
                 elif word_combination_L5 is not None:
                     has_error = True
             elif word_combination_L4 is not None:
@@ -164,6 +177,29 @@ def add_errors(i, error, source, target, edges):
     edges[edge_id] = {"id": edge_id, "ids": edge_ids, "labels": labels, "manual": True}
 
     return i, has_error
+
+
+def save_file(paragraph_error, output_folder_loc, error_folder_loc, paragraph, dictionary, essay_problematic, dictionary_i):
+    if not paragraph_error:
+        if not os.path.exists(output_folder_loc):
+            os.mkdir(output_folder_loc)
+        if not os.path.exists(error_folder_loc):
+            os.mkdir(error_folder_loc)
+        file_name = paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'] + '.json' if dictionary_i == 1 else paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'] + '_P' + str(dictionary_i) + '.json'
+        with open(os.path.join(output_folder_loc, file_name), 'w') as wf:
+            json.dump(dictionary, wf, ensure_ascii=False, indent="")
+        with open(os.path.join(error_folder_loc, file_name), 'w') as wf:
+            json.dump(dictionary, wf, ensure_ascii=False, indent="")
+    else:
+        essay_problematic = True
+        if not os.path.exists(error_folder_loc):
+            os.mkdir(error_folder_loc)
+        file_name = paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'] + '_problem.json' if dictionary_i == 1 else paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'] + '_P' + str(dictionary_i) + '_problem.json'
+        with open(os.path.join(error_folder_loc, file_name),
+                  'w') as wf:
+            json.dump(dictionary, wf, ensure_ascii=False, indent="")
+
+    return essay_problematic
 
 
 def process_file(et, args):
@@ -186,6 +222,9 @@ def process_file(et, args):
         for paragraph in paragraphs:
             sentences = paragraph.findall('s')
             i = 1
+            dictionary_i = 1
+            dictionary = []
+
             source = []
             target = []
             edges = {}
@@ -203,23 +242,19 @@ def process_file(et, args):
                         if has_error:
                             paragraph_error = True
 
-            dictionary = {"source": source, "target": target, "edges": edges}
+                # add part of dictionary
+                if i > dictionary_i * 10000000000000:
+                    essay_problematic = save_file(paragraph_error, output_folder_loc, error_folder_loc, paragraph, {"source": source, "target": target, "edges": edges}, essay_problematic, dictionary_i)
+                    # dictionary.append({"source": source, "target": target, "edges": edges})
+                    dictionary_i += 1
+                    source = []
+                    target = []
+                    edges = {}
+                    paragraph_error = False
 
-            if not paragraph_error:
-                if not os.path.exists(output_folder_loc):
-                    os.mkdir(output_folder_loc)
-                if not os.path.exists(error_folder_loc):
-                    os.mkdir(error_folder_loc)
-                with open(os.path.join(output_folder_loc, paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'] + '.json'), 'w') as wf:
-                    json.dump(dictionary, wf, ensure_ascii=False, indent="")
-                with open(os.path.join(error_folder_loc, paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'] + '.json'), 'w') as wf:
-                    json.dump(dictionary, wf, ensure_ascii=False, indent="")
-            else:
-                essay_problematic = True
-                if not os.path.exists(error_folder_loc):
-                    os.mkdir(error_folder_loc)
-                with open(os.path.join(error_folder_loc, paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'] + '_problem.json'), 'w') as wf:
-                    json.dump(dictionary, wf, ensure_ascii=False, indent="")
+            # dictionary.append({"source": source, "target": target, "edges": edges})
+
+            essay_problematic = save_file(paragraph_error, output_folder_loc, error_folder_loc, paragraph, {"source": source, "target": target, "edges": edges}, essay_problematic, dictionary_i)
 
         if not essay_problematic:
             shutil.rmtree(error_folder_loc)
