@@ -230,11 +230,17 @@ def build_links(all_edges):
             for sentence_edges in paragraph_edges:
                 s = etree.Element('linkGrp')
 
-                random_id = ''
+                sentence_id = ''
                 for token_edges in sentence_edges:
-                    if not random_id:
-                        random_id = token_edges['source_ids'][0] if len(token_edges['source_ids']) > 0 else token_edges['target_ids'][0]
-                        sentence_id = '.'.join(random_id.split('.')[:3])
+                    if not sentence_id:
+                        if len(token_edges['source_ids']) > 0:
+                            random_source_id = token_edges['source_ids'][0]
+                            sentence_id += '.'.join(random_source_id.split('.')[:3])
+                        elif len(token_edges['target_ids']) > 0:
+                            random_target_id = token_edges['target_ids'][0]
+                            if len(token_edges['source_ids']) > 0:
+                                sentence_id += ' #'
+                            sentence_id += '.'.join(random_target_id.split('.')[:3])
                     link = etree.Element('link')
                     labels = '|'.join(token_edges['labels']) if len(token_edges['labels']) > 0 else 'ID'
                     link.set('type', labels)
