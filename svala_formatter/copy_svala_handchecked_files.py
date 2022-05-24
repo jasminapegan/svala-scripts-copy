@@ -38,12 +38,23 @@ def compare_files(corrected_file, original_file):
 def main(args):
     # create mapper to corrected files
     corrected_files_mapper = {}
+    filename_encountered = False
     for foldername in os.listdir(args.corrected_folder):
         orig_name = 'KUS' + foldername.split('KUS')[1]
+        # if orig_name == 'KUS-G-slo-4-GO-E-2009-10105':
+        #     filename_encountered = True
+        # if not filename_encountered:
+        #     continue
         corrected_files_mapper[orig_name] = foldername
 
+    filename_encountered = False
     for foldername in os.listdir(args.original_folder):
+        # if foldername == 'KUS-G-slo-4-GO-E-2009-10105':
+        #     filename_encountered = True
+        # if not filename_encountered:
+        #     continue
         for filename in os.listdir(os.path.join(args.original_folder, foldername)):
+            fixed = False
             of = os.path.join(args.original_folder, foldername, filename)
             copy_filename = filename
             if filename.endswith('_problem.json'):
@@ -55,12 +66,13 @@ def main(args):
             if filename.endswith('_problem.json'):
                 new_filename = filename[:-13] + '_popravljeno.json'
                 if os.path.exists(os.path.join(args.corrected_folder, corrected_files_mapper[foldername], new_filename)):
+                    fixed = True
                     filename = new_filename
             cf = os.path.join(args.corrected_folder, corrected_files_mapper[foldername], filename)
             cor_files = read_json(cf)
             ori_files = read_json(of)
             target, source = compare_files(cor_files, ori_files)
-            if target or source:
+            if target or source or fixed:
                 if not os.path.exists(cpfol):
                     os.mkdir(cpfol)
                 shutil.copyfile(cf, cpf)
