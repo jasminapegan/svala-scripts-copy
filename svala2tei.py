@@ -38,12 +38,41 @@ def add_edges(source_id, target_id, svala_data, edges, source_token_id, target_t
     labels = svala_data['edges'][edge_id]['labels']
     edges.append({'source_ids': [source_token_id], 'target_ids': [target_token_id], 'labels': labels})
 
+
+def create_edges_list(target_ids, links_ids_mapper):
+    target_edges = []
+    target_edges_set = []
+    for target_sentence in target_ids:
+        target_sentence_edges = []
+        for target_id in target_sentence:
+            target_sentence_edges.extend(links_ids_mapper[target_id])
+        target_edges.append(target_sentence_edges)
+        target_edges_set.append(set(target_sentence_edges))
+
+    return target_edges, target_edges_set
+
+
+SKIP_IDS = ['solar2284s.1.1.1']
+
 def create_edges(svala_data, source_par, target_par):
+    # if source_par and source_par[0]:
+    #     if source_par[0][0]['id'] in SKIP_IDS:
+    #         return []
+    #     # print(source_par[0][0]['id'])
+    #     if source_par[0][0]['id'] == 'solar2440s.5.1.1':
+    #         print('pause!')
+    # if target_par and target_par[0]:
+    #     print(target_par[0][0]['id'])
+    #     if target_par[0][0]['id'] == 'solar364t.5.1.1':
+    #         print('pause!')
     source_mapper = {el['svala_id']: el['id'] for source in source_par for el in source}
     target_mapper = {el['svala_id']: el['id'] for target in target_par for el in target}
 
-    source_ids = [el['svala_id'] for source in source_par for el in source]
-    target_ids = [el['svala_id'] for target in target_par for el in target]
+    # source_ids = [el['svala_id'] for source in source_par for el in source]
+    # target_ids = [el['svala_id'] for target in target_par for el in target]
+
+    source_ids = [[el['svala_id'] for el in source] for source in source_par]
+    target_ids = [[el['svala_id'] for el in target] for target in target_par]
 
     source_sentence_ids = [set([el['svala_id'] for el in source]) for source in source_par]
     target_sentence_ids = [set([el['svala_id'] for el in target]) for target in target_par]
@@ -51,6 +80,11 @@ def create_edges(svala_data, source_par, target_par):
     # create links to ids mapper
     links_ids_mapper = {}
     edges_of_one_type = set()
+
+    # delete empty edge
+    if 'e-' in svala_data['edges']:
+        del (svala_data['edges']['e-'])
+
     for k, v in svala_data['edges'].items():
         has_source = False
         has_target = False
@@ -65,43 +99,207 @@ def create_edges(svala_data, source_par, target_par):
             if el not in links_ids_mapper:
                 links_ids_mapper[el] = []
             links_ids_mapper[el].append(k)
-        if not has_source or not has_target:
+        if not has_source or not has_target or (len(svala_data['source']) == 1 and svala_data['source'][0]['text'] == ' ') \
+                or (len(svala_data['target']) == 1 and svala_data['target'][0]['text'] == ' '):
             edges_of_one_type.add(k)
 
+    # delete edge with space
+    save_deleted_edges = {}
+    if len(svala_data['source']) == 1 and svala_data['source'][0]['text'] == ' ':
+        for edg in links_ids_mapper[svala_data['source'][0]['id']]:
+            save_deleted_edges[edg] = svala_data['edges'][edg]
+            del (svala_data['edges'][edg])
+            del (links_ids_mapper[svala_data['source'][0]['id']])
+    if len(svala_data['target']) == 1 and svala_data['target'][0]['text'] == ' ':
+        for edg in links_ids_mapper[svala_data['target'][0]['id']]:
+            save_deleted_edges[edg] = svala_data['edges'][edg]
+            del (svala_data['edges'][edg])
+            del (links_ids_mapper[svala_data['target'][0]['id']])
 
     # create edge order
     edges_order = []
     edges_processed = set()
+    # active_source_sentence_i = 0
+    active_target_sentence_i = 0
     s_i = 0
     t_i = 0
-    check_s_i = True
-    while s_i < len(source_ids) or t_i < len(target_ids):
-        # take care of getting ids over desired s_i/t_i
-        if check_s_i and s_i >= len(source_ids):
-            check_s_i = False
 
-        if not check_s_i and t_i >= len(target_ids):
-            check_s_i = True
+    # create target edges
+    target_edges, target_edges_set = create_edges_list(target_ids, links_ids_mapper)
+    source_edges, source_edges_set = create_edges_list(source_ids, links_ids_mapper)
 
-        if check_s_i:
-            id_of_interest = source_ids[s_i]
-            s_i += 1
-            check_s_i = not check_s_i
-        else:
-            id_of_interest = target_ids[t_i]
-            t_i += 1
-            check_s_i = not check_s_i
+    last_target_edge = ''
 
-        any_addition = False
-        if id_of_interest not in links_ids_mapper:
-            print('NOOOOO')
-        for edge_id in links_ids_mapper[id_of_interest]:
-            if edge_id not in edges_processed and edge_id not in edges_of_one_type:
-                any_addition = True
-                edges_order.append(edge_id)
-                edges_processed.add(edge_id)
-        if not any_addition:
-            check_s_i = not check_s_i
+    for active_source_sentence_i, active_source_sentence in enumerate(source_edges):
+        for source_edge in active_source_sentence:
+            print(source_edge)
+            # if 'e-s261-t261' == source_edge:
+            #     print('aaa')
+            # if 'e-s253-s254-s255-s256-s257-s258-s259-s260' == source_edge:
+            #     print('aaa')
+            # if 'e-s252-t252' == source_edge:
+            #     print('aaa')
+            if source_edge in edges_of_one_type:
+                if source_edge not in edges_processed:
+                    edges_order.append(source_edge)
+                    edges_processed.add(source_edge)
+
+            elif target_edges_set and source_edge in target_edges_set[active_target_sentence_i]:
+                # if 'e-s120-t121' == source_edge:
+                #     print('aaa')
+                # if 'e-s119-t119' == source_edge:
+                #     print('aaa')
+                if source_edge not in edges_processed:
+                    edges_order.append(source_edge)
+                    edges_processed.add(source_edge)
+                last_target_edge = source_edge
+            # when source is connected to two targets
+            elif source_edge not in target_edges_set[active_target_sentence_i]:
+                # add missing edges from target
+                while source_edge not in target_edges_set[active_target_sentence_i]:
+                    for target_edge in target_edges[active_target_sentence_i]:
+                        if target_edge in edges_of_one_type:
+                            if target_edge not in edges_processed:
+                                edges_order.append(target_edge)
+                                edges_processed.add(target_edge)
+                            # if 'e-s411-s412-t413' == target_edge:
+                            #     print('nnnno')
+                            last_target_edge = target_edge
+                    active_target_sentence_i += 1
+                    # if active_target_sentence_i >= len(target_edges_set):
+                    #     break
+                    if source_edge in target_edges_set[active_target_sentence_i]:
+                        if source_edge not in edges_processed:
+                            edges_order.append(source_edge)
+                            edges_processed.add(source_edge)
+
+            else:
+                raise 'Impossible!!!'
+        if not target_edges_set or not target_edges_set[0] or active_target_sentence_i >= len(target_edges):
+            continue
+        # if last_target_edge == 'e-s197-t197':
+        #     print('HERE!')
+        if len(target_edges[active_target_sentence_i]) == 0:
+            active_target_sentence_i += 1
+            continue
+
+        # if last_target_edge == target_edges[active_target_sentence_i][-1] or (len(target_edges[active_target_sentence_i]) > 1 and last_target_edge == target_edges[active_target_sentence_i][-2] and target_edges[active_target_sentence_i][-1] in edges_of_one_type):
+        # (target_edges[active_target_sentence_i][-1] in edges_of_one_type or (target_edges[active_target_sentence_i][-1] not in edges_of_one_type and target_edges[active_target_sentence_i][-1] not in source_edges_set[active_source_sentence_i]))
+        # if last_target_edge == target_edges[active_target_sentence_i][-1] or (len(target_edges[active_target_sentence_i]) > 1 and last_target_edge == target_edges[active_target_sentence_i][-2] and last_target_edge in target_edges_set[active_target_sentence_i]):
+        if last_target_edge == target_edges[active_target_sentence_i][-1] or (len(target_edges[active_target_sentence_i]) > 1 and last_target_edge == target_edges[active_target_sentence_i][-2] and (target_edges[active_target_sentence_i][-1] in edges_of_one_type or (target_edges[active_target_sentence_i][-1] not in edges_of_one_type and target_edges[active_target_sentence_i][-1] in source_edges_set[active_source_sentence_i]))):
+            for target_edge in target_edges[active_target_sentence_i]:
+                if target_edge in edges_of_one_type:
+                    if target_edge not in edges_processed:
+                        edges_order.append(target_edge)
+                        edges_processed.add(target_edge)
+                    # if 'e-s243-t243' == target_edge:
+                    #     print('nnnno')
+                    last_target_edge = target_edge
+            active_target_sentence_i += 1
+            continue
+        target_edge_in_next_source_edge_sentence = False
+        for target_edge in target_edges[active_target_sentence_i]:
+            if active_source_sentence_i + 1 < len(source_edges_set) and target_edge in source_edges_set[active_source_sentence_i + 1]:
+                target_edge_in_next_source_edge_sentence = True
+                break
+        if target_edge_in_next_source_edge_sentence:
+            pass
+        elif not target_edge_in_next_source_edge_sentence:
+            target_edge_in_next_source_edge_sentence = False
+            while not target_edge_in_next_source_edge_sentence:
+                # if active_target_sentence_i >= len(target_edges_set):
+                #     break
+                for target_edge in target_edges[active_target_sentence_i]:
+                    if target_edge in edges_of_one_type:
+                        if target_edge not in edges_processed:
+                            edges_order.append(target_edge)
+                            edges_processed.add(target_edge)
+                        last_target_edge = target_edge
+
+                # if there is no next source sentence
+                if active_source_sentence_i + 1 >= len(source_edges_set):
+                    target_edge_in_next_source_edge_sentence = True
+
+                # if last_target_edge only in target stop regularly
+                if last_target_edge == target_edges[active_target_sentence_i][-1]:
+                    target_edge_in_next_source_edge_sentence = True
+
+                # test if target_edge in next source
+                for target_edge in target_edges[active_target_sentence_i]:
+                    if active_source_sentence_i + 1 < len(source_edges_set) and target_edge in source_edges_set[
+                        active_source_sentence_i + 1]:
+                        target_edge_in_next_source_edge_sentence = True
+                        break
+                active_target_sentence_i += 1
+
+    if not source_edges:
+        for active_target_sentence in target_edges:
+            for target_edge in active_target_sentence:
+                if target_edge not in edges_processed:
+                    edges_order.append(target_edge)
+                    edges_processed.add(target_edge)
+
+
+
+
+
+    # # create edge order
+    # edges_order = []
+    # edges_processed = set()
+    # s_i = 0
+    # t_i = 0
+    # check_s_i = True
+    # while s_i < len(source_ids) or t_i < len(target_ids):
+    #     # take care of getting ids over desired s_i/t_i
+    #     if check_s_i and s_i >= len(source_ids):
+    #         check_s_i = False
+    #
+    #     if not check_s_i and t_i >= len(target_ids):
+    #         check_s_i = True
+    #
+    #     if check_s_i:
+    #         id_of_interest = source_ids[s_i]
+    #         s_i += 1
+    #         check_s_i = not check_s_i
+    #     else:
+    #         id_of_interest = target_ids[t_i]
+    #         t_i += 1
+    #         check_s_i = not check_s_i
+    #
+    #     any_addition = False
+    #     if id_of_interest not in links_ids_mapper:
+    #         print('NOOOOO')
+    #     for edge_id in links_ids_mapper[id_of_interest]:
+    #         if edge_id not in edges_processed:
+    #             if edge_id not in edges_of_one_type:
+    #                 any_addition = True
+    #             edges_order.append(edge_id)
+    #             edges_processed.add(edge_id)
+    #     if not any_addition:
+    #         check_s_i = not check_s_i
+
+    # # DEBUG stuff
+    # for edge_order in edges_order:
+    #     if edges_order.count(edge_order) > 1:
+    #     # if edge_order not in a:
+    #         print(f'ERROR {edge_order}')
+    #
+    # for edge_order in edges_order:
+    #     if edge_order not in svala_data['edges']:
+    #         print(f'ERROR {edge_order}')
+    #
+    # for key in svala_data['edges'].keys():
+    #     if key not in edges_order:
+    #         print(f'ERROR {key}')
+    #
+    # a = len(svala_data['edges'])
+    # b = len(edges_order)
+    if len(svala_data['edges']) != len(edges_order):
+        for k, v in save_deleted_edges.items():
+            svala_data['edges'][k] = v
+
+
+    assert len(svala_data['edges']) == len(edges_order)
 
     sentence_edges = []
     source_sent_id = 0
@@ -120,6 +318,8 @@ def create_edges(svala_data, source_par, target_par):
         if not source_ok_all:
             source_sent_id += 1
 
+        if edge_id == 'e-s590-t590':
+            print(edge_id)
         target_ok = [el[0] == 's' or el in target_sentence_ids[target_sent_id] for el in ids] if target_sentence_ids else []
         target_ok_all = all(target_ok)
 
@@ -130,6 +330,9 @@ def create_edges(svala_data, source_par, target_par):
             sentence_edges.append(edges)
             edges = []
         edges.append({'source_ids': source_ids, 'target_ids': target_ids, 'labels': labels})
+
+    if edges:
+        sentence_edges.append(edges)
 
     return sentence_edges
 
@@ -612,12 +815,14 @@ def process_solar2_paragraph(sentences, paragraph, svala_i, svala_data, add_erro
 
     sentence_edges = create_edges(svala_data, par_source, par_target)
 
-    return etree_source_sentences, etree_target_sentences, sentence_edges
+    return etree_source_sentences, etree_target_sentences, sentence_edges, complete_source_conllu, complete_target_conllu
 
 
 def read_raw_text(path):
     with open(path, 'r') as rf:
         return rf.read()
+
+HAND_FIXES = {'§§§pisala': ['§', '§', '§', 'pisala'], '§§§poldne': ['§', '§', '§', 'poldne'], '§§§o': ['§', '§', '§', 'o'], '§§§mimi': ['§', '§', '§', 'mimi'], '§§§nil': ['§', '§', '§', 'nil'], '§§§ela': ['§', '§', '§', 'ela'], 'sam§§§': ['sam', '§', '§', '§'], 'globač§§§': ['globač', '§', '§', '§'], 'sin.': ['sin', '.'],  '§§§oveduje': ['§', '§', '§', 'oveduje'],  'na§§§': ['na', '§', '§', '§'], '§§§ka§§§': ['§', '§', '§', 'ka', '§', '§', '§'], '§§§e§§§': ['§', '§', '§', 'e', '§', '§', '§'], '§§§': ['§', '§', '§'], 'ljubezni.': ['ljubezni', '.'], '12.': ['12', '.'], '16.': ['16', '.'], 'st.': ['st', '.'], 'S.': ['S', '.'], 'pr.': ['pr', '.'], 'n.': ['n', '.'], '19:30': ['19', ':', '30'], '9.': ['9', '.'], '6:35': ['6', ':', '35'], 'itd.': ['itd', '.'], 'Sv.': ['Sv', '.'], 'npr.': ['npr', '.'], 'sv.': ['sv', '.'], '12:00': ['12', ':', '00'], "sram'vali": ['sram', "'", 'vali'], '18:00': ['18', ':', '00'], 'J.': ['J', '.'], '5:45': ['5', ':', '45'], '17.': ['17', '.'], '9.00h': ['9', '.', '00h'], 'H.': ['H', '.'], '1.': ['1', '.'], '6.': ['6', '.'], '7:10': ['7', ':', '10'], 'g.': ['g', '.'], 'Oz.': ['Oz', '.'], '20:00': ['20', ':', '00'], '17.4.2010': ['17.', '4.', '2010'], 'ga.': ['ga', '.'], 'prof.': ['prof', '.'], '6:45': ['6', ':', '45'], '19.': ['19', '.'], '3.': ['3', '.'], 'tj.': ['tj', '.'], 'Prof.': ['Prof', '.'], '8.': ['8', '.'], '9:18': ['9', ':', '18'], 'ipd.': ['ipd', '.'], '7.': ['7', '.'], 'št.': ['št', '.'], 'oz.': ['oz', '.'], 'R.': ['R', '.'], '13:30': ['13', ':', '30'], '5.': ['5', '.']}
 
 def map_svala_tokenized(svala_data_part, tokenized_paragraph):
     paragraph_res = []
@@ -632,15 +837,37 @@ def map_svala_tokenized(svala_data_part, tokenized_paragraph):
                 assert tok['misc'] == 'SpaceAfter=No'
             space_after = not 'misc' in tok
             if svala_data_part[svala_data_i]['text'].strip() != tok['text']:
-                if tok['text'] == '§' and svala_data_part[svala_data_i]['text'].strip() == '§§§':
+                key = svala_data_part[svala_data_i]['text'].strip()
+                if key not in HAND_FIXES:
+                    print(f'key: {key} ; tok[text]: {tok["text"]}')
+                    if key.startswith('§§§') and key.endswith('§§§'):
+                        HAND_FIXES[key] = ['§', '§', '§', key[3:-3], '§', '§', '§']
+                    elif key.startswith('§§§'):
+                        HAND_FIXES[key] = ['§', '§', '§', key[3:]]
+                    elif key.endswith('§§§'):
+                        HAND_FIXES[key] = [key[:-3], '§', '§', '§']
+                    else:
+                        raise 'Word mismatch!'
+
+                if tok['text'] == HAND_FIXES[key][wierd_sign_count]:
                     wierd_sign_count += 1
-                    if wierd_sign_count < 3:
+                    if wierd_sign_count < len(HAND_FIXES[key]):
                         continue
                     else:
-                        tok['text'] = '§§§'
+                        tok['text'] = key
                         wierd_sign_count = 0
                 else:
+                    print(f'key: {key} ; tok[text]: {tok["text"]}')
                     raise 'Word mismatch!'
+                # if tok['text'] == '§' and svala_data_part[svala_data_i]['text'].strip() == '§§§':
+                #     wierd_sign_count += 1
+                #     if wierd_sign_count < 3:
+                #         continue
+                #     else:
+                #         tok['text'] = '§§§'
+                #         wierd_sign_count = 0
+                # else:
+                #     raise 'Word mismatch!'
             sentence_id += 1
             sentence_res.append({'token': tok['text'], 'tag': tag, 'id': sentence_id, 'space_after': space_after, 'svala_id': svala_data_part[svala_data_i]['id']})
             svala_data_i += 1
@@ -684,13 +911,13 @@ def process_obeliks_paragraph(sentences, paragraph, svala_i, svala_data, add_err
     sentence_edges = []
     if source_raw_text is not None:
         text = read_raw_text(source_raw_text)
-        raw_text, source_tokenized, metadocument = nlp_tokenize.processors['tokenize']._tokenizer.tokenize(text) if text else [], [], []
+        raw_text, source_tokenized, metadocument = nlp_tokenize.processors['tokenize']._tokenizer.tokenize(text) if text else ([], [], [])
         # source_tokenized = nlp_tokenize()
         source_res = map_svala_tokenized(svala_data['source'], source_tokenized)
 
     if target_raw_text is not None:
         text = read_raw_text(target_raw_text)
-        raw_text, target_tokenized, metadocument = nlp_tokenize.processors['tokenize']._tokenizer.tokenize(text) if text else [], [], []
+        raw_text, target_tokenized, metadocument = nlp_tokenize.processors['tokenize']._tokenizer.tokenize(text) if text else ([], [], [])
         target_res = map_svala_tokenized(svala_data['target'], target_tokenized)
 
     # TODO RETURN IF SOURCE AND TARGET ARE NOT NONE
@@ -798,7 +1025,7 @@ def process_obeliks_paragraph(sentences, paragraph, svala_i, svala_data, add_err
 
     sentence_edges = create_edges(svala_data, par_source, par_target)
 
-    return etree_source_sentences, etree_target_sentences, sentence_edges
+    return etree_source_sentences, etree_target_sentences, sentence_edges, complete_source_conllu, complete_target_conllu
 
 def process_file(et, args, nlp, nlp_tokenize):
     if os.path.exists(args.results_folder):
@@ -823,9 +1050,13 @@ def process_file(et, args, nlp, nlp_tokenize):
         print(f'{i*100/folders_count} % : {file_name}')
         i += 1
         # if file_name == 'S20-PI-slo-2-SG-D-2016_2017-30479-12.txt':
-        #     filename_encountered = True
-        # if not filename_encountered:
-        #     continue
+        # if file_name == 'KUS-G-slo-1-LJ-E-2009_2010-10602':
+        if i*100/folders_count > 40:
+            filename_encountered = True
+        # if i*100/folders_count > 50:
+        #     filename_encountered = False
+        if not filename_encountered:
+            continue
 
         svala_path = os.path.join(args.svala_folder, file_name)
         corrected_svala_path = os.path.join(args.corrected_svala_folder, file_name)
@@ -871,11 +1102,11 @@ def process_file(et, args, nlp, nlp_tokenize):
             target_raw_text = os.path.join(raw_texts_path, target_filename) if os.path.exists(os.path.join(raw_texts_path, target_filename)) else None
 
             if not (source_raw_text or target_raw_text):
-                etree_source_sentences, etree_target_sentences, sentence_edges = process_solar2_paragraph(sentences, paragraph, svala_i, svala_data, add_errors_func, nlp,
+                etree_source_sentences, etree_target_sentences, sentence_edges, complete_source_conllu, complete_target_conllu = process_solar2_paragraph(sentences, paragraph, svala_i, svala_data, add_errors_func, nlp,
                                          complete_source_conllu, complete_target_conllu)
 
             else:
-                etree_source_sentences, etree_target_sentences, sentence_edges = process_obeliks_paragraph(sentences, paragraph, svala_i,
+                etree_source_sentences, etree_target_sentences, sentence_edges, complete_source_conllu, complete_target_conllu = process_obeliks_paragraph(sentences, paragraph, svala_i,
                                                                                                           svala_data, add_errors_func, nlp, complete_source_conllu, complete_target_conllu, source_raw_text, target_raw_text, nlp_tokenize)
 
             etree_source_paragraphs.append(construct_paragraph_from_list(paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[0], paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[1], etree_source_sentences, True))
@@ -899,10 +1130,7 @@ def process_file(et, args, nlp, nlp_tokenize):
     print('BUILDING LINKS...')
     etree_links = build_links(document_edges)
 
-    print('BUILDING COMPLETE TEI...')
-    complete_etree = build_complete_tei(copy.deepcopy(etree_source), copy.deepcopy(etree_target), etree_links)
-
-    print('WRITING FILES')
+    print('Writting all but complete')
     with open(os.path.join(args.results_folder, f"source.conllu"), 'w') as sf:
         sf.write(complete_source_conllu)
 
@@ -918,11 +1146,34 @@ def process_file(et, args, nlp, nlp_tokenize):
     with open(os.path.join(args.results_folder, f"links.xml"), 'w') as tf:
         tf.write(etree.tostring(etree_links, pretty_print=True, encoding='utf-8').decode())
 
+    with open(os.path.join(args.results_folder, f"links.json"), 'w') as jf:
+        json.dump(document_edges, jf, ensure_ascii=False, indent="  ")
+
+    # TODO STUCKS HERE
+    print('COMPLETE TREE CREATION...')
+    complete_etree = build_complete_tei(copy.deepcopy(etree_source), copy.deepcopy(etree_target), etree_links)
+
+    print('WRITING FILES')
+    # with open(os.path.join(args.results_folder, f"source.conllu"), 'w') as sf:
+    #     sf.write(complete_source_conllu)
+    #
+    # with open(os.path.join(args.results_folder, f"target.conllu"), 'w') as sf:
+    #     sf.write(complete_target_conllu)
+    #
+    # with open(os.path.join(args.results_folder, f"source.xml"), 'w') as sf:
+    #     sf.write(etree.tostring(etree_source[0], pretty_print=True, encoding='utf-8').decode())
+    #
+    # with open(os.path.join(args.results_folder, f"target.xml"), 'w') as tf:
+    #     tf.write(etree.tostring(etree_target[0], pretty_print=True, encoding='utf-8').decode())
+    #
+    # with open(os.path.join(args.results_folder, f"links.xml"), 'w') as tf:
+    #     tf.write(etree.tostring(etree_links, pretty_print=True, encoding='utf-8').decode())
+
     with open(os.path.join(args.results_folder, f"complete.xml"), 'w') as tf:
         tf.write(etree.tostring(complete_etree, pretty_print=True, encoding='utf-8').decode())
 
-    with open(os.path.join(args.results_folder, f"links.json"), 'w') as jf:
-        json.dump(document_edges, jf, ensure_ascii=False, indent="  ")
+    # with open(os.path.join(args.results_folder, f"links.json"), 'w') as jf:
+    #     json.dump(document_edges, jf, ensure_ascii=False, indent="  ")
 
 
 def main(args):
@@ -946,6 +1197,8 @@ if __name__ == '__main__':
     parser.add_argument('--results_folder', default='data/results/solar3.0',
                         help='input file in (gz or xml currently). If none, then just database is loaded')
     parser.add_argument('--svala_generated_text_folder', default='data/svala_generated_text.formatted',
+                        help='input file in (gz or xml currently). If none, then just database is loaded')
+    parser.add_argument('--raw_conllu_interprocessing', default='data/processing.raw_conllu',
                         help='input file in (gz or xml currently). If none, then just database is loaded')
     args = parser.parse_args()
 

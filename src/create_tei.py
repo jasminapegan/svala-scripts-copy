@@ -198,20 +198,29 @@ def build_tei_etrees(documents):
 
 
 def build_complete_tei(etree_source, etree_target, etree_links):
+    print('P1')
     root = etree.Element('TEI')
     root.set('xmlns', 'http://www.tei-c.org/ns/1.0')
+    print('P2')
     tei_header = etree.Element('teiHeader')
     text = etree.Element('text')
     group = etree.Element('group')
+    print('P3')
     group.append(list(etree_source[0])[1])
+    print('P4')
     group.append(list(etree_target[0])[1])
+    print('P5')
     text.append(group)
+    print('P6')
     root.append(tei_header)
+    print('P7')
     root.append(text)
+    print('P8')
     # standoff = etree.Element('standOff')
     # standoff.append(etree_links)
     # root.append(standoff)
     root.append(etree_links)
+    print('P9')
     return root
 
 
