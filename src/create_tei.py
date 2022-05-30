@@ -142,14 +142,6 @@ class TeiDocument:
 
         text = etree.SubElement(root, 'text')
         body = etree.SubElement(text, 'body')
-        for paras, bibl in self.divs:
-            div = etree.Element('div')
-            set_xml_attr(div, 'id', xml_id)
-            div.append(bibl)
-            for para in paras:
-                div.append(para.as_xml())
-            body.append(div)
-
         encoding_desc = etree.SubElement(tei_header, 'encodingDesc')
         tags_decl = etree.SubElement(encoding_desc, 'tagsDecl')
         namespace = etree.SubElement(tags_decl, 'namespace')
@@ -159,6 +151,16 @@ class TeiDocument:
             tag_usage = etree.SubElement(namespace, 'tagUsage')
             tag_usage.set('gi', tag)
             tag_usage.set('occurs', str(count))
+
+        for paras, bibl, div_id in self.divs:
+            div = etree.Element('div')
+            set_xml_attr(div, 'id', div_id)
+            div.append(bibl)
+            for para in paras:
+                div.append(para.as_xml())
+            body.append(div)
+
+
         return root
 
     def add_paragraph(self, paragraph):
@@ -245,7 +247,7 @@ def build_links(all_edges):
                         if len(token_edges['source_ids']) > 0:
                             random_source_id = token_edges['source_ids'][0]
                             sentence_id += '.'.join(random_source_id.split('.')[:3])
-                        elif len(token_edges['target_ids']) > 0:
+                        if len(token_edges['target_ids']) > 0:
                             random_target_id = token_edges['target_ids'][0]
                             if len(token_edges['source_ids']) > 0:
                                 sentence_id += ' #'

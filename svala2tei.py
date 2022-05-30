@@ -2,6 +2,7 @@ import argparse
 import json
 import logging
 import os
+import pickle
 import shutil
 import time
 from xml.etree import ElementTree
@@ -55,9 +56,9 @@ def create_edges_list(target_ids, links_ids_mapper):
 SKIP_IDS = ['solar2284s.1.1.1']
 
 def create_edges(svala_data, source_par, target_par):
-    # if source_par and source_par[0]:
-    #     if source_par[0][0]['id'] in SKIP_IDS:
-    #         return []
+    if source_par and source_par[0]:
+        if source_par[0][0]['id'] in SKIP_IDS:
+            return []
     #     # print(source_par[0][0]['id'])
     #     if source_par[0][0]['id'] == 'solar2440s.5.1.1':
     #         print('pause!')
@@ -132,8 +133,8 @@ def create_edges(svala_data, source_par, target_par):
 
     for active_source_sentence_i, active_source_sentence in enumerate(source_edges):
         for source_edge in active_source_sentence:
-            print(source_edge)
-            # if 'e-s261-t261' == source_edge:
+            # print(source_edge)
+            # if 'e-s7-t8' == source_edge:
             #     print('aaa')
             # if 'e-s253-s254-s255-s256-s257-s258-s259-s260' == source_edge:
             #     print('aaa')
@@ -145,8 +146,7 @@ def create_edges(svala_data, source_par, target_par):
                     edges_processed.add(source_edge)
 
             elif target_edges_set and source_edge in target_edges_set[active_target_sentence_i]:
-                # if 'e-s120-t121' == source_edge:
-                #     print('aaa')
+
                 # if 'e-s119-t119' == source_edge:
                 #     print('aaa')
                 if source_edge not in edges_processed:
@@ -318,8 +318,8 @@ def create_edges(svala_data, source_par, target_par):
         if not source_ok_all:
             source_sent_id += 1
 
-        if edge_id == 'e-s590-t590':
-            print(edge_id)
+        # if edge_id == 'e-s590-t590':
+        #     print(edge_id)
         target_ok = [el[0] == 's' or el in target_sentence_ids[target_sent_id] for el in ids] if target_sentence_ids else []
         target_ok_all = all(target_ok)
 
@@ -746,7 +746,7 @@ def create_conllu(interest_list, sentence_string_id):
     return conllu_result.serialize()
 
 
-def process_solar2_paragraph(sentences, paragraph, svala_i, svala_data, add_errors_func, nlp, complete_source_conllu, complete_target_conllu):
+def process_solar2_paragraph(sentences, paragraph, svala_i, svala_data, add_errors_func):
     etree_source_sentences = []
     etree_target_sentences = []
 
@@ -754,6 +754,9 @@ def process_solar2_paragraph(sentences, paragraph, svala_i, svala_data, add_erro
 
     par_source = []
     par_target = []
+
+    source_conllus = []
+    target_conllus = []
 
     for sentence_id, sentence in enumerate(sentences):
         source = []
@@ -788,34 +791,40 @@ def process_solar2_paragraph(sentences, paragraph, svala_i, svala_data, add_erro
         par_target.append(target)
 
         # sentence_edges.append(edges)
+        source_conllu = ''
         if len(source) > 0:
             source_conllu = create_conllu(source, sentence_string_id)
+        target_conllu = ''
         if len(target) > 0:
             target_conllu = create_conllu(target, sentence_string_id)
 
-        if len(source) > 0:
-            source_conllu_annotated = nlp(source_conllu).to_conll()
-        if len(target) > 0:
-            target_conllu_annotated = nlp(target_conllu).to_conll()
+        source_conllus.append(source_conllu)
+        target_conllus.append(target_conllu)
 
-        if len(source) > 0:
-            complete_source_conllu += source_conllu_annotated
-        if len(target) > 0:
-            complete_target_conllu += target_conllu_annotated
-
-        if len(source) > 0:
-            source_conllu_parsed = conllu.parse(source_conllu_annotated)[0]
-        if len(target) > 0:
-            target_conllu_parsed = conllu.parse(target_conllu_annotated)[0]
-
-        if len(source) > 0:
-            etree_source_sentences.append(construct_sentence_from_list(str(sentence_id), source_conllu_parsed, True))
-        if len(target) > 0:
-            etree_target_sentences.append(construct_sentence_from_list(str(sentence_id), target_conllu_parsed, False))
+        # if len(source) > 0:
+        #     source_conllu_annotated = nlp(source_conllu).to_conll()
+        # if len(target) > 0:
+        #     target_conllu_annotated = nlp(target_conllu).to_conll()
+        #
+        # if len(source) > 0:
+        #     complete_source_conllu += source_conllu_annotated
+        # if len(target) > 0:
+        #     complete_target_conllu += target_conllu_annotated
+        #
+        # if len(source) > 0:
+        #     source_conllu_parsed = conllu.parse(source_conllu_annotated)[0]
+        # if len(target) > 0:
+        #     target_conllu_parsed = conllu.parse(target_conllu_annotated)[0]
+        #
+        # if len(source) > 0:
+        #     etree_source_sentences.append(construct_sentence_from_list(str(sentence_id), source_conllu_parsed, True))
+        # if len(target) > 0:
+        #     etree_target_sentences.append(construct_sentence_from_list(str(sentence_id), target_conllu_parsed, False))
 
     sentence_edges = create_edges(svala_data, par_source, par_target)
 
-    return etree_source_sentences, etree_target_sentences, sentence_edges, complete_source_conllu, complete_target_conllu
+    # return etree_source_sentences, etree_target_sentences, sentence_edges, complete_source_conllu, complete_target_conllu
+    return sentence_edges, source_conllus, target_conllus
 
 
 def read_raw_text(path):
@@ -904,9 +913,9 @@ def update_ids(pretag, in_list):
         el['id'] = f'{pretag}.{el["id"]}'
 
 
-def process_obeliks_paragraph(sentences, paragraph, svala_i, svala_data, add_errors_func, nlp, complete_source_conllu, complete_target_conllu, source_raw_text, target_raw_text, nlp_tokenize):
-    etree_source_sentences = []
-    etree_target_sentences = []
+def process_obeliks_paragraph(sentences, paragraph, svala_i, svala_data, add_errors_func, source_raw_text, target_raw_text, nlp_tokenize):
+    # etree_source_sentences = []
+    # etree_target_sentences = []
 
     sentence_edges = []
     if source_raw_text is not None:
@@ -924,6 +933,8 @@ def process_obeliks_paragraph(sentences, paragraph, svala_i, svala_data, add_err
     par_source = []
     par_target = []
     sentences_len = len(sentences)
+    source_conllus = []
+    target_conllus = []
     if source_raw_text is not None:
         sentences_len = max(sentences_len, len(source_res))
     if target_raw_text is not None:
@@ -982,6 +993,7 @@ def process_obeliks_paragraph(sentences, paragraph, svala_i, svala_data, add_err
             source = source_res[sentence_id - 1]
             update_ids(f'{sentence_string_id_split[0]}s.{".".join(sentence_string_id_split[1:])}', source)
             par_source.append(source)
+        source_conllu = ''
         if len(source) > 0:
             source_conllu = create_conllu(source, sentence_string_id)
         if target_raw_text is not None and sentence_id - 1 < len(target_res):
@@ -994,28 +1006,31 @@ def process_obeliks_paragraph(sentences, paragraph, svala_i, svala_data, add_err
         if target_raw_text is None:
             par_target.append(target)
 
+        target_conllu = ''
         if len(target) > 0:
             target_conllu = create_conllu(target, sentence_string_id)
 
-        if len(source) > 0:
-            source_conllu_annotated = nlp(source_conllu).to_conll()
-        if len(target) > 0:
-            target_conllu_annotated = nlp(target_conllu).to_conll()
-
-        if len(source) > 0:
-            complete_source_conllu += source_conllu_annotated
-        if len(target) > 0:
-            complete_target_conllu += target_conllu_annotated
-
-        if len(source) > 0:
-            source_conllu_parsed = conllu.parse(source_conllu_annotated)[0]
-        if len(target) > 0:
-            target_conllu_parsed = conllu.parse(target_conllu_annotated)[0]
-
-        if len(source) > 0:
-            etree_source_sentences.append(construct_sentence_from_list(str(sentence_id), source_conllu_parsed, True))
-        if len(target) > 0:
-            etree_target_sentences.append(construct_sentence_from_list(str(sentence_id), target_conllu_parsed, False))
+        source_conllus.append(source_conllu)
+        target_conllus.append(target_conllu)
+        # if len(source) > 0:
+        #     source_conllu_annotated = nlp(source_conllu).to_conll()
+        # if len(target) > 0:
+        #     target_conllu_annotated = nlp(target_conllu).to_conll()
+        #
+        # if len(source) > 0:
+        #     complete_source_conllu += source_conllu_annotated
+        # if len(target) > 0:
+        #     complete_target_conllu += target_conllu_annotated
+        #
+        # if len(source) > 0:
+        #     source_conllu_parsed = conllu.parse(source_conllu_annotated)[0]
+        # if len(target) > 0:
+        #     target_conllu_parsed = conllu.parse(target_conllu_annotated)[0]
+        #
+        # if len(source) > 0:
+        #     etree_source_sentences.append(construct_sentence_from_list(str(sentence_id), source_conllu_parsed, True))
+        # if len(target) > 0:
+        #     etree_target_sentences.append(construct_sentence_from_list(str(sentence_id), target_conllu_parsed, False))
 
     # reannotate svala_ids
     if source_raw_text is None:
@@ -1025,24 +1040,28 @@ def process_obeliks_paragraph(sentences, paragraph, svala_i, svala_data, add_err
 
     sentence_edges = create_edges(svala_data, par_source, par_target)
 
-    return etree_source_sentences, etree_target_sentences, sentence_edges, complete_source_conllu, complete_target_conllu
+    return sentence_edges, source_conllus, target_conllus
 
-def process_file(et, args, nlp, nlp_tokenize):
-    if os.path.exists(args.results_folder):
-        shutil.rmtree(args.results_folder)
-    os.mkdir(args.results_folder)
-    etree_source_documents = []
-    etree_target_documents = []
-    etree_source_divs = []
-    etree_target_divs = []
+def tokenize(args):
+    if os.path.exists(args.tokenization_interprocessing) and not args.overwrite_tokenization:
+        print('READING AND MERGING...')
+        with open(args.tokenization_interprocessing, 'rb') as rp:
+            tokenized_source_divs, tokenized_target_divs, document_edges = pickle.load(rp)
+            return tokenized_source_divs, tokenized_target_divs, document_edges
 
-    complete_source_conllu = ''
-    complete_target_conllu = ''
+    print('TOKENIZING...')
+    with open(args.solar_file, 'r') as fp:
+        logging.info(args.solar_file)
+        et = ElementTree.XML(fp.read())
 
-    document_edges = []
+    nlp_tokenize = classla.Pipeline('sl', processors='tokenize', pos_lemma_pretag=True)
     filename_encountered = False
     i = 0
     folders_count = 5484
+    tokenized_source_divs = []
+    tokenized_target_divs = []
+    document_edges = []
+
     for div in et.iter('div'):
         bibl = div.find('bibl')
         file_name = bibl.get('n')
@@ -1050,13 +1069,13 @@ def process_file(et, args, nlp, nlp_tokenize):
         print(f'{i*100/folders_count} % : {file_name}')
         i += 1
         # if file_name == 'S20-PI-slo-2-SG-D-2016_2017-30479-12.txt':
-        # if file_name == 'KUS-G-slo-1-LJ-E-2009_2010-10602':
-        if i*100/folders_count > 40:
-            filename_encountered = True
-        # if i*100/folders_count > 50:
-        #     filename_encountered = False
-        if not filename_encountered:
-            continue
+        # if file_name == 'KUS-OS-slo-8-KR-R-2010-40088':
+        # # if i*100/folders_count > 40:
+        #     filename_encountered = True
+        # # if i*100/folders_count > 41:
+        # #     filename_encountered = False
+        # if not filename_encountered:
+        #     continue
 
         svala_path = os.path.join(args.svala_folder, file_name)
         corrected_svala_path = os.path.join(args.corrected_svala_folder, file_name)
@@ -1074,8 +1093,10 @@ def process_file(et, args, nlp, nlp_tokenize):
 
             svala_dict.update(corrected_svala_dict)
 
-        etree_source_paragraphs = []
-        etree_target_paragraphs = []
+        # etree_source_paragraphs = []
+        # etree_target_paragraphs = []
+        tokenized_source_paragraphs = []
+        tokenized_target_paragraphs = []
         paragraph_edges = []
 
         paragraphs = div.findall('p')
@@ -1102,46 +1123,85 @@ def process_file(et, args, nlp, nlp_tokenize):
             target_raw_text = os.path.join(raw_texts_path, target_filename) if os.path.exists(os.path.join(raw_texts_path, target_filename)) else None
 
             if not (source_raw_text or target_raw_text):
-                etree_source_sentences, etree_target_sentences, sentence_edges, complete_source_conllu, complete_target_conllu = process_solar2_paragraph(sentences, paragraph, svala_i, svala_data, add_errors_func, nlp,
-                                         complete_source_conllu, complete_target_conllu)
+                sentence_edges, tokenized_source_sentences, tokenized_target_sentences = process_solar2_paragraph(sentences, paragraph, svala_i, svala_data, add_errors_func)
 
             else:
-                etree_source_sentences, etree_target_sentences, sentence_edges, complete_source_conllu, complete_target_conllu = process_obeliks_paragraph(sentences, paragraph, svala_i,
-                                                                                                          svala_data, add_errors_func, nlp, complete_source_conllu, complete_target_conllu, source_raw_text, target_raw_text, nlp_tokenize)
+                sentence_edges, tokenized_source_sentences, tokenized_target_sentences = process_obeliks_paragraph(sentences, paragraph, svala_i,
+                                                                                           svala_data, add_errors_func, source_raw_text, target_raw_text, nlp_tokenize)
 
-            etree_source_paragraphs.append(construct_paragraph_from_list(paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[0], paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[1], etree_source_sentences, True))
-            etree_target_paragraphs.append(construct_paragraph_from_list(paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[0], paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[1], etree_target_sentences, False))
+            tokenized_source_paragraphs.append(tokenized_source_sentences)
+            tokenized_target_paragraphs.append(tokenized_target_sentences)
+            # etree_source_paragraphs.append(construct_paragraph_from_list(paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[0], paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[1], etree_source_sentences, True))
+            # etree_target_paragraphs.append(construct_paragraph_from_list(paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[0], paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[1], etree_target_sentences, False))
             paragraph_edges.append(sentence_edges)
 
-        etree_bibl = convert_bibl(bibl)
-
-        etree_source_divs.append((etree_source_paragraphs, copy.deepcopy(etree_bibl)))
-        etree_target_divs.append((etree_target_paragraphs, copy.deepcopy(etree_bibl)))
+        # etree_bibl = convert_bibl(bibl)
+        tokenized_source_divs.append(tokenized_source_paragraphs)
+        tokenized_target_divs.append(tokenized_target_paragraphs)
+        # etree_source_divs.append((etree_source_paragraphs, copy.deepcopy(etree_bibl)))
+        # etree_target_divs.append((etree_target_paragraphs, copy.deepcopy(etree_bibl)))
         document_edges.append(paragraph_edges)
 
-    print('APPENDING DOCUMENT...')
-    etree_source_documents.append(TeiDocument(paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[0] + 's', etree_source_divs))
-    etree_target_documents.append(TeiDocument(paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[0] + 't', etree_target_divs))
+    with open(args.tokenization_interprocessing, 'wb') as wp:
+        pickle.dump((tokenized_source_divs, tokenized_target_divs, document_edges), wp)
 
-    print('BUILDING TEI DOCUMENTS...')
-    etree_source = build_tei_etrees(etree_source_documents)
-    etree_target = build_tei_etrees(etree_target_documents)
+    return tokenized_source_divs, tokenized_target_divs, document_edges
 
-    print('BUILDING LINKS...')
-    etree_links = build_links(document_edges)
+def annotate(tokenized_source_divs, tokenized_target_divs, args):
+    if os.path.exists(args.annotation_interprocessing) and not args.overwrite_annotation:
+        print('READING...')
+        with open(args.annotation_interprocessing, 'rb') as rp:
+            annotated_source_divs, annotated_target_divs = pickle.load(rp)
+            return annotated_source_divs, annotated_target_divs
 
-    print('Writting all but complete')
+    nlp = classla.Pipeline('sl', pos_use_lexicon=True, pos_lemma_pretag=False, tokenize_pretokenized="conllu",
+                           type='standard_jos')
+
+    annotated_source_divs = []
+    complete_source_conllu = ''
+    print('ANNOTATING SOURCE...')
+    for i, div in enumerate(tokenized_source_divs):
+        print(f'{str(i*100/len(tokenized_source_divs))}')
+        annotated_source_pars = []
+        for par in div:
+            annotated_source_sens = []
+            for sen in par:
+                source_conllu_annotated = nlp(sen).to_conll() if sen else ''
+                annotated_source_sens.append(source_conllu_annotated)
+                complete_source_conllu += source_conllu_annotated
+            annotated_source_pars.append(annotated_source_sens)
+        annotated_source_divs.append(annotated_source_pars)
+
+    annotated_target_divs = []
+    complete_target_conllu = ''
+    print('ANNOTATING TARGET...')
+    for i, div in enumerate(tokenized_target_divs):
+        print(f'{str(i * 100 / len(tokenized_target_divs))}')
+        annotated_target_pars = []
+        for par in div:
+            annotated_target_sens = []
+            for sen in par:
+                target_conllu_annotated = nlp(sen).to_conll() if sen else ''
+                annotated_target_sens.append(target_conllu_annotated)
+                complete_target_conllu += target_conllu_annotated
+            annotated_target_pars.append(annotated_target_sens)
+        annotated_target_divs.append(annotated_target_pars)
+
     with open(os.path.join(args.results_folder, f"source.conllu"), 'w') as sf:
         sf.write(complete_source_conllu)
 
     with open(os.path.join(args.results_folder, f"target.conllu"), 'w') as sf:
         sf.write(complete_target_conllu)
 
-    with open(os.path.join(args.results_folder, f"source.xml"), 'w') as sf:
-        sf.write(etree.tostring(etree_source[0], pretty_print=True, encoding='utf-8').decode())
+    with open(args.annotation_interprocessing, 'wb') as wp:
+        pickle.dump((annotated_source_divs, annotated_target_divs), wp)
 
-    with open(os.path.join(args.results_folder, f"target.xml"), 'w') as tf:
-        tf.write(etree.tostring(etree_target[0], pretty_print=True, encoding='utf-8').decode())
+    return annotated_source_divs, annotated_target_divs
+
+
+def write_tei(annotated_source_divs, annotated_target_divs, document_edges, args):
+    print('BUILDING LINKS...')
+    etree_links = build_links(document_edges)
 
     with open(os.path.join(args.results_folder, f"links.xml"), 'w') as tf:
         tf.write(etree.tostring(etree_links, pretty_print=True, encoding='utf-8').decode())
@@ -1149,40 +1209,154 @@ def process_file(et, args, nlp, nlp_tokenize):
     with open(os.path.join(args.results_folder, f"links.json"), 'w') as jf:
         json.dump(document_edges, jf, ensure_ascii=False, indent="  ")
 
+
+    print('WRITTING TEI...')
+    etree_source_documents = []
+    etree_target_documents = []
+    etree_source_divs = []
+    etree_target_divs = []
+
+    with open(args.solar_file, 'r') as fp:
+        logging.info(args.solar_file)
+        et = ElementTree.XML(fp.read())
+
+    filename_encountered = False
+    i = 0
+    folders_count = 5484
+
+    div_i = 0
+    for div in et.iter('div'):
+        bibl = div.find('bibl')
+        file_name = bibl.get('n')
+        file_name = file_name.replace('/', '_')
+        print(f'{i * 100 / folders_count} % : {file_name}')
+        i += 1
+
+
+
+        # if i * 100 / folders_count > 50:
+        #     filename_encountered = True
+        # if i * 100 / folders_count > 100:
+        #     filename_encountered = False
+
+        if file_name == 'KUS-G-slo-1-LJ-E-2009_2010-10540':
+            # div_i -= 1
+            continue
+
+        if file_name == 'KUS-SI-slo-2-NM-E-2009_2010-20362' or file_name == 'KUS-OS-slo-9-SG-R-2009_2010-40129' or file_name == 'KUS-OS-slo-7-SG-R-2009_2010-40173':
+            # div_i -= 1
+            continue
+
+        # if not filename_encountered:
+        #     div_i+=1
+        #
+        #     continue
+
+        # svala_path = os.path.join(args.svala_folder, file_name)
+        # corrected_svala_path = os.path.join(args.corrected_svala_folder, file_name)
+        # raw_texts_path = os.path.join(args.svala_generated_text_folder, file_name)
+        # skip files that are not svala annotated (to enable short examples)
+        # if not os.path.isdir(svala_path):
+        #     continue
+
+        # svala_list = [[fname[:-13], fname] if 'problem' in fname else [fname[:-5], fname] for fname in
+        #               os.listdir(svala_path)]
+        # svala_dict = {e[0]: e[1] for e in svala_list}
+
+        # if os.path.exists(corrected_svala_path):
+        #     corrected_svala_list = [[fname[:-13], fname] if 'problem' in fname else [fname[:-5], fname] for fname in
+        #                             os.listdir(corrected_svala_path)]
+        #     corrected_svala_dict = {e[0]: e[1] for e in corrected_svala_list}
+        #
+        #     svala_dict.update(corrected_svala_dict)
+
+        etree_source_paragraphs = []
+        etree_target_paragraphs = []
+        # paragraph_edges = []
+
+        paragraphs = div.findall('p')
+        par_i = 0
+        for paragraph in paragraphs:
+            sentences = paragraph.findall('s')
+
+            etree_source_sentences = []
+            etree_target_sentences = []
+
+            for sentence_id, sentence in enumerate(sentences):
+                # print(f'{div_i} + {par_i} + {sentence_id}')
+                source_conllu_annotated = annotated_source_divs[div_i][par_i][sentence_id]
+                target_conllu_annotated = annotated_target_divs[div_i][par_i][sentence_id]
+
+                if len(source_conllu_annotated) > 0:
+                    source_conllu_parsed = conllu.parse(source_conllu_annotated)[0]
+                if len(target_conllu_annotated) > 0:
+                    target_conllu_parsed = conllu.parse(target_conllu_annotated)[0]
+
+                if len(source_conllu_annotated) > 0:
+                    etree_source_sentences.append(construct_sentence_from_list(str(sentence_id + 1), source_conllu_parsed, True))
+                if len(target_conllu_annotated) > 0:
+                    etree_target_sentences.append(construct_sentence_from_list(str(sentence_id + 1), target_conllu_parsed, False))
+
+
+            etree_source_paragraphs.append(construct_paragraph_from_list(paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[0], paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[1], etree_source_sentences, True))
+            etree_target_paragraphs.append(construct_paragraph_from_list(paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[0], paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[1], etree_target_sentences, False))
+
+            par_i += 1
+
+        etree_bibl = convert_bibl(bibl)
+        etree_source_divs.append((etree_source_paragraphs, copy.deepcopy(etree_bibl), paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[0] + 's'))
+        etree_target_divs.append((etree_target_paragraphs, copy.deepcopy(etree_bibl), paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[0] + 't'))
+
+        div_i += 1
+
+    print('APPENDING DOCUMENT...')
+    etree_source_documents.append(
+        TeiDocument(paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[0] + 's',
+                    etree_source_divs))
+    etree_target_documents.append(
+        TeiDocument(paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[0] + 't',
+                    etree_target_divs))
+
+    print('BUILDING TEI DOCUMENTS...')
+    etree_source = build_tei_etrees(etree_source_documents)
+    etree_target = build_tei_etrees(etree_target_documents)
+
+    print('Writting all but complete')
+    with open(os.path.join(args.results_folder, f"source.xml"), 'w') as sf:
+        sf.write(etree.tostring(etree_source[0], pretty_print=True, encoding='utf-8').decode())
+
+    with open(os.path.join(args.results_folder, f"target.xml"), 'w') as tf:
+        tf.write(etree.tostring(etree_target[0], pretty_print=True, encoding='utf-8').decode())
+
     # TODO STUCKS HERE
     print('COMPLETE TREE CREATION...')
     complete_etree = build_complete_tei(copy.deepcopy(etree_source), copy.deepcopy(etree_target), etree_links)
+    # complete_etree = build_complete_tei(etree_source, etree_target, etree_links)
 
-    print('WRITING FILES')
-    # with open(os.path.join(args.results_folder, f"source.conllu"), 'w') as sf:
-    #     sf.write(complete_source_conllu)
-    #
-    # with open(os.path.join(args.results_folder, f"target.conllu"), 'w') as sf:
-    #     sf.write(complete_target_conllu)
-    #
-    # with open(os.path.join(args.results_folder, f"source.xml"), 'w') as sf:
-    #     sf.write(etree.tostring(etree_source[0], pretty_print=True, encoding='utf-8').decode())
-    #
-    # with open(os.path.join(args.results_folder, f"target.xml"), 'w') as tf:
-    #     tf.write(etree.tostring(etree_target[0], pretty_print=True, encoding='utf-8').decode())
-    #
-    # with open(os.path.join(args.results_folder, f"links.xml"), 'w') as tf:
-    #     tf.write(etree.tostring(etree_links, pretty_print=True, encoding='utf-8').decode())
-
+    print('WRITING COMPLETE TREE')
     with open(os.path.join(args.results_folder, f"complete.xml"), 'w') as tf:
         tf.write(etree.tostring(complete_etree, pretty_print=True, encoding='utf-8').decode())
 
-    # with open(os.path.join(args.results_folder, f"links.json"), 'w') as jf:
-    #     json.dump(document_edges, jf, ensure_ascii=False, indent="  ")
+def process_file(args):
+    if os.path.exists(args.results_folder):
+        shutil.rmtree(args.results_folder)
+    os.mkdir(args.results_folder)
+
+
+
+
+    # READ AND MERGE svala tokenization, solar2 tokenization and obeliks tokenization
+    tokenized_source_divs, tokenized_target_divs, document_edges = tokenize(args)
+
+    # ANNOTATE WITH CLASSLA
+    annotated_source_divs, annotated_target_divs = annotate(tokenized_source_divs, tokenized_target_divs, args)
+
+    # GENERATE TEI AND WRITE OUTPUT
+    write_tei(annotated_source_divs, annotated_target_divs, document_edges, args)
 
 
 def main(args):
-    with open(args.solar_file, 'r') as fp:
-        logging.info(args.solar_file)
-        nlp = classla.Pipeline('sl', pos_use_lexicon=True, pos_lemma_pretag=False, tokenize_pretokenized="conllu", type='standard_jos')
-        nlp_tokenize = classla.Pipeline('sl', processors='tokenize', pos_lemma_pretag=True)
-        et = ElementTree.XML(fp.read())
-        process_file(et, args, nlp, nlp_tokenize)
+    process_file(args)
 
 
 if __name__ == '__main__':
@@ -1198,8 +1372,12 @@ if __name__ == '__main__':
                         help='input file in (gz or xml currently). If none, then just database is loaded')
     parser.add_argument('--svala_generated_text_folder', default='data/svala_generated_text.formatted',
                         help='input file in (gz or xml currently). If none, then just database is loaded')
-    parser.add_argument('--raw_conllu_interprocessing', default='data/processing.raw_conllu',
+    parser.add_argument('--tokenization_interprocessing', default='data/processing.tokenization',
                         help='input file in (gz or xml currently). If none, then just database is loaded')
+    parser.add_argument('--overwrite_tokenization', action='store_true', help='input file in (gz or xml currently). If none, then just database is loaded')
+    parser.add_argument('--annotation_interprocessing', default='data/processing.annotation',
+                        help='input file in (gz or xml currently). If none, then just database is loaded')
+    parser.add_argument('--overwrite_annotation', action='store_true', help='input file in (gz or xml currently). If none, then just database is loaded')
     args = parser.parse_args()
 
     start = time.time()
