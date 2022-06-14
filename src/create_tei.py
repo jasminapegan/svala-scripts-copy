@@ -125,9 +125,10 @@ class Paragraph:
 
 
 class TeiDocument:
-    def __init__(self, _id, divs=list()):
+    def __init__(self, _id, divs=list(), corresp_divs=list()):
         self._id = _id
         self.divs = divs
+        self.corresp_divs = corresp_divs
 
     def as_xml(self):
         root = etree.Element('TEI')
@@ -152,9 +153,10 @@ class TeiDocument:
             tag_usage.set('gi', tag)
             tag_usage.set('occurs', str(count))
 
-        for paras, bibl, div_id in self.divs:
+        for (paras, bibl, div_id), (_, _, corresp_div_id) in zip(self.divs, self.corresp_divs):
             div = etree.Element('div')
             set_xml_attr(div, 'id', div_id)
+            div.set('corresp', f'#{corresp_div_id}')
             div.append(bibl)
             for para in paras:
                 div.append(para.as_xml())
@@ -169,7 +171,7 @@ class TeiDocument:
 
 def convert_bibl(bibl):
     etree_bibl = etree.Element('bibl')
-    etree_bibl.set('corresp', bibl.get('corresp'))
+    # etree_bibl.set('corresp', bibl.get('corresp'))
     etree_bibl.set('n', bibl.get('n'))
     for bibl_el in bibl:
         etree_bibl_el = etree.Element(bibl_el.tag)
@@ -187,15 +189,6 @@ def build_tei_etrees(documents):
     elements = []
     for document in documents:
         elements.append(document.as_xml())
-        # b = elements[-1]
-        # a = list(b)
-        # c = list(b)[0]
-        # d = list(b)[1]
-        # for e in d:
-        #     for f in e:
-        #         for g in f:
-        #             print(g)
-        # d = list(b)[1]
     return elements
 
 
@@ -218,26 +211,16 @@ def build_complete_tei(etree_source, etree_target, etree_links):
     print('P7')
     root.append(text)
     print('P8')
-    # standoff = etree.Element('standOff')
-    # standoff.append(etree_links)
-    # root.append(standoff)
     root.append(etree_links)
     print('P9')
     return root
 
 
 def build_links(all_edges):
-    # root = etree.Element('text')
-    # body = etree.Element('body')
     body = etree.Element('standOff')
-    # root.set('xmlns', 'http://www.tei-c.org/ns/1.0')
-    # set_xml_attr(root, 'lang', 'sl')
 
-    # elements = []
     for document_edges in all_edges:
-        # d = etree.Element('linkGrp')
         for paragraph_edges in document_edges:
-            # p = etree.Element('linkGrp')
             for sentence_edges in paragraph_edges:
                 s = etree.Element('linkGrp')
 
@@ -256,15 +239,12 @@ def build_links(all_edges):
                     labels = '|'.join(token_edges['labels']) if len(token_edges['labels']) > 0 else 'ID'
                     link.set('type', labels)
                     link.set('target', ' '.join(['#' + source for source in token_edges['source_ids']] + ['#' + source for source in token_edges['target_ids']]))
-                    # link.set('target', ' '.join(['#' + source for source in token_edges['target_ids']]))
 
                     s.append(link)
                 s.set('type', 'CORR')
                 s.set('targFunc', 'orig reg')
                 s.set('corresp', f'#{sentence_id}')
-                # body.append(s)
                 body.append(s)
-    # root.append(body)
     return body
 
 

@@ -209,10 +209,16 @@ def process_file(et, args):
         shutil.rmtree(args.error_folder)
     os.mkdir(args.output_folder)
     os.mkdir(args.error_folder)
-    for div in et.iter('div'):
+    # folders_count = 5484
+    for i, div in enumerate(et.iter('div')):
         bibl = div.find('bibl')
         file_name = bibl.get('n')
         file_name = file_name.replace('/', '_')
+        # print(f'{i * 100 / folders_count} % : {file_name}')
+        # if file_name == 'KUS-G-slo-1-LJ-E-2009_2010-10540':
+        #     print('asd')
+        # else:
+        #     continue
         output_folder_loc = os.path.join(args.output_folder, file_name)
         error_folder_loc = os.path.join(args.error_folder, file_name)
 
@@ -223,7 +229,6 @@ def process_file(et, args):
             sentences = paragraph.findall('s')
             i = 1
             dictionary_i = 1
-            dictionary = []
 
             source = []
             target = []
@@ -245,14 +250,11 @@ def process_file(et, args):
                 # add part of dictionary
                 if i > dictionary_i * 10000000000000:
                     essay_problematic = save_file(paragraph_error, output_folder_loc, error_folder_loc, paragraph, {"source": source, "target": target, "edges": edges}, essay_problematic, dictionary_i)
-                    # dictionary.append({"source": source, "target": target, "edges": edges})
                     dictionary_i += 1
                     source = []
                     target = []
                     edges = {}
                     paragraph_error = False
-
-            # dictionary.append({"source": source, "target": target, "edges": edges})
 
             essay_problematic = save_file(paragraph_error, output_folder_loc, error_folder_loc, paragraph, {"source": source, "target": target, "edges": edges}, essay_problematic, dictionary_i)
 

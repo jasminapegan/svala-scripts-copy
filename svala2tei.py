@@ -10,7 +10,6 @@ from conllu import TokenList
 import conllu
 import classla
 import copy
-from classla.pipeline.tokenize_processor import TokenizeProcessor
 
 from lxml import etree
 
@@ -59,18 +58,15 @@ def create_edges(svala_data, source_par, target_par):
     if source_par and source_par[0]:
         if source_par[0][0]['id'] in SKIP_IDS:
             return []
-    #     # print(source_par[0][0]['id'])
-    #     if source_par[0][0]['id'] == 'solar2440s.5.1.1':
-    #         print('pause!')
+        # print(source_par[0][0]['id'])
+        # if source_par[0][0]['id'] == 'solar2150s.4.14.1':
+        #     print('pause!')
     # if target_par and target_par[0]:
     #     print(target_par[0][0]['id'])
-    #     if target_par[0][0]['id'] == 'solar364t.5.1.1':
+    #     if target_par[0][0]['id'] == 'solar2150t.4.1.1':
     #         print('pause!')
     source_mapper = {el['svala_id']: el['id'] for source in source_par for el in source}
     target_mapper = {el['svala_id']: el['id'] for target in target_par for el in target}
-
-    # source_ids = [el['svala_id'] for source in source_par for el in source]
-    # target_ids = [el['svala_id'] for target in target_par for el in target]
 
     source_ids = [[el['svala_id'] for el in source] for source in source_par]
     target_ids = [[el['svala_id'] for el in target] for target in target_par]
@@ -120,10 +116,7 @@ def create_edges(svala_data, source_par, target_par):
     # create edge order
     edges_order = []
     edges_processed = set()
-    # active_source_sentence_i = 0
     active_target_sentence_i = 0
-    s_i = 0
-    t_i = 0
 
     # create target edges
     target_edges, target_edges_set = create_edges_list(target_ids, links_ids_mapper)
@@ -135,10 +128,6 @@ def create_edges(svala_data, source_par, target_par):
         for source_edge in active_source_sentence:
             # print(source_edge)
             # if 'e-s7-t8' == source_edge:
-            #     print('aaa')
-            # if 'e-s253-s254-s255-s256-s257-s258-s259-s260' == source_edge:
-            #     print('aaa')
-            # if 'e-s252-t252' == source_edge:
             #     print('aaa')
             if source_edge in edges_of_one_type:
                 if source_edge not in edges_processed:
@@ -162,12 +151,8 @@ def create_edges(svala_data, source_par, target_par):
                             if target_edge not in edges_processed:
                                 edges_order.append(target_edge)
                                 edges_processed.add(target_edge)
-                            # if 'e-s411-s412-t413' == target_edge:
-                            #     print('nnnno')
                             last_target_edge = target_edge
                     active_target_sentence_i += 1
-                    # if active_target_sentence_i >= len(target_edges_set):
-                    #     break
                     if source_edge in target_edges_set[active_target_sentence_i]:
                         if source_edge not in edges_processed:
                             edges_order.append(source_edge)
@@ -177,23 +162,16 @@ def create_edges(svala_data, source_par, target_par):
                 raise 'Impossible!!!'
         if not target_edges_set or not target_edges_set[0] or active_target_sentence_i >= len(target_edges):
             continue
-        # if last_target_edge == 'e-s197-t197':
-        #     print('HERE!')
         if len(target_edges[active_target_sentence_i]) == 0:
             active_target_sentence_i += 1
             continue
 
-        # if last_target_edge == target_edges[active_target_sentence_i][-1] or (len(target_edges[active_target_sentence_i]) > 1 and last_target_edge == target_edges[active_target_sentence_i][-2] and target_edges[active_target_sentence_i][-1] in edges_of_one_type):
-        # (target_edges[active_target_sentence_i][-1] in edges_of_one_type or (target_edges[active_target_sentence_i][-1] not in edges_of_one_type and target_edges[active_target_sentence_i][-1] not in source_edges_set[active_source_sentence_i]))
-        # if last_target_edge == target_edges[active_target_sentence_i][-1] or (len(target_edges[active_target_sentence_i]) > 1 and last_target_edge == target_edges[active_target_sentence_i][-2] and last_target_edge in target_edges_set[active_target_sentence_i]):
         if last_target_edge == target_edges[active_target_sentence_i][-1] or (len(target_edges[active_target_sentence_i]) > 1 and last_target_edge == target_edges[active_target_sentence_i][-2] and (target_edges[active_target_sentence_i][-1] in edges_of_one_type or (target_edges[active_target_sentence_i][-1] not in edges_of_one_type and target_edges[active_target_sentence_i][-1] in source_edges_set[active_source_sentence_i]))):
             for target_edge in target_edges[active_target_sentence_i]:
                 if target_edge in edges_of_one_type:
                     if target_edge not in edges_processed:
                         edges_order.append(target_edge)
                         edges_processed.add(target_edge)
-                    # if 'e-s243-t243' == target_edge:
-                    #     print('nnnno')
                     last_target_edge = target_edge
             active_target_sentence_i += 1
             continue
@@ -239,45 +217,6 @@ def create_edges(svala_data, source_par, target_par):
                     edges_order.append(target_edge)
                     edges_processed.add(target_edge)
 
-
-
-
-
-    # # create edge order
-    # edges_order = []
-    # edges_processed = set()
-    # s_i = 0
-    # t_i = 0
-    # check_s_i = True
-    # while s_i < len(source_ids) or t_i < len(target_ids):
-    #     # take care of getting ids over desired s_i/t_i
-    #     if check_s_i and s_i >= len(source_ids):
-    #         check_s_i = False
-    #
-    #     if not check_s_i and t_i >= len(target_ids):
-    #         check_s_i = True
-    #
-    #     if check_s_i:
-    #         id_of_interest = source_ids[s_i]
-    #         s_i += 1
-    #         check_s_i = not check_s_i
-    #     else:
-    #         id_of_interest = target_ids[t_i]
-    #         t_i += 1
-    #         check_s_i = not check_s_i
-    #
-    #     any_addition = False
-    #     if id_of_interest not in links_ids_mapper:
-    #         print('NOOOOO')
-    #     for edge_id in links_ids_mapper[id_of_interest]:
-    #         if edge_id not in edges_processed:
-    #             if edge_id not in edges_of_one_type:
-    #                 any_addition = True
-    #             edges_order.append(edge_id)
-    #             edges_processed.add(edge_id)
-    #     if not any_addition:
-    #         check_s_i = not check_s_i
-
     # # DEBUG stuff
     # for edge_order in edges_order:
     #     if edges_order.count(edge_order) > 1:
@@ -318,8 +257,6 @@ def create_edges(svala_data, source_par, target_par):
         if not source_ok_all:
             source_sent_id += 1
 
-        # if edge_id == 'e-s590-t590':
-        #     print(edge_id)
         target_ok = [el[0] == 's' or el in target_sentence_ids[target_sent_id] for el in ids] if target_sentence_ids else []
         target_ok_all = all(target_ok)
 
@@ -471,7 +408,6 @@ def add_errors1_0_1(svala_i, source_i, target_i, error, source, target, svala_da
                                         elif el_l5.tag.startswith('c') and len(source) > 0:
                                             source[-1]['space_after'] = True
 
-            # TODO NOT SURE IF THIS SHOULD BE COMMENTED! IF IT IS NOT THERE ARE ERRORS ON 2ND lvl of errors, where some words are duplicated
             for p_el in el:
                 if p_el.tag.startswith('w') or p_el.tag.startswith('pc'):
                     ind = str(svala_i)
@@ -594,21 +530,6 @@ def add_errors(svala_i, source_i, target_i, error, source, target, svala_data, s
                                         elif el_l5.tag.startswith('c') and len(source) > 0:
                                             source[-1]['space_after'] = True
 
-            # TODO NOT SURE IF THIS SHOULD BE COMMENTED! IF IT IS NOT THERE ARE ERRORS ON 2ND lvl of errors, where some words are duplicated
-            # for p_el in el:
-            #     if p_el.tag.startswith('w') or p_el.tag.startswith('pc'):
-            #         ind = str(svala_i)
-            #
-            #         target_id = "t" + ind
-            #         target_edge_ids.append(target_id)
-            #
-            #         add_error_token(p_el, target, sentence_string_id, target_i, target_ids, False)
-            #
-            #         target_i += 1
-            #         svala_i += 1
-            #     elif p_el.tag.startswith('c') and len(target) > 0:
-            #         target[-1]['space_after'] = True
-
     if edges is not None:
         edge_ids = sorted(source_edge_ids) + sorted(target_edge_ids)
         edge_id = "e-" + "-".join(edge_ids)
@@ -706,7 +627,6 @@ def add_errors_source_target_only(svala_i, source_i, target_i, error, source, ta
                                         elif el_l5.tag.startswith('c') and len(source) > 0:
                                             source[-1]['space_after'] = True
 
-            # TODO NOT SURE IF THIS SHOULD BE COMMENTED! IF IT IS NOT THERE ARE ERRORS ON 2ND lvl of errors, where some words are duplicated
             for p_el in el:
                 if p_el.tag.startswith('w') or p_el.tag.startswith('pc'):
                     ind = str(svala_i)
@@ -719,11 +639,6 @@ def add_errors_source_target_only(svala_i, source_i, target_i, error, source, ta
                     svala_i += 1
                 elif p_el.tag.startswith('c') and len(target) > 0:
                     target[-1]['space_after'] = True
-
-    # edge_ids = sorted(source_edge_ids) + sorted(target_edge_ids)
-    # edge_id = "e-" + "-".join(edge_ids)
-    # edges.append({'source_ids': source_ids, 'target_ids': target_ids, 'labels': svala_data['edges'][edge_id]['labels']})
-
     return svala_i, source_i, target_i
 
 
@@ -747,11 +662,6 @@ def create_conllu(interest_list, sentence_string_id):
 
 
 def process_solar2_paragraph(sentences, paragraph, svala_i, svala_data, add_errors_func):
-    etree_source_sentences = []
-    etree_target_sentences = []
-
-    sentence_edges = []
-
     par_source = []
     par_target = []
 
@@ -790,7 +700,6 @@ def process_solar2_paragraph(sentences, paragraph, svala_i, svala_data, add_erro
         par_source.append(source)
         par_target.append(target)
 
-        # sentence_edges.append(edges)
         source_conllu = ''
         if len(source) > 0:
             source_conllu = create_conllu(source, sentence_string_id)
@@ -801,29 +710,8 @@ def process_solar2_paragraph(sentences, paragraph, svala_i, svala_data, add_erro
         source_conllus.append(source_conllu)
         target_conllus.append(target_conllu)
 
-        # if len(source) > 0:
-        #     source_conllu_annotated = nlp(source_conllu).to_conll()
-        # if len(target) > 0:
-        #     target_conllu_annotated = nlp(target_conllu).to_conll()
-        #
-        # if len(source) > 0:
-        #     complete_source_conllu += source_conllu_annotated
-        # if len(target) > 0:
-        #     complete_target_conllu += target_conllu_annotated
-        #
-        # if len(source) > 0:
-        #     source_conllu_parsed = conllu.parse(source_conllu_annotated)[0]
-        # if len(target) > 0:
-        #     target_conllu_parsed = conllu.parse(target_conllu_annotated)[0]
-        #
-        # if len(source) > 0:
-        #     etree_source_sentences.append(construct_sentence_from_list(str(sentence_id), source_conllu_parsed, True))
-        # if len(target) > 0:
-        #     etree_target_sentences.append(construct_sentence_from_list(str(sentence_id), target_conllu_parsed, False))
-
     sentence_edges = create_edges(svala_data, par_source, par_target)
 
-    # return etree_source_sentences, etree_target_sentences, sentence_edges, complete_source_conllu, complete_target_conllu
     return sentence_edges, source_conllus, target_conllus
 
 
@@ -868,15 +756,6 @@ def map_svala_tokenized(svala_data_part, tokenized_paragraph):
                 else:
                     print(f'key: {key} ; tok[text]: {tok["text"]}')
                     raise 'Word mismatch!'
-                # if tok['text'] == '§' and svala_data_part[svala_data_i]['text'].strip() == '§§§':
-                #     wierd_sign_count += 1
-                #     if wierd_sign_count < 3:
-                #         continue
-                #     else:
-                #         tok['text'] = '§§§'
-                #         wierd_sign_count = 0
-                # else:
-                #     raise 'Word mismatch!'
             sentence_id += 1
             sentence_res.append({'token': tok['text'], 'tag': tag, 'id': sentence_id, 'space_after': space_after, 'svala_id': svala_data_part[svala_data_i]['id']})
             svala_data_i += 1
@@ -885,11 +764,8 @@ def map_svala_tokenized(svala_data_part, tokenized_paragraph):
 
 
 def map_svala_solar2(svala_data_part, solar2_paragraph):
-    paragraph_res = []
     svala_data_i = 0
-    wierd_sign_count = 0
     for sentence in solar2_paragraph:
-        sentence_res = []
         sentence_id = 0
         for tok in sentence:
             # if svala_data_part[svala_data_i]['text'].strip() != tok['token']:
@@ -914,14 +790,9 @@ def update_ids(pretag, in_list):
 
 
 def process_obeliks_paragraph(sentences, paragraph, svala_i, svala_data, add_errors_func, source_raw_text, target_raw_text, nlp_tokenize):
-    # etree_source_sentences = []
-    # etree_target_sentences = []
-
-    sentence_edges = []
     if source_raw_text is not None:
         text = read_raw_text(source_raw_text)
         raw_text, source_tokenized, metadocument = nlp_tokenize.processors['tokenize']._tokenizer.tokenize(text) if text else ([], [], [])
-        # source_tokenized = nlp_tokenize()
         source_res = map_svala_tokenized(svala_data['source'], source_tokenized)
 
     if target_raw_text is not None:
@@ -929,7 +800,6 @@ def process_obeliks_paragraph(sentences, paragraph, svala_i, svala_data, add_err
         raw_text, target_tokenized, metadocument = nlp_tokenize.processors['tokenize']._tokenizer.tokenize(text) if text else ([], [], [])
         target_res = map_svala_tokenized(svala_data['target'], target_tokenized)
 
-    # TODO RETURN IF SOURCE AND TARGET ARE NOT NONE
     par_source = []
     par_target = []
     sentences_len = len(sentences)
@@ -940,10 +810,6 @@ def process_obeliks_paragraph(sentences, paragraph, svala_i, svala_data, add_err
     if target_raw_text is not None:
         sentences_len = max(sentences_len, len(target_res))
     for sentence_id in range(sentences_len):
-        # assert sentence_id < len(sentences)
-
-        # sentence_id += 1
-    # for sentence_id, sentence in enumerate(sentences):
         source = []
         target = []
         sentence_id += 1
@@ -955,14 +821,11 @@ def process_obeliks_paragraph(sentences, paragraph, svala_i, svala_data, add_err
         if sentence_id - 1 < len(sentences):
             sentence = sentences[sentence_id - 1]
             for el in sentence:
-                # if source_i == 101:
-                #     print('HMM')
                 if el.tag.startswith('w'):
                     if source_raw_text is None:
                         add_source(str(svala_i), source_i, sentence_string_id_split, source, el)
                     if target_raw_text is None:
                         add_target(str(svala_i), target_i, sentence_string_id_split, target, el)
-                    # add_edges(source_id, target_id, svala_data, edges, source_token_id, target_token_id)
 
                     svala_i += 1
                     source_i += 1
@@ -972,7 +835,6 @@ def process_obeliks_paragraph(sentences, paragraph, svala_i, svala_data, add_err
                         add_source(str(svala_i), source_i, sentence_string_id_split, source, el)
                     if target_raw_text is None:
                         add_target(str(svala_i), target_i, sentence_string_id_split, target, el)
-                    # add_edges(source_id, target_id, svala_data, edges, source_token_id, target_token_id)
 
                     svala_i += 1
                     source_i += 1
@@ -1010,27 +872,11 @@ def process_obeliks_paragraph(sentences, paragraph, svala_i, svala_data, add_err
         if len(target) > 0:
             target_conllu = create_conllu(target, sentence_string_id)
 
-        source_conllus.append(source_conllu)
-        target_conllus.append(target_conllu)
-        # if len(source) > 0:
-        #     source_conllu_annotated = nlp(source_conllu).to_conll()
-        # if len(target) > 0:
-        #     target_conllu_annotated = nlp(target_conllu).to_conll()
-        #
-        # if len(source) > 0:
-        #     complete_source_conllu += source_conllu_annotated
-        # if len(target) > 0:
-        #     complete_target_conllu += target_conllu_annotated
-        #
-        # if len(source) > 0:
-        #     source_conllu_parsed = conllu.parse(source_conllu_annotated)[0]
-        # if len(target) > 0:
-        #     target_conllu_parsed = conllu.parse(target_conllu_annotated)[0]
-        #
-        # if len(source) > 0:
-        #     etree_source_sentences.append(construct_sentence_from_list(str(sentence_id), source_conllu_parsed, True))
-        # if len(target) > 0:
-        #     etree_target_sentences.append(construct_sentence_from_list(str(sentence_id), target_conllu_parsed, False))
+        if source_raw_text is None or len(source_conllus) < len(par_source):
+            source_conllus.append(source_conllu)
+
+        if target_raw_text is None or len(target_conllus) < len(par_target):
+            target_conllus.append(target_conllu)
 
     # reannotate svala_ids
     if source_raw_text is None:
@@ -1055,7 +901,7 @@ def tokenize(args):
         et = ElementTree.XML(fp.read())
 
     nlp_tokenize = classla.Pipeline('sl', processors='tokenize', pos_lemma_pretag=True)
-    filename_encountered = False
+    # filename_encountered = False
     i = 0
     folders_count = 5484
     tokenized_source_divs = []
@@ -1069,22 +915,19 @@ def tokenize(args):
         print(f'{i*100/folders_count} % : {file_name}')
         i += 1
         # if file_name == 'S20-PI-slo-2-SG-D-2016_2017-30479-12.txt':
-        # if file_name == 'KUS-OS-slo-8-KR-R-2010-40088':
-        # # if i*100/folders_count > 40:
+        # if file_name == 'KUS-PI-slo-5-CE-E-2009-30137':
+        # # # if i*100/folders_count > 40:
         #     filename_encountered = True
-        # # if i*100/folders_count > 41:
-        # #     filename_encountered = False
+        # # # # if i*100/folders_count > 41:
+        # # # #     filename_encountered = False
         # if not filename_encountered:
         #     continue
 
         svala_path = os.path.join(args.svala_folder, file_name)
         corrected_svala_path = os.path.join(args.corrected_svala_folder, file_name)
         raw_texts_path = os.path.join(args.svala_generated_text_folder, file_name)
-        # skip files that are not svala annotated (to enable short examples)
-        if not os.path.isdir(svala_path):
-            continue
 
-        svala_list = [[fname[:-13], fname] if 'problem' in fname else [fname[:-5], fname] for fname in os.listdir(svala_path)]
+        svala_list = [[fname[:-13], fname] if 'problem' in fname else [fname[:-5], fname] for fname in os.listdir(svala_path)] if os.path.isdir(svala_path) else []
         svala_dict = {e[0]: e[1] for e in svala_list}
 
         if os.path.exists(corrected_svala_path):
@@ -1093,8 +936,8 @@ def tokenize(args):
 
             svala_dict.update(corrected_svala_dict)
 
-        # etree_source_paragraphs = []
-        # etree_target_paragraphs = []
+        assert len(svala_dict) != 0
+
         tokenized_source_paragraphs = []
         tokenized_target_paragraphs = []
         paragraph_edges = []
@@ -1109,8 +952,6 @@ def tokenize(args):
             #     print('here')
             svala_file = os.path.join(svala_path, svala_dict[paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id']])
             corrected_svala_file = os.path.join(corrected_svala_path, svala_dict[paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id']])
-            # if os.path.exists(corrected_svala_file):
-            #     print('aaa')
             add_errors_func = add_errors if not os.path.exists(corrected_svala_file) else add_errors1_0_1
             jf = open(svala_file) if not os.path.exists(corrected_svala_file) else open(corrected_svala_file)
             svala_data = json.load(jf)
@@ -1131,15 +972,10 @@ def tokenize(args):
 
             tokenized_source_paragraphs.append(tokenized_source_sentences)
             tokenized_target_paragraphs.append(tokenized_target_sentences)
-            # etree_source_paragraphs.append(construct_paragraph_from_list(paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[0], paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[1], etree_source_sentences, True))
-            # etree_target_paragraphs.append(construct_paragraph_from_list(paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[0], paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[1], etree_target_sentences, False))
             paragraph_edges.append(sentence_edges)
 
-        # etree_bibl = convert_bibl(bibl)
         tokenized_source_divs.append(tokenized_source_paragraphs)
         tokenized_target_divs.append(tokenized_target_paragraphs)
-        # etree_source_divs.append((etree_source_paragraphs, copy.deepcopy(etree_bibl)))
-        # etree_target_divs.append((etree_target_paragraphs, copy.deepcopy(etree_bibl)))
         document_edges.append(paragraph_edges)
 
     with open(args.tokenization_interprocessing, 'wb') as wp:
@@ -1220,7 +1056,7 @@ def write_tei(annotated_source_divs, annotated_target_divs, document_edges, args
         logging.info(args.solar_file)
         et = ElementTree.XML(fp.read())
 
-    filename_encountered = False
+    # filename_encountered = False
     i = 0
     folders_count = 5484
 
@@ -1232,43 +1068,26 @@ def write_tei(annotated_source_divs, annotated_target_divs, document_edges, args
         print(f'{i * 100 / folders_count} % : {file_name}')
         i += 1
 
-
-
         # if i * 100 / folders_count > 50:
         #     filename_encountered = True
-        # if i * 100 / folders_count > 100:
+        # # if file_name == 'KUS-G-slo-4-GO-E-2009-10071':
+        # #     filename_encountered = True
+        # if i * 100 / folders_count > 51:
         #     filename_encountered = False
-
-        if file_name == 'KUS-G-slo-1-LJ-E-2009_2010-10540':
-            # div_i -= 1
-            continue
-
-        if file_name == 'KUS-SI-slo-2-NM-E-2009_2010-20362' or file_name == 'KUS-OS-slo-9-SG-R-2009_2010-40129' or file_name == 'KUS-OS-slo-7-SG-R-2009_2010-40173':
-            # div_i -= 1
-            continue
-
+        #
+        # if file_name == 'KUS-G-slo-1-LJ-E-2009_2010-10540':
+        #     # div_i -= 1
+        #     continue
+        #
+        # if file_name == 'KUS-SI-slo-2-NM-E-2009_2010-20362' or file_name == 'KUS-OS-slo-9-SG-R-2009_2010-40129' or file_name == 'KUS-OS-slo-7-SG-R-2009_2010-40173':
+        #     # div_i -= 1
+        #     continue
+        #
         # if not filename_encountered:
         #     div_i+=1
         #
         #     continue
 
-        # svala_path = os.path.join(args.svala_folder, file_name)
-        # corrected_svala_path = os.path.join(args.corrected_svala_folder, file_name)
-        # raw_texts_path = os.path.join(args.svala_generated_text_folder, file_name)
-        # skip files that are not svala annotated (to enable short examples)
-        # if not os.path.isdir(svala_path):
-        #     continue
-
-        # svala_list = [[fname[:-13], fname] if 'problem' in fname else [fname[:-5], fname] for fname in
-        #               os.listdir(svala_path)]
-        # svala_dict = {e[0]: e[1] for e in svala_list}
-
-        # if os.path.exists(corrected_svala_path):
-        #     corrected_svala_list = [[fname[:-13], fname] if 'problem' in fname else [fname[:-5], fname] for fname in
-        #                             os.listdir(corrected_svala_path)]
-        #     corrected_svala_dict = {e[0]: e[1] for e in corrected_svala_list}
-        #
-        #     svala_dict.update(corrected_svala_dict)
 
         etree_source_paragraphs = []
         etree_target_paragraphs = []
@@ -1277,26 +1096,22 @@ def write_tei(annotated_source_divs, annotated_target_divs, document_edges, args
         paragraphs = div.findall('p')
         par_i = 0
         for paragraph in paragraphs:
-            sentences = paragraph.findall('s')
 
             etree_source_sentences = []
             etree_target_sentences = []
 
-            for sentence_id, sentence in enumerate(sentences):
-                # print(f'{div_i} + {par_i} + {sentence_id}')
-                source_conllu_annotated = annotated_source_divs[div_i][par_i][sentence_id]
-                target_conllu_annotated = annotated_target_divs[div_i][par_i][sentence_id]
-
+            for sentence_id, source_conllu_annotated in enumerate(annotated_source_divs[div_i][par_i]):
                 if len(source_conllu_annotated) > 0:
                     source_conllu_parsed = conllu.parse(source_conllu_annotated)[0]
-                if len(target_conllu_annotated) > 0:
-                    target_conllu_parsed = conllu.parse(target_conllu_annotated)[0]
-
                 if len(source_conllu_annotated) > 0:
                     etree_source_sentences.append(construct_sentence_from_list(str(sentence_id + 1), source_conllu_parsed, True))
+
+
+            for sentence_id, target_conllu_annotated in enumerate(annotated_target_divs[div_i][par_i]):
+                if len(target_conllu_annotated) > 0:
+                    target_conllu_parsed = conllu.parse(target_conllu_annotated)[0]
                 if len(target_conllu_annotated) > 0:
                     etree_target_sentences.append(construct_sentence_from_list(str(sentence_id + 1), target_conllu_parsed, False))
-
 
             etree_source_paragraphs.append(construct_paragraph_from_list(paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[0], paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[1], etree_source_sentences, True))
             etree_target_paragraphs.append(construct_paragraph_from_list(paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[0], paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[1], etree_target_sentences, False))
@@ -1312,10 +1127,10 @@ def write_tei(annotated_source_divs, annotated_target_divs, document_edges, args
     print('APPENDING DOCUMENT...')
     etree_source_documents.append(
         TeiDocument(paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[0] + 's',
-                    etree_source_divs))
+                    etree_source_divs, etree_target_divs))
     etree_target_documents.append(
         TeiDocument(paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'].split('.')[0] + 't',
-                    etree_target_divs))
+                    etree_target_divs, etree_source_divs))
 
     print('BUILDING TEI DOCUMENTS...')
     etree_source = build_tei_etrees(etree_source_documents)
@@ -1328,7 +1143,6 @@ def write_tei(annotated_source_divs, annotated_target_divs, document_edges, args
     with open(os.path.join(args.results_folder, f"target.xml"), 'w') as tf:
         tf.write(etree.tostring(etree_target[0], pretty_print=True, encoding='utf-8').decode())
 
-    # TODO STUCKS HERE
     print('COMPLETE TREE CREATION...')
     complete_etree = build_complete_tei(copy.deepcopy(etree_source), copy.deepcopy(etree_target), etree_links)
     # complete_etree = build_complete_tei(etree_source, etree_target, etree_links)
