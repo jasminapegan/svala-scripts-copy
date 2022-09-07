@@ -6,6 +6,84 @@ from conversion_utils.translate_conllu_jos import get_syn_map
 
 from lxml import etree
 
+labels_mapper = {
+	"B/GLAG/moči_morati": "B/GLAG/moči-morati",
+	"B/MEN/besedna_družina": "B/MEN/besedna-družina",
+	"B/MEN/glagol_bz": "B/MEN/glagol-bz",
+	"B/MEN/polnopomenska_v_zaimek": "B/MEN/polnopomenska-v-zaimek",
+	"B/MEN/prislov_pridevnik_bz": "B/MEN/prislov-pridevnik-bz",
+	"B/MEN/samostalnik_bz": "B/MEN/samostalnik-bz",
+	"B/MEN/veznik_zaimek": "B/MEN/veznik-zaimek",
+	"B/MEN/zaimek_v_polnopomensko": "B/MEN/zaimek-v-polnopomensko",
+	"B/PRED/glag_zveze": "B/PRED/glagolske-zveze",
+	"B/PRED/lokacijske_dvojnice": "B/PRED/lokacijske-dvojnice",
+	"B/PRED/neglag_zveze": "B/PRED/neglagolske-zveze",
+	"B/SAM/lastno_občno": "B/SAM/lastno-občno",
+	"B/SAM/napačno_lastno": "B/SAM/napačno-lastno",
+	"B/SAM/občno_besedišče": "B/SAM/občno-besedišče",
+	"B/VEZ/in_pa_ter": "B/VEZ/in-pa-ter",
+	"B/VEZ/sprememba_odnosa": "B/VEZ/sprememba-odnosa",
+	"B/ZAIM/ki_kateri": "B/ZAIM/ki-kateri",
+	"B/ZAIM/povratna_svojilnost": "B/ZAIM/povratna-svojilnost",
+	"Č/PREDL/sz": "Č/PRED/sz",
+	"N//necitljivo": "N//nečitljivo",
+	"O/DOD/besede-mati_hči": "O/DOD/besede-mati-hči",
+	"O/KAT/oblika_zaimka": "O/KAT/oblika-zaimka",
+	"O/PAR/glagolska_končnica": "O/PAR/glagolska-končnica",
+	"O/PAR/glagolska_osnova": "O/PAR/glagolska-osnova",
+	"O/PAR/neglagolska_končnica": "O/PAR/neglagolska-končnica",
+	"O/PAR/neglagolska_osnova": "O/PAR/neglagolska-osnova",
+	"O/PAR/neobstojni_vokal": "O/PAR/neobstojni-vokal",
+	"O/PAR/preglas_in_cč": "O/PAR/preglas-in-cč",
+	"P/ZAP/mala_velika": "P/ZAP/mala-velika",
+	"S/BR/naslonski_niz-prirednost_podrednost": "S/BR/naslonski-niz-prirednost-podrednost",
+	"S/BR/naslonski_niz-znotraj": "S/BR/naslonski-niz-znotraj",
+	"S/BR/povedek-prislovno_določilo": "S/BR/povedek-prislovno-določilo",
+	"S/BR/znotraj_stavčnega_člena": "S/BR/znotraj-stavčnega-člena",
+	"S/DOD/pomensko_prazni": "S/DOD/pomensko-prazni",
+	"S/IZPUST/samostalnik-lastno_ime": "S/IZPUST/samostalnik-lastno-ime",
+	"S/IZPUST/samostalnik-občno_ime": "S/IZPUST/samostalnik-občno-ime",
+	"S/ODVEČ/pomensko-prazni": "S/DOD/pomensko-prazni",
+	"S/ODVEČ/samostalnik-lastno_ime": "S/ODVEČ/samostalnik-lastno-ime",
+	"S/ODVEČ/samostalnik-občno_ime": "S/ODVEČ/samostalnik-občno-ime",
+	"S/ODVEČ/veznik-pa_drugo": "S/ODVEČ/veznik-pa-drugo",
+	"S/ODVEČ/veznik-pa_vezniki": "S/ODVEČ/veznik-pa-vezniki",
+	"S/ODVEČ/vsebina-drugo": "S/DOD/vsebina-drugo",
+	"S/STR/besedna_zveza_stavek": "S/STR/besedna-zveza-stavek",
+	"S/STR/deljenje_stavkov": "S/STR/deljenje-stavkov",
+	"S/STR/ločilo_veznik": "S/STR/ločilo-veznik",
+	"S/STR/preoblikovanje_stavka": "S/STR/preoblikovanje-stavka",
+	"S/STR/svojina_od": "S/STR/svojina-od",
+	"S/STR/svojina_rodilnik": "S/STR/svojina-rodilnik",
+	"S/STR/združevanje_stavkov": "S/STR/združevanje-stavkov",
+	"Z/LOC/clenek+veznik": "Z/LOČ/nerazvrščeno",
+	"Z/LOC/DRUGO": "Z/LOČ/nerazvrščeno",
+	"Z/LOC/glede": "Z/LOČ/nerazvrščeno",
+	"Z/LOC/hiperkorekcija": "Z/LOČ/nerazvrščeno",
+	"Z/LOC/NERAZ": "Z/LOČ/nerazvrščeno",
+	"Z/LOC/NEREL": "Z/LOČ/nerazvrščeno",
+	"Z/LOC/polstavek": "Z/LOČ/vzorec-vejica-pristavki",
+	"Z/LOC/pridevniski-niz": "Z/LOČ/vzorec-vejica-pridevniški-niz",
+	"Z/LOC/primerjavaKOT": "Z/LOČ/vzorec-vejica-kot",
+	"Z/LOC/primerjaveKOT": "Z/LOČ/vzorec-vejica-kot",
+	"Z/LOC/prirednaBZ": "Z/LOČ/vzorec-vejica-priredja-zvez",
+	"Z/LOC/priredni-odvisniki": "Z/LOČ/vzorec-vejica-priredja-odvisnikov",
+	"Z/LOC/se-posebej": "Z/LOČ/vzorec-vejica-pristavki",
+	"Z/LOC/VEJ-elipsa": "Z/LOČ/vzorec-vejica-elipsa-povedka",
+	"Z/LOC/VEJ-stavki": "Z/LOČ/vzorec-vejica-stavki",
+	"Z/LOC/VEJ-stclen": "Z/LOČ/vzorec-vejica-stavčni-členi",
+	"Z/LOC/VEJ-veznik": "Z/LOČ/vzorec-vejica-vezniki",
+	"Z/LOC/VEJ-vrivki": "Z/LOČ/vzorec-vejica-pristavki",
+	"Z/LOC/vrinjen-odvisnik": "Z/LOČ/vzorec-vejica-vrinjen-odvisnik",
+	"Z/LOC/z-imenom": "Z/LOČ/nerazvrščeno",
+	"Z/MV/hiperkorekcija_ločila": "Z/MV/hiperkorekcija-ločila",
+	"Z/MV/občna_imena": "Z/MV/občna-imena",
+	"Z/MV/osebna_imena": "Z/MV/osebna-imena",
+	"Z/MV/premi_govor": "Z/MV/premi-govor",
+	"Z/MV/stvarna_imena": "Z/MV/stvarna-imena",
+	"Z/MV/začetek_povedi": "Z/MV/začetek-povedi",
+	"Z/MV/zemljepisna_imena": "Z/MV/zemljepisna-imena"
+}
 
 class Sentence:
     def __init__(self, _id, no_ud=False, is_source=None):
@@ -175,7 +253,10 @@ def convert_bibl(bibl):
     etree_bibl.set('n', bibl.get('n'))
     for bibl_el in bibl:
         etree_bibl_el = etree.Element(bibl_el.tag)
-        etree_bibl_el.text = bibl_el.text
+        if bibl_el.tag == 'note' and 'type' in bibl_el.attrib and bibl_el.attrib['type'] == 'errs' and bibl_el.text == 'DA-NEVNESENO':
+            etree_bibl_el.text = 'NEVNESENO'
+        else:
+            etree_bibl_el.text = bibl_el.text
         for att, val in bibl_el.attrib.items():
             if '{http://www.w3.org/XML/1998/namespace}' in att:
                 set_xml_attr(etree_bibl_el, att.split('{http://www.w3.org/XML/1998/namespace}')[-1], val)
@@ -225,25 +306,41 @@ def build_links(all_edges):
                 s = etree.Element('linkGrp')
 
                 sentence_id = ''
+                corresp_source_id = ''
+                corresp_target_id = ''
+                corresp = []
                 for token_edges in sentence_edges:
-                    if not sentence_id:
-                        if len(token_edges['source_ids']) > 0:
-                            random_source_id = token_edges['source_ids'][0]
-                            sentence_id += '.'.join(random_source_id.split('.')[:3])
-                        if len(token_edges['target_ids']) > 0:
-                            random_target_id = token_edges['target_ids'][0]
-                            if len(token_edges['source_ids']) > 0:
-                                sentence_id += ' #'
-                            sentence_id += '.'.join(random_target_id.split('.')[:3])
+                    if not corresp_source_id and len(token_edges['source_ids']) > 0:
+                        random_source_id = token_edges['source_ids'][0]
+                        corresp_source_id = '#'
+                        corresp_source_id += '.'.join(random_source_id.split('.')[:3])
+                        corresp.append(corresp_source_id)
+                    if not corresp_target_id and len(token_edges['target_ids']) > 0:
+                        random_target_id = token_edges['target_ids'][0]
+                        corresp_target_id = '#'
+                        corresp_target_id += '.'.join(random_target_id.split('.')[:3])
+                        corresp.append(corresp_target_id)
                     link = etree.Element('link')
-                    labels = '|'.join(token_edges['labels']) if len(token_edges['labels']) > 0 else 'ID'
+                    # translate labels
+                    labels_list = []
+                    for label in token_edges['labels']:
+                        if label in labels_mapper:
+                            labels_list.append(labels_mapper[label])
+                        else:
+                            labels_list.append(label)
+                    labels = '|'.join(labels_list) if len(labels_list) > 0 else 'ID'
                     link.set('type', labels)
                     link.set('target', ' '.join(['#' + source for source in token_edges['source_ids']] + ['#' + source for source in token_edges['target_ids']]))
 
                     s.append(link)
                 s.set('type', 'CORR')
-                s.set('targFunc', 'orig reg')
-                s.set('corresp', f'#{sentence_id}')
+                targFunc = []
+                if corresp_source_id:
+                    targFunc.append('orig')
+                if corresp_target_id:
+                    targFunc.append('reg')
+                s.set('targFunc', f'{" ".join(targFunc)}')
+                s.set('corresp', f'{" ".join(corresp)}')
                 body.append(s)
     return body
 

@@ -59,7 +59,7 @@ def create_edges(svala_data, source_par, target_par):
         if source_par[0][0]['id'] in SKIP_IDS:
             return []
         # print(source_par[0][0]['id'])
-        # if source_par[0][0]['id'] == 'solar2150s.4.14.1':
+        # if source_par[0][0]['id'] == 'solar17s.6.3.1':
         #     print('pause!')
     # if target_par and target_par[0]:
     #     print(target_par[0][0]['id'])
@@ -271,7 +271,31 @@ def create_edges(svala_data, source_par, target_par):
     if edges:
         sentence_edges.append(edges)
 
-    return sentence_edges
+    actual_sentence_edges = []
+    passed_sentence = []
+    for sent in sentence_edges:
+        ha_source = False
+        ha_target = False
+        for toke in sent:
+            if len(toke['target_ids']) > 0:
+                ha_target = toke['target_ids'][0]
+            if len(toke['source_ids']) > 0:
+                ha_source = toke['source_ids'][0]
+            if ha_target and ha_source:
+                break
+
+        if not ha_target or not ha_source:
+            passed_sentence.extend(sent)
+
+        else:
+            passed_sentence.extend(sent)
+            actual_sentence_edges.append(passed_sentence)
+            passed_sentence = []
+
+    if passed_sentence:
+        actual_sentence_edges.append(passed_sentence)
+
+    return actual_sentence_edges
 
 def add_token(svala_i, source_i, target_i, el, source, target, edges, svala_data, sentence_string_id):
     source_id = "s" + svala_i
@@ -915,7 +939,7 @@ def tokenize(args):
         print(f'{i*100/folders_count} % : {file_name}')
         i += 1
         # if file_name == 'S20-PI-slo-2-SG-D-2016_2017-30479-12.txt':
-        # if file_name == 'KUS-PI-slo-5-CE-E-2009-30137':
+        # if file_name == 'KUS-G-slo-4-GO-E-2009-10017':
         # # # if i*100/folders_count > 40:
         #     filename_encountered = True
         # # # # if i*100/folders_count > 41:
@@ -948,7 +972,7 @@ def tokenize(args):
             svala_i = 1
 
             # read json
-            # if paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'] == 'solar5.7':
+            # if paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'] == 'solar17.6':
             #     print('here')
             svala_file = os.path.join(svala_path, svala_dict[paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id']])
             corrected_svala_file = os.path.join(corrected_svala_path, svala_dict[paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id']])
