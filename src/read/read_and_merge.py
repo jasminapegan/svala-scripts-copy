@@ -1,13 +1,17 @@
 import json
+import logging
 import os
 import pickle
+import queue
+import string
+from collections import deque
+
 import classla
 
-
-from src.read.merge import merge
+from src.read.hand_fixes import apply_svala_handfixes
+from src.read.merge import merge, create_conllu, create_edges
 from src.read.read import read_raw_text, map_svala_tokenized
-
-HAND_FIXES = {'§§§pisala': ['§', '§', '§', 'pisala'], '§§§poldne': ['§', '§', '§', 'poldne'], '§§§o': ['§', '§', '§', 'o'], '§§§mimi': ['§', '§', '§', 'mimi'], '§§§nil': ['§', '§', '§', 'nil'], '§§§ela': ['§', '§', '§', 'ela'], 'sam§§§': ['sam', '§', '§', '§'], 'globač§§§': ['globač', '§', '§', '§'], 'sin.': ['sin', '.'],  '§§§oveduje': ['§', '§', '§', 'oveduje'],  'na§§§': ['na', '§', '§', '§'], '§§§ka§§§': ['§', '§', '§', 'ka', '§', '§', '§'], '§§§e§§§': ['§', '§', '§', 'e', '§', '§', '§'], '§§§': ['§', '§', '§'], 'ljubezni.': ['ljubezni', '.'], '12.': ['12', '.'], '16.': ['16', '.'], 'st.': ['st', '.'], 'S.': ['S', '.'], 'pr.': ['pr', '.'], 'n.': ['n', '.'], '19:30': ['19', ':', '30'], '9.': ['9', '.'], '6:35': ['6', ':', '35'], 'itd.': ['itd', '.'], 'Sv.': ['Sv', '.'], 'npr.': ['npr', '.'], 'sv.': ['sv', '.'], '12:00': ['12', ':', '00'], "sram'vali": ['sram', "'", 'vali'], '18:00': ['18', ':', '00'], 'J.': ['J', '.'], '5:45': ['5', ':', '45'], '17.': ['17', '.'], '9.00h': ['9', '.', '00h'], 'H.': ['H', '.'], '1.': ['1', '.'], '6.': ['6', '.'], '7:10': ['7', ':', '10'], 'g.': ['g', '.'], 'Oz.': ['Oz', '.'], '20:00': ['20', ':', '00'], '17.4.2010': ['17.', '4.', '2010'], 'ga.': ['ga', '.'], 'prof.': ['prof', '.'], '6:45': ['6', ':', '45'], '19.': ['19', '.'], '3.': ['3', '.'], 'tj.': ['tj', '.'], 'Prof.': ['Prof', '.'], '8.': ['8', '.'], '9:18': ['9', ':', '18'], 'ipd.': ['ipd', '.'], '7.': ['7', '.'], 'št.': ['št', '.'], 'oz.': ['oz', '.'], 'R.': ['R', '.'], '13:30': ['13', ':', '30'], '5.': ['5', '.'], '...': ['.', '.', '.']}
+from src.read.svala_data import SvalaData
 
 
 def add_error_token(el, out_list, sentence_string_id, out_list_i, out_list_ids, is_source, s_t_id):
@@ -129,9 +133,114 @@ def add_errors(svala_i, source_i, target_i, error, source, target, svala_data, s
     return svala_i, source_i, target_i
 
 
-def create_target(svala_data, source_tokenized):
-    for i, el in enumerate(svala_data['target']):
-        print(i)
+def create_target(svala_data_object, source_tokenized):
+    source_tokenized_dict = {}
+    for i, sent in enumerate(source_tokenized):
+        for tok in sent:
+            tok['sent_id'] = i + 1
+            source_tokenized_dict[tok['svala_id']] = tok
+
+
+    links_ids_mapper, edges_of_one_type = svala_data_object.links_ids_mapper, svala_data_object.edges_of_one_type
+
+    curr_sententence = 1
+    source_curr_sentence = 1
+
+    target_tokenized = []
+    target_sent_tokenized = []
+    tok_i = 1
+
+    for i, token in enumerate(svala_data_object.svala_data['target']):
+        edge_id = links_ids_mapper[token['id']]
+        if len(edge_id) > 1:
+            print('Whaat?')
+        edge_id = edge_id[0]
+        edge = svala_data_object.svala_data['edges'][edge_id]
+        source_word_ids = []
+        target_word_ids = []
+        for word_id in edge['ids']:
+            if word_id[0] == 's':
+                source_word_ids.append(word_id)
+            if word_id[0] == 't':
+                target_word_ids.append(word_id)
+
+        token_text = token['text']
+        new_sentence = False
+        if len(source_word_ids) == 1:
+            source_id = source_word_ids[0]
+            source_token = source_tokenized_dict[source_id]
+
+            if source_token['sent_id'] != source_curr_sentence:
+                source_curr_sentence = source_token['sent_id']
+                if source_token['id'] == 1 and len(target_sent_tokenized) > 1:
+                    target_tokenized.append(target_sent_tokenized)
+                    target_sent_tokenized = []
+                    curr_sententence += 1
+                    tok_i = 1
+
+            # check if words are equal and update
+            if token_text == source_token['token']:
+                target_token = {
+                    'token': source_token['token'],
+                    'tag': source_token['tag'],
+                    'id': tok_i,
+                    'space_after': source_token['space_after'],
+                    'svala_id': token['id'],
+                    'sent_id': curr_sententence,
+                }
+            else:
+
+                # Check for punctuation mismatch.
+                if token_text in string.punctuation:
+                    tag = 'pc'
+                else:
+                    tag = 'w'
+
+                target_token = {
+                    'token': token_text,
+                    'tag': tag,
+                    'id': tok_i,
+                    'space_after': source_token['space_after'],
+                    'svala_id': token['id'],
+                    'sent_id': curr_sententence,
+                }
+
+        else:
+            space_after = True
+            if token_text in string.punctuation:
+                tag = 'pc'
+                if token_text in '!?.,):;]}':
+                    if len(target_sent_tokenized) == 0:
+                        raise ValueError('Sentence lenght = 0!')
+                    target_sent_tokenized[-1]['space_after'] = False
+                    if token_text in '!?.':
+                        new_sentence = True
+
+                        # Handle cases like `...`
+                        if len(svala_data_object.svala_data['target']) > i + 1 and svala_data_object.svala_data['target'][i+1]['text'] in '.?!':
+                            new_sentence = False
+                elif token_text in '([{':
+                    space_after = False
+            else:
+                tag = 'w'
+
+            target_token = {
+                'token': token_text,
+                'tag': tag,
+                'id': tok_i,
+                'space_after': space_after,
+                'svala_id': token['id'],
+                'sent_id': curr_sententence,
+            }
+        target_sent_tokenized.append(target_token)
+        if new_sentence:
+            target_tokenized.append(target_sent_tokenized)
+            target_sent_tokenized = []
+            curr_sententence += 1
+            tok_i = 1
+        tok_i += 1
+    target_tokenized.append(target_sent_tokenized)
+    return target_tokenized
 
 
 def tokenize(args):
@@ -149,14 +258,19 @@ def tokenize(args):
     nlp_tokenize = classla.Pipeline('sl', processors='tokenize', pos_lemma_pretag=True)
     # filename_encountered = False
     i = 0
-    tokenized_source_divs = []
-    tokenized_target_divs = []
+    tokenized_divs = {}
+    # tokenized_source_divs = {}
+    # tokenized_target_divs = {}
     document_edges = []
 
     text_filename = ''
 
     for folder, _, filenames in os.walk(args.svala_folder):
-        for filename in filenames:
+        filenames = sorted(filenames)
+        for filename_i, filename in enumerate(filenames):
+            # if filename_i*100/len(filenames) > 35:
+            #     print('here')
+            #     continue
             svala_path = os.path.join(folder, filename)
             new_text_filename = '-'.join(filename[:-5].split('-')[:3]) + '.txt'
             if text_filename != new_text_filename:
@@ -166,81 +280,61 @@ def tokenize(args):
                     text_file) if text_file else ([], [], [])
                 source_sent_i = 0
 
-            jf = open(svala_path)
+            jf = open(svala_path, encoding='utf-8')
+            print(svala_path)
             svala_data = json.load(jf)
             jf.close()
 
+            svala_data_object = SvalaData(svala_data)
 
-            target_res = create_target(svala_data, source_tokenized)
-            source_sent_i, source_res = map_svala_tokenized(svala_data['source'], source_tokenized, source_sent_i)
-            print('aaa')
+            apply_svala_handfixes(svala_data_object)
+
+            source_sent_i, source_res = map_svala_tokenized(svala_data_object.svala_data['source'], source_tokenized, source_sent_i)
+            # target_res = create_target(svala_data, source_tokenized)
 
 
-    for div in et.iter('div'):
-        bibl = div.find('bibl')
-        file_name = bibl.get('n')
-        file_name = file_name.replace('/', '_')
-        print(f'{i*100/folders_count} % : {file_name}')
-        i += 1
-        # if file_name == 'S20-PI-slo-2-SG-D-2016_2017-30479-12.txt':
-        # if file_name == 'KUS-G-slo-4-GO-E-2009-10017':
-        # # # if i*100/folders_count > 40:
-        #     filename_encountered = True
-        # # # # if i*100/folders_count > 41:
-        # # # #     filename_encountered = False
-        # if not filename_encountered:
-        #     continue
+            target_res = create_target(svala_data_object, source_res)
 
-        svala_path = os.path.join(args.svala_folder, file_name)
-        corrected_svala_path = os.path.join(args.corrected_svala_folder, file_name)
-        raw_texts_path = os.path.join(args.svala_generated_text_folder, file_name)
+            if text_filename not in tokenized_divs:
+                tokenized_divs[text_filename] = []
 
-        svala_list = [[fname[:-13], fname] if 'problem' in fname else [fname[:-5], fname] for fname in os.listdir(svala_path)] if os.path.isdir(svala_path) else []
-        svala_dict = {e[0]: e[1] for e in svala_list}
+            tokenized_divs[text_filename].append((filename, source_res, target_res, svala_data_object.svala_data['edges']))
 
-        if os.path.exists(corrected_svala_path):
-            corrected_svala_list = [[fname[:-13], fname] if 'problem' in fname else [fname[:-5], fname] for fname in os.listdir(corrected_svala_path)]
-            corrected_svala_dict = {e[0]: e[1] for e in corrected_svala_list}
+            logging.info(f'Tokenizing at {filename_i*100/len(filenames)} %')
 
-            svala_dict.update(corrected_svala_dict)
+    tokenized_source_divs = []
+    tokenized_target_divs = []
+    document_edges = []
 
-        assert len(svala_dict) != 0
-
+    for div_id in tokenized_divs.keys():
+        paragraph_edges = []
         tokenized_source_paragraphs = []
         tokenized_target_paragraphs = []
-        paragraph_edges = []
+        # par_source = []
+        # par_target = []
+        for tokenized_para in tokenized_divs[div_id]:
+            paragraph_name, source_res, target_res, edges = tokenized_para
+            source_paragraphs = []
+            target_paragraphs = []
+            sen_source = []
+            sen_target = []
+            for sen_i, sen in enumerate(source_res):
+                source_conllu = create_conllu(sen, f'{paragraph_name[:-5]}.s{str(sen_i + 1)}')
+                source_paragraphs.append(source_conllu)
+                sen_source.append(sen)
 
-        paragraphs = div.findall('p')
-        for paragraph in paragraphs:
-            sentences = paragraph.findall('s')
-            svala_i = 1
-
-            # read json
-            # if paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'] == 'solar17.6':
-            #     print('here')
-            svala_file = os.path.join(svala_path, svala_dict[paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id']])
-            corrected_svala_file = os.path.join(corrected_svala_path, svala_dict[paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id']])
-            add_errors_func = add_errors
-            jf = open(svala_file) if not os.path.exists(corrected_svala_file) else open(corrected_svala_file)
-            svala_data = json.load(jf)
-            jf.close()
-
-            source_filename = svala_dict[paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id']][:-5] + '_source.json'
-            target_filename = svala_dict[paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id']][:-5] + '_target.json'
-
-            source_raw_text = os.path.join(raw_texts_path, source_filename) if os.path.exists(os.path.join(raw_texts_path, source_filename)) else None
-            target_raw_text = os.path.join(raw_texts_path, target_filename) if os.path.exists(os.path.join(raw_texts_path, target_filename)) else None
-
-
-            sentence_edges, tokenized_source_sentences, tokenized_target_sentences = merge(sentences, paragraph, svala_i,
-                                                                                           svala_data, add_errors_func, source_raw_text, target_raw_text, nlp_tokenize)
-
-            tokenized_source_paragraphs.append(tokenized_source_sentences)
-            tokenized_target_paragraphs.append(tokenized_target_sentences)
-            paragraph_edges.append(sentence_edges)
+            for sen_i, sen in enumerate(target_res):
+                target_conllu = create_conllu(sen, f'{paragraph_name}.t{str(sen_i)}')
+                target_paragraphs.append(target_conllu)
+                sen_target.append(sen)
+            paragraph_edges.append(edges)
+            tokenized_source_paragraphs.append(source_paragraphs)
+            tokenized_target_paragraphs.append(target_paragraphs)
+            paragraph_edges.append(create_edges(edges, sen_source, sen_target))
 
         tokenized_source_divs.append(tokenized_source_paragraphs)
         tokenized_target_divs.append(tokenized_target_paragraphs)
+
         document_edges.append(paragraph_edges)
 
     with open(args.tokenization_interprocessing, 'wb') as wp:

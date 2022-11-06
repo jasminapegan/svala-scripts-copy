@@ -15,6 +15,7 @@ from src.annotate.annotate import annotate
 from src.create_tei import construct_sentence_from_list, \
     construct_paragraph_from_list, TeiDocument, build_tei_etrees, build_links, build_complete_tei, convert_bibl
 from src.read.read_and_merge import tokenize
+from src.write.write import write_tei
 
 logging.basicConfig(level=logging.INFO)
 

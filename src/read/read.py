@@ -1,13 +1,29 @@
+import re
 
-HAND_FIXES = {'§§§pisala': ['§', '§', '§', 'pisala'], '§§§poldne': ['§', '§', '§', 'poldne'], '§§§o': ['§', '§', '§', 'o'], '§§§mimi': ['§', '§', '§', 'mimi'], '§§§nil': ['§', '§', '§', 'nil'], '§§§ela': ['§', '§', '§', 'ela'], 'sam§§§': ['sam', '§', '§', '§'], 'globač§§§': ['globač', '§', '§', '§'], 'sin.': ['sin', '.'],  '§§§oveduje': ['§', '§', '§', 'oveduje'],  'na§§§': ['na', '§', '§', '§'], '§§§ka§§§': ['§', '§', '§', 'ka', '§', '§', '§'], '§§§e§§§': ['§', '§', '§', 'e', '§', '§', '§'], '§§§': ['§', '§', '§'], 'ljubezni.': ['ljubezni', '.'], '12.': ['12', '.'], '16.': ['16', '.'], 'st.': ['st', '.'], 'S.': ['S', '.'], 'pr.': ['pr', '.'], 'n.': ['n', '.'], '19:30': ['19', ':', '30'], '9.': ['9', '.'], '6:35': ['6', ':', '35'], 'itd.': ['itd', '.'], 'Sv.': ['Sv', '.'], 'npr.': ['npr', '.'], 'sv.': ['sv', '.'], '12:00': ['12', ':', '00'], "sram'vali": ['sram', "'", 'vali'], '18:00': ['18', ':', '00'], 'J.': ['J', '.'], '5:45': ['5', ':', '45'], '17.': ['17', '.'], '9.00h': ['9', '.', '00h'], 'H.': ['H', '.'], '1.': ['1', '.'], '6.': ['6', '.'], '7:10': ['7', ':', '10'], 'g.': ['g', '.'], 'Oz.': ['Oz', '.'], '20:00': ['20', ':', '00'], '17.4.2010': ['17.', '4.', '2010'], 'ga.': ['ga', '.'], 'prof.': ['prof', '.'], '6:45': ['6', ':', '45'], '19.': ['19', '.'], '3.': ['3', '.'], 'tj.': ['tj', '.'], 'Prof.': ['Prof', '.'], '8.': ['8', '.'], '9:18': ['9', ':', '18'], 'ipd.': ['ipd', '.'], '7.': ['7', '.'], 'št.': ['št', '.'], 'oz.': ['oz', '.'], 'R.': ['R', '.'], '13:30': ['13', ':', '30'], '5.': ['5', '.'], '...': ['.', '.', '.']}
+from src.read.hand_fixes import HAND_FIXES, apply_obeliks_handfixes, SVALA_HAND_FIXES_MERGE
 
 
 def read_raw_text(path):
-    with open(path, 'r') as rf:
-        return rf.read()
+    print(path)
+    # if path == "data/KOST/raw/L-1819-110.txt":
+    #     print('here')
+    try:
+        with open(path, 'r', encoding='utf-8') as rf:
+            return rf.read()
+    except:
+        try:
+            with open(path, 'r', encoding='utf-16') as rf:
+                return rf.read()
+        except:
+            with open(path, 'r', encoding="windows-1250") as rf:
+                return rf.read()
+
 
 
 def map_svala_tokenized(svala_data_part, tokenized_paragraph, sent_i):
+    # apply handfixes for obeliks
+    apply_obeliks_handfixes(tokenized_paragraph)
+
     paragraph_res = []
     wierd_sign_count = 0
     svala_data_i = 0
@@ -21,11 +37,14 @@ def map_svala_tokenized(svala_data_part, tokenized_paragraph, sent_i):
                 assert tok['misc'] == 'SpaceAfter=No'
             space_after = not 'misc' in tok
             if len(svala_data_part) <= svala_data_i:
+                # if sentence does not end add it anyway
+                # TODO i error?
+                if sentence_res:
+                    paragraph_res.append(sentence_res)
                 return i, paragraph_res
-            if svala_data_part[svala_data_i]['text'].strip() != tok['text']:
-                key = svala_data_part[svala_data_i]['text'].strip()
+            if svala_data_part[svala_data_i]['text'] != tok['text']:
+                key = svala_data_part[svala_data_i]['text']
                 if key not in HAND_FIXES:
-                    print(f'key: {key} ; tok[text]: {tok["text"]}')
                     if key.startswith('§§§') and key.endswith('§§§'):
                         HAND_FIXES[key] = ['§', '§', '§', key[3:-3], '§', '§', '§']
                     elif key.startswith('§§§'):
@@ -33,7 +52,23 @@ def map_svala_tokenized(svala_data_part, tokenized_paragraph, sent_i):
                     elif key.endswith('§§§'):
                         HAND_FIXES[key] = [key[:-3], '§', '§', '§']
                     else:
-                        raise 'Word mismatch!'
+                        if len(key) < len(tok['text']):
+                            print('HAND_FIXES_MERGE:')
+                            print(f", ('{tok['text'][:len(key)]}', '{tok['text'][len(key):]}'): '{tok['text']}'")
+                            SVALA_HAND_FIXES_MERGE[(tok['text'][:len(key)], tok['text'][len(key):])] = tok['text']
+                            a = SVALA_HAND_FIXES_MERGE
+                        else:
+                            print('HAND_FIXES OLD:')
+                            print(f", '{key}': ['{key[:len(tok['text'])]}', '{key[len(tok['text']):]}']")
+
+                            print('HAND_FIXES NEW:')
+                            reg = re.findall(r"[\w]+|[^\s\w]", key)
+                            print(f", '{key}': {str(reg)}")
+
+                            # HAND_FIXES[key] = [key[:len(tok['text'])], key[len(tok['text']):]]
+                            HAND_FIXES[key] = re.findall(r"[\w]+|[^\s\w]", key)
+                        print(f'key: {key} ; tok[text]: {tok["text"]}')
+                        # raise ValueError('Word mismatch!')
 
                 if tok['text'] == HAND_FIXES[key][wierd_sign_count]:
                     wierd_sign_count += 1
@@ -42,6 +77,10 @@ def map_svala_tokenized(svala_data_part, tokenized_paragraph, sent_i):
                     else:
                         tok['text'] = key
                         wierd_sign_count = 0
+                elif key in ['[XKrajX]']:
+                    tok['text'] = '[XKrajX]'
+                elif key in ['[XImeX]']:
+                    tok['text'] = '[XImeX]'
                 else:
                     print(f'key: {key} ; tok[text]: {tok["text"]}')
                     raise 'Word mismatch!'
