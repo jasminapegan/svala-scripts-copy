@@ -34,8 +34,8 @@ def form_paragraphs(annotated_source_divs):
     return etree_source_divs, div_name
 
 def write_tei(annotated_source_divs, annotated_target_divs, document_edges, args):
-    # print('BUILDING LINKS...')
-    # etree_links = build_links(document_edges)
+    print('BUILDING LINKS...')
+    etree_links = build_links(document_edges)
 
     with open(os.path.join(args.results_folder, f"links.xml"), 'w') as tf:
         tf.write(etree.tostring(etree_links, pretty_print=True, encoding='utf-8').decode())
