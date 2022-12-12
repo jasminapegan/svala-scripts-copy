@@ -19,8 +19,8 @@ SKIP_IDS = ['solar2284s.1.1.1']
 
 
 def create_edges(raw_edges, source_par, target_par):
-    source_mapper = {el['svala_id']: el['id'] for source in source_par for el in source}
-    target_mapper = {el['svala_id']: el['id'] for target in target_par for el in target}
+    source_mapper = {el['svala_id']: source[1] + '.' + str(el['id']) for source in source_par for el in source[0]}
+    target_mapper = {el['svala_id']: target[1] + '.' + str(el['id']) for target in target_par for el in target[0]}
 
     # actually add edges
     edges = []

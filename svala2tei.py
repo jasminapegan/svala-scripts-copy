@@ -249,7 +249,7 @@ if __name__ == '__main__':
         description='Read already processed xmls, erase entries without examples and limit gigafida examples to 1 per entry.')
     parser.add_argument('--svala_folder', default='data/KOST/svala',
                         help='input file in (gz or xml currently). If none, then just database is loaded')
-    parser.add_argument('--results_folder', default='data/results/solar3.0',
+    parser.add_argument('--results_folder', default='data/KOST/results',
                         help='input file in (gz or xml currently). If none, then just database is loaded')
     parser.add_argument('--raw_text', default='data/KOST/raw',
                         help='input file in (gz or xml currently). If none, then just database is loaded')

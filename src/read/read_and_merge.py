@@ -13,6 +13,7 @@ from src.read.merge import merge, create_conllu, create_edges
 from src.read.read import read_raw_text, map_svala_tokenized
 from src.read.svala_data import SvalaData
 
+alphabet = list(map(chr, range(97, 123)))
 
 def add_error_token(el, out_list, sentence_string_id, out_list_i, out_list_ids, is_source, s_t_id):
     sentence_string_id_split = sentence_string_id.split('.')
@@ -245,7 +246,7 @@ def create_target(svala_data_object, source_tokenized):
 
 def tokenize(args):
     if os.path.exists(args.tokenization_interprocessing) and not args.overwrite_tokenization:
-        print('READING AND MERGING...')
+        print('READING TOKENIZATION...')
         with open(args.tokenization_interprocessing, 'rb') as rp:
             tokenized_source_divs, tokenized_target_divs, document_edges = pickle.load(rp)
             return tokenized_source_divs, tokenized_target_divs, document_edges
@@ -314,26 +315,35 @@ def tokenize(args):
         # par_target = []
         for tokenized_para in tokenized_divs[div_id]:
             paragraph_name, source_res, target_res, edges = tokenized_para
+            split_para_name = paragraph_name[:-5].split('-')
+            div_name = '-'.join(split_para_name[:-1])
+            par_name = split_para_name[-1]
+            assert not par_name.isnumeric() or par_name not in alphabet, Exception('Incorrect paragraph name!')
+            if par_name in alphabet:
+                par_name = str(alphabet.index(par_name) + 10)
+
             source_paragraphs = []
             target_paragraphs = []
             sen_source = []
             sen_target = []
             for sen_i, sen in enumerate(source_res):
-                source_conllu = create_conllu(sen, f'{paragraph_name[:-5]}.s{str(sen_i + 1)}')
+                source_sen_name = f'{div_name}s.{par_name}.{str(sen_i + 1)}'
+                source_conllu = create_conllu(sen, source_sen_name)
                 source_paragraphs.append(source_conllu)
-                sen_source.append(sen)
+                sen_source.append((sen, source_sen_name))
 
             for sen_i, sen in enumerate(target_res):
-                target_conllu = create_conllu(sen, f'{paragraph_name}.t{str(sen_i)}')
+                target_sen_name = f'{div_name}t.{par_name}.{str(sen_i + 1)}'
+                target_conllu = create_conllu(sen, target_sen_name)
                 target_paragraphs.append(target_conllu)
-                sen_target.append(sen)
-            paragraph_edges.append(edges)
-            tokenized_source_paragraphs.append(source_paragraphs)
-            tokenized_target_paragraphs.append(target_paragraphs)
+                sen_target.append((sen, target_sen_name))
+            # paragraph_edges.append(edges)
+            tokenized_source_paragraphs.append((par_name, source_paragraphs))
+            tokenized_target_paragraphs.append((par_name, target_paragraphs))
             paragraph_edges.append(create_edges(edges, sen_source, sen_target))
 
-        tokenized_source_divs.append(tokenized_source_paragraphs)
-        tokenized_target_divs.append(tokenized_target_paragraphs)
+        tokenized_source_divs.append((div_name+'s', tokenized_source_paragraphs))
+        tokenized_target_divs.append((div_name+'t', tokenized_target_paragraphs))
 
         document_edges.append(paragraph_edges)
 

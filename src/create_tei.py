@@ -176,9 +176,9 @@ class Sentence:
 
 
 class Paragraph:
-    def __init__(self, _id, _doc_id, is_source):
+    def __init__(self, _id, _doc_id):
         self._id = _id if _id is not None else 'no-id'
-        _doc_id += 's' if is_source else 't'
+        # _doc_id += 's' if is_source else 't'
         self._doc_id = _doc_id if _doc_id is not None else ''
         self.sentences = []
 
@@ -231,15 +231,13 @@ class TeiDocument:
             tag_usage.set('gi', tag)
             tag_usage.set('occurs', str(count))
 
-        for (paras, bibl, div_id), (_, _, corresp_div_id) in zip(self.divs, self.corresp_divs):
+        for (paras, div_id), (_, corresp_div_id) in zip(self.divs, self.corresp_divs):
             div = etree.Element('div')
             set_xml_attr(div, 'id', div_id)
             div.set('corresp', f'#{corresp_div_id}')
-            div.append(bibl)
             for para in paras:
                 div.append(para.as_xml())
             body.append(div)
-
 
         return root
 
@@ -301,47 +299,56 @@ def build_links(all_edges):
     body = etree.Element('standOff')
 
     for document_edges in all_edges:
+
+
+
+        # if len(document_edges) > 1:
+        #     print('here')
+
+        # mine paragraphs
         for paragraph_edges in document_edges:
-            for sentence_edges in paragraph_edges:
-                s = etree.Element('linkGrp')
+            p = etree.Element('linkGrp')
+            paragraph_id = ''
+            corresp_source_id = ''
+            corresp_target_id = ''
+            corresp = []
+            # for sentence_edges in paragraph_edges:
+            #
+            for token_edges in paragraph_edges:
+                if not corresp_source_id and len(token_edges['source_ids']) > 0:
+                    random_source_id = token_edges['source_ids'][0]
+                    corresp_source_id = '#'
+                    # corresp_source_id += '.'.join(random_source_id.split('.')[:3])
+                    corresp_source_id += '.'.join(random_source_id.split('.')[:2])
+                    corresp.append(corresp_source_id)
+                if not corresp_target_id and len(token_edges['target_ids']) > 0:
+                    random_target_id = token_edges['target_ids'][0]
+                    corresp_target_id = '#'
+                    corresp_target_id += '.'.join(random_target_id.split('.')[:2])
+                    # corresp_target_id += random_target_id.split('.')[0]
+                    corresp.append(corresp_target_id)
+                link = etree.Element('link')
+                # translate labels
+                labels_list = []
+                for label in token_edges['labels']:
+                    if label in labels_mapper:
+                        labels_list.append(labels_mapper[label])
+                    else:
+                        labels_list.append(label)
+                labels = '|'.join(labels_list) if len(labels_list) > 0 else 'ID'
+                link.set('type', labels)
+                link.set('target', ' '.join(['#' + source for source in token_edges['source_ids']] + ['#' + source for source in token_edges['target_ids']]))
 
-                sentence_id = ''
-                corresp_source_id = ''
-                corresp_target_id = ''
-                corresp = []
-                for token_edges in sentence_edges:
-                    if not corresp_source_id and len(token_edges['source_ids']) > 0:
-                        random_source_id = token_edges['source_ids'][0]
-                        corresp_source_id = '#'
-                        corresp_source_id += '.'.join(random_source_id.split('.')[:3])
-                        corresp.append(corresp_source_id)
-                    if not corresp_target_id and len(token_edges['target_ids']) > 0:
-                        random_target_id = token_edges['target_ids'][0]
-                        corresp_target_id = '#'
-                        corresp_target_id += '.'.join(random_target_id.split('.')[:3])
-                        corresp.append(corresp_target_id)
-                    link = etree.Element('link')
-                    # translate labels
-                    labels_list = []
-                    for label in token_edges['labels']:
-                        if label in labels_mapper:
-                            labels_list.append(labels_mapper[label])
-                        else:
-                            labels_list.append(label)
-                    labels = '|'.join(labels_list) if len(labels_list) > 0 else 'ID'
-                    link.set('type', labels)
-                    link.set('target', ' '.join(['#' + source for source in token_edges['source_ids']] + ['#' + source for source in token_edges['target_ids']]))
-
-                    s.append(link)
-                s.set('type', 'CORR')
-                targFunc = []
-                if corresp_source_id:
-                    targFunc.append('orig')
-                if corresp_target_id:
-                    targFunc.append('reg')
-                s.set('targFunc', f'{" ".join(targFunc)}')
-                s.set('corresp', f'{" ".join(corresp)}')
-                body.append(s)
+                p.append(link)
+            p.set('type', 'CORR')
+            targFunc = []
+            if corresp_source_id:
+                targFunc.append('orig')
+            if corresp_target_id:
+                targFunc.append('reg')
+            p.set('targFunc', f'{" ".join(targFunc)}')
+            p.set('corresp', f'{" ".join(corresp)}')
+            body.append(p)
     return body
 
 
@@ -365,34 +372,11 @@ def is_metaline(line):
     return False
 
 
-def construct_paragraph_from_list(doc_id, para_id, etree_source_sentences, source_id):
-    para = Paragraph(para_id, doc_id, source_id)
+def construct_paragraph_from_list(doc_id, para_id, etree_source_sentences):
+    para = Paragraph(para_id, doc_id)
 
     for sentence in etree_source_sentences:
         para.add_sentence(sentence)
-
-    return para
-
-
-def construct_paragraph(doc_id, para_id, conllu_lines, is_source):
-    para = Paragraph(para_id, doc_id, is_source)
-
-    sent_id = None
-    sent_buffer = []
-
-    for line in conllu_lines:
-        if is_metaline(line):
-            key, val = parse_metaline(line)
-            if key == 'sent_id':
-                if len(sent_buffer) > 0:
-                    para.add_sentence(construct_sentence(sent_id, sent_buffer))
-                    sent_buffer = []
-                sent_id = val
-        elif not line.isspace():
-            sent_buffer.append(line)
-
-    if len(sent_buffer) > 0:
-        para.add_sentence(construct_sentence(sent_id, sent_buffer))
 
     return para
 
