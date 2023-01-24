@@ -316,8 +316,8 @@ def tokenize(args):
         for tokenized_para in tokenized_divs[div_id]:
             paragraph_name, source_res, target_res, edges = tokenized_para
             split_para_name = paragraph_name[:-5].split('-')
-            div_name = '-'.join(split_para_name[:-1])
-            par_name = split_para_name[-1]
+            div_name = '-'.join(split_para_name[:-1]) if len(split_para_name) == 4 else '-'.join(split_para_name)
+            par_name = split_para_name[-1] if len(split_para_name) == 4 else '1'
             assert not par_name.isnumeric() or par_name not in alphabet, Exception('Incorrect paragraph name!')
             if par_name in alphabet:
                 par_name = str(alphabet.index(par_name) + 10)

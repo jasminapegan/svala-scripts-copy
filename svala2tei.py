@@ -253,6 +253,12 @@ if __name__ == '__main__':
                         help='input file in (gz or xml currently). If none, then just database is loaded')
     parser.add_argument('--raw_text', default='data/KOST/raw',
                         help='input file in (gz or xml currently). If none, then just database is loaded')
+    parser.add_argument('--texts_metadata', default='data/KOST/texts_metadata2.csv',
+                        help='KOST metadata location')
+    parser.add_argument('--authors_metadata', default='data/KOST/authors_metadata2.csv',
+                        help='KOST authors location')
+    parser.add_argument('--translations', default='data/KOST/translations.csv',
+                        help='KOST Slovenian-English column names translations')
     parser.add_argument('--tokenization_interprocessing', default='data/processing.tokenization',
                         help='input file in (gz or xml currently). If none, then just database is loaded')
     parser.add_argument('--overwrite_tokenization', action='store_true', help='input file in (gz or xml currently). If none, then just database is loaded')

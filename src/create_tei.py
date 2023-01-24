@@ -6,6 +6,36 @@ from conversion_utils.translate_conllu_jos import get_syn_map
 
 from lxml import etree
 
+kost_translations = {
+    "Author": "Author",
+    "Sex": "Sex",
+    "Year of birth": "YearOfBirth",
+    "Country": "Country",
+    "Employment status": "EmploymentStatus",
+    "Completed education": "CompletedEducation",
+    "Current school": "CurrentSchool",
+    "First language": "FirstLang",
+    "Knowledge of other languages": "OtherLang",
+    "Duration of Slovene language learning": "DurSlvLearning",
+    "Experience with Slovene before current program": "ExpSlv",
+    "Language proficiency in Slovene": "ProficSlv",
+    "Life in Slovenija before this current program": "LifeSlovenia",
+    "Location of Slovene language learning": "LocSlvLearning",
+    "Creation date": "CreationDate",
+    "Teacher": "Teacher",
+    "Academic year": "AcademicYear",
+    "Grade": "Grade",
+    "Input type": "InputType",
+    "Program type": "ProgramType",
+    "Program subtype": "ProgramSubtype",
+    "Slovene textbooks used": "SloveneTextbooks",
+    "Study cycle": "StudyCycle",
+    "Study year": "StudyYear",
+    "Task setting": "TaskSetting",
+    "Topic": "Topic",
+    "Instruction": "Instruction"
+}
+
 labels_mapper = {
 	"B/GLAG/moči_morati": "B/GLAG/moči-morati",
 	"B/MEN/besedna_družina": "B/MEN/besedna-družina",
@@ -231,10 +261,12 @@ class TeiDocument:
             tag_usage.set('gi', tag)
             tag_usage.set('occurs', str(count))
 
-        for (paras, div_id), (_, corresp_div_id) in zip(self.divs, self.corresp_divs):
+        for (paras, div_id, metadata), (_, corresp_div_id, _) in zip(self.divs, self.corresp_divs):
             div = etree.Element('div')
             set_xml_attr(div, 'id', div_id)
             div.set('corresp', f'#{corresp_div_id}')
+            bibl = create_bibl(metadata)
+            div.append(bibl)
             for para in paras:
                 div.append(para.as_xml())
             body.append(div)
@@ -244,6 +276,24 @@ class TeiDocument:
     def add_paragraph(self, paragraph):
         self.paragraphs.append(paragraph)
 
+
+def create_bibl(metadata):
+    bibl = etree.Element('bibl')
+    bibl.set('n', metadata['Text ID'])
+    for k, v in metadata.items():
+        if k == 'Text ID' or not v:
+            continue
+        note = etree.Element('note')
+        if k not in kost_translations:
+            # print(k)
+            key = ''.join([el.capitalize() for el in k.split()])
+        else:
+            key = kost_translations[k]
+        note.set('ana', f'#{key}')
+        # set_xml_attr(note, 'lang', 'sl')
+        note.text = f'{v}'
+        bibl.append(note)
+    return bibl
 
 def convert_bibl(bibl):
     etree_bibl = etree.Element('bibl')
