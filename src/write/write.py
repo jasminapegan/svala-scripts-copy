@@ -14,7 +14,7 @@ def form_paragraphs(annotated_source_divs, metadata):
     for div_i, div_tuple in enumerate(annotated_source_divs):
         div_name, div = div_tuple
         if div_name[:-1] not in metadata:
-            print(div_name[:-1] + "!!!!!!!!!!!!!!!!!!")
+            # print(div_name[:-1] + "!!!!!!!!!!!!!!!!!!")
             print(div_name[:-1])
             continue
         div_metadata = metadata[div_name[:-1]]
@@ -55,6 +55,23 @@ def read_metadata(args):
                     row_dict[column_names[j]] = content
                 texts_metadata.append(row_dict)
 
+    # handle teachers
+    teachers_metadata = {}
+    with open(args.teachers_metadata, 'r') as file:
+        csvreader = csv.reader(file, delimiter='\t', quotechar='"')
+        column_names = []
+        for i, row in enumerate(csvreader):
+            if i == 0:
+                column_names = row
+                continue
+            else:
+                row_dict = {}
+                for j, content in enumerate(row):
+                    row_dict[column_names[j]] = content
+                row_dict['Ime in priimek'] = row_dict['Ime in priimek'].strip()
+                teachers_metadata[row_dict['Ime in priimek']] = row_dict
+
+    # handle authors
     authors_metadata = {}
     with open(args.authors_metadata, 'r') as file:
         csvreader = csv.reader(file, delimiter='\t', quotechar='"')
@@ -86,11 +103,11 @@ def read_metadata(args):
         for row in csvreader:
             translations[row[0]] = row[1]
 
-    return texts_metadata, authors_metadata, translations
+    return texts_metadata, authors_metadata, teachers_metadata, translations
 
 
 def process_metadata(args):
-    texts_metadata, authors_metadata, translations = read_metadata(args)
+    texts_metadata, authors_metadata, teachers_metadata, translations = read_metadata(args)
 
     metadata = {}
     for document_metadata in texts_metadata:
@@ -107,6 +124,8 @@ def process_metadata(args):
                     metadata_el[attribute_name_en] = f'{document_metadata[attribute_name_sl]} od {document_metadata["Najvišja možna ocena"]}'
                 elif attribute_name_sl == 'Tvorec':
                     metadata_el[attribute_name_en] = author_metadata['Koda tvorca']
+                elif attribute_name_sl == 'Učitelj':
+                    metadata_el[attribute_name_en] = teachers_metadata[document_metadata['Učitelj']]['Koda'] if document_metadata['Učitelj'] in teachers_metadata else None
                 else:
                     metadata_el[attribute_name_en] = document_metadata[attribute_name_sl]
             elif attribute_name_sl in author_metadata:
@@ -171,16 +190,16 @@ def write_tei(annotated_source_divs, annotated_target_divs, document_edges, args
     etree_source = build_tei_etrees(etree_source_documents)
     etree_target = build_tei_etrees(etree_target_documents)
 
-    print('Writting all but complete')
-    with open(os.path.join(args.results_folder, f"source.xml"), 'w') as sf:
-        sf.write(etree.tostring(etree_source[0], pretty_print=True, encoding='utf-8').decode())
-
-    with open(os.path.join(args.results_folder, f"target.xml"), 'w') as tf:
-        tf.write(etree.tostring(etree_target[0], pretty_print=True, encoding='utf-8').decode())
+    # print('Writting all but complete')
+    # with open(os.path.join(args.results_folder, f"source.xml"), 'w') as sf:
+    #     sf.write(etree.tostring(etree_source[0], pretty_print=True, encoding='utf-8').decode())
+    #
+    # with open(os.path.join(args.results_folder, f"target.xml"), 'w') as tf:
+    #     tf.write(etree.tostring(etree_target[0], pretty_print=True, encoding='utf-8').decode())
 
     print('COMPLETE TREE CREATION...')
-    complete_etree = build_complete_tei(copy.deepcopy(etree_source), copy.deepcopy(etree_target), etree_links)
-    # complete_etree = build_complete_tei(etree_source, etree_target, etree_links)
+    # complete_etree = build_complete_tei(copy.deepcopy(etree_source), copy.deepcopy(etree_target), etree_links)
+    complete_etree = build_complete_tei(etree_source, etree_target, etree_links)
 
     print('WRITING COMPLETE TREE')
     with open(os.path.join(args.results_folder, f"complete.xml"), 'w') as tf:

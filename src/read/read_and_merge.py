@@ -244,6 +244,48 @@ def create_target(svala_data_object, source_tokenized):
     return target_tokenized
 
 
+def fake_svala_data(source_tokenized):
+    source_res, target_res, generated_edges = [], [], {}
+
+    edge_id = 0
+    for sent in source_tokenized:
+        source_sent = []
+        target_sent = []
+        for tok in sent:
+            tok_id = tok['id'][0]
+            tok_tag = 'w' if 'xpos' not in tok or tok['xpos'] != 'Z' else 'pc'
+            source_svala_id = 's' + str(edge_id)
+            target_svala_id = 't' + str(edge_id)
+            source_sent.append({
+                'token': tok['text'],
+                'tag': tok_tag,
+                'id': tok_id,
+                'space_after': 'misc' in tok and tok['misc'] == 'SpaceAfter=No',
+                'svala_id': source_svala_id
+            })
+            target_sent.append({
+                'token': tok['text'],
+                'tag': tok_tag,
+                'id': tok_id,
+                'space_after': 'misc' in tok and tok['misc'] == 'SpaceAfter=No',
+                'svala_id': target_svala_id
+            })
+            generated_edges[f'e-{source_svala_id}-{target_svala_id}'] = {
+                'id': f'e-{source_svala_id}-{target_svala_id}',
+                'ids': [source_svala_id, target_svala_id],
+                'labels': [],
+                'manual': False,
+                'source_ids': [source_svala_id],
+                'target_ids': [target_svala_id]
+            }
+            edge_id += 1
+        source_res.append(source_sent)
+        target_res.append(target_sent)
+
+
+    return source_res, target_res, generated_edges
+
+
 def tokenize(args):
     if os.path.exists(args.tokenization_interprocessing) and not args.overwrite_tokenization:
         print('READING TOKENIZATION...')
@@ -266,42 +308,54 @@ def tokenize(args):
 
     text_filename = ''
 
-    for folder, _, filenames in os.walk(args.svala_folder):
-        filenames = sorted(filenames)
-        for filename_i, filename in enumerate(filenames):
+    all_js_filenames = [sorted(filenames) for folder, _, filenames in os.walk(args.svala_folder)][0]
+
+    for text_folder, _, text_filenames in os.walk(args.raw_text):
+        text_filenames = sorted(text_filenames)
+        for text_filename_i, text_filename in enumerate(text_filenames):
             # if filename_i*100/len(filenames) > 35:
             #     print('here')
             #     continue
-            svala_path = os.path.join(folder, filename)
-            new_text_filename = '-'.join(filename[:-5].split('-')[:3]) + '.txt'
-            if text_filename != new_text_filename:
-                text_filename = new_text_filename
-                text_file = read_raw_text(os.path.join(args.raw_text, text_filename))
-                raw_text, source_tokenized, metadocument = nlp_tokenize.processors['tokenize']._tokenizer.tokenize(
-                    text_file) if text_file else ([], [], [])
-                source_sent_i = 0
 
-            jf = open(svala_path, encoding='utf-8')
-            print(svala_path)
-            svala_data = json.load(jf)
-            jf.close()
+            text_file = read_raw_text(os.path.join(args.raw_text, text_filename))
+            raw_text, source_tokenized, metadocument = nlp_tokenize.processors['tokenize']._tokenizer.tokenize(
+                text_file) if text_file else ([], [], [])
+            source_sent_i = 0
 
-            svala_data_object = SvalaData(svala_data)
+            filenames = [filename for filename in all_js_filenames if filename.startswith(text_filename[:-4])]
+            # new_text_filename = '-'.join(filename[:-5].split('-')[:3]) + '.txt'
+            if filenames:
+                for filename in filenames:
+                    svala_path = os.path.join(args.svala_folder, filename)
+                    jf = open(svala_path, encoding='utf-8')
+                    print(svala_path)
+                    svala_data = json.load(jf)
+                    jf.close()
 
-            apply_svala_handfixes(svala_data_object)
+                    svala_data_object = SvalaData(svala_data)
 
-            source_sent_i, source_res = map_svala_tokenized(svala_data_object.svala_data['source'], source_tokenized, source_sent_i)
-            # target_res = create_target(svala_data, source_tokenized)
+                    apply_svala_handfixes(svala_data_object)
+
+                    source_sent_i, source_res = map_svala_tokenized(svala_data_object.svala_data['source'], source_tokenized, source_sent_i)
+                    # target_res = create_target(svala_data, source_tokenized)
 
 
-            target_res = create_target(svala_data_object, source_res)
+                    target_res = create_target(svala_data_object, source_res)
 
-            if text_filename not in tokenized_divs:
-                tokenized_divs[text_filename] = []
+                    if text_filename not in tokenized_divs:
+                        tokenized_divs[text_filename] = []
 
-            tokenized_divs[text_filename].append((filename, source_res, target_res, svala_data_object.svala_data['edges']))
+                    tokenized_divs[text_filename].append((filename, source_res, target_res, svala_data_object.svala_data['edges']))
 
-            logging.info(f'Tokenizing at {filename_i*100/len(filenames)} %')
+
+            else:
+                filename = text_filename[:-4] + '.json'
+                source_res, target_res, generated_edges = fake_svala_data(source_tokenized)
+                if text_filename not in tokenized_divs:
+                    tokenized_divs[text_filename] = []
+                tokenized_divs[text_filename].append((filename, source_res, target_res, generated_edges))
+
+            logging.info(f'Tokenizing at {text_filename_i * 100 / len(text_filenames)} %')
 
     tokenized_source_divs = []
     tokenized_target_divs = []
