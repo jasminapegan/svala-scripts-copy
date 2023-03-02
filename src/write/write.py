@@ -43,7 +43,7 @@ def form_paragraphs(annotated_source_divs, metadata):
 def read_metadata(args):
     texts_metadata = []
     with open(args.texts_metadata, 'r') as file:
-        csvreader = csv.reader(file, delimiter='\t', quotechar='"')
+        csvreader = csv.reader(file, delimiter='|', quotechar='"')
         column_names = []
         for i, row in enumerate(csvreader):
             if i == 0:
@@ -52,7 +52,7 @@ def read_metadata(args):
             else:
                 row_dict = {}
                 for j, content in enumerate(row):
-                    row_dict[column_names[j]] = content
+                    row_dict[column_names[j]] = content.strip()
                 texts_metadata.append(row_dict)
 
     # handle teachers
@@ -74,7 +74,7 @@ def read_metadata(args):
     # handle authors
     authors_metadata = {}
     with open(args.authors_metadata, 'r') as file:
-        csvreader = csv.reader(file, delimiter='\t', quotechar='"')
+        csvreader = csv.reader(file, delimiter='|', quotechar='"')
         column_names = []
         for i, row in enumerate(csvreader):
             if i == 0:
@@ -93,7 +93,7 @@ def read_metadata(args):
             else:
                 row_dict = {}
                 for j, content in enumerate(row):
-                    row_dict[column_names[j]] = content
+                    row_dict[column_names[j]] = content.strip()
                 row_dict['Ime in priimek'] = row_dict['Ime in priimek'].strip()
                 authors_metadata[row_dict['Ime in priimek']] = row_dict
 
@@ -121,7 +121,8 @@ def process_metadata(args):
         for attribute_name_sl, attribute_name_en in translations.items():
             if attribute_name_sl in document_metadata:
                 if attribute_name_sl == 'Ocena':
-                    metadata_el[attribute_name_en] = f'{document_metadata[attribute_name_sl]} od {document_metadata["Najvišja možna ocena"]}'
+                    grade = f'{document_metadata[attribute_name_sl]} od {document_metadata["Najvišja možna ocena"]}' if document_metadata[attribute_name_sl] and document_metadata["Najvišja možna ocena"] else ''
+                    metadata_el[attribute_name_en] = grade
                 elif attribute_name_sl == 'Tvorec':
                     metadata_el[attribute_name_en] = author_metadata['Koda tvorca']
                 elif attribute_name_sl == 'Učitelj':
@@ -131,7 +132,12 @@ def process_metadata(args):
             elif attribute_name_sl in author_metadata:
                 metadata_el[attribute_name_en] = author_metadata[attribute_name_sl]
             elif attribute_name_sl == 'Ime šole, Fakulteta':
-                metadata_el['Current school'] = f'{author_metadata["Trenutno šolanje - Ime šole"]}, {author_metadata["Trenutno šolanje - Fakulteta"]}'
+                curr_school = []
+                if author_metadata["Trenutno šolanje - Ime šole"]:
+                    curr_school.append(author_metadata["Trenutno šolanje - Ime šole"])
+                if author_metadata["Trenutno šolanje - Fakulteta"]:
+                    curr_school.append(author_metadata["Trenutno šolanje - Fakulteta"])
+                metadata_el['Current school'] = ', '.join(curr_school)
             elif attribute_name_sl == 'Stopnja študija':
                 metadata_el[attribute_name_en] = author_metadata['Trenutno šolanje - Stopnja študija']
             elif attribute_name_sl == 'Leto študija':

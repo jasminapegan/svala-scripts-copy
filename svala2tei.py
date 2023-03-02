@@ -253,9 +253,9 @@ if __name__ == '__main__':
                         help='input file in (gz or xml currently). If none, then just database is loaded')
     parser.add_argument('--raw_text', default='data/KOST/raw',
                         help='input file in (gz or xml currently). If none, then just database is loaded')
-    parser.add_argument('--texts_metadata', default='data/KOST/texts_metadata2.csv',
+    parser.add_argument('--texts_metadata', default='data/KOST/texts_metadata5.csv',
                         help='KOST metadata location')
-    parser.add_argument('--authors_metadata', default='data/KOST/authors_metadata2.csv',
+    parser.add_argument('--authors_metadata', default='data/KOST/authors_metadata5.csv',
                         help='KOST authors location')
     parser.add_argument('--teachers_metadata', default='data/KOST/teachers_metadata.csv',
                         help='KOST teachers location')

@@ -330,17 +330,29 @@ def build_complete_tei(etree_source, etree_target, etree_links):
     text = etree.Element('text')
     group = etree.Element('group')
     print('P3')
-    group.append(list(etree_source[0])[1])
+    group.insert(len(group),
+                      list(etree_source[0])[1])
+    # group.append(list(etree_source[0])[1])
     print('P4')
-    group.append(list(etree_target[0])[1])
+    group.insert(len(group),
+                 list(etree_target[0])[1])
+    # group.append(list(etree_target[0])[1])
     print('P5')
-    text.append(group)
+    text.insert(len(text),
+                 group)
+    # text.append(group)
     print('P6')
-    root.append(tei_header)
+    root.insert(len(root),
+                tei_header)
+    # root.append(tei_header)
     print('P7')
-    root.append(text)
+    # root.append(text)
+    root.insert(len(root),
+                text)
     print('P8')
-    root.append(etree_links)
+    # root.append(etree_links)
+    root.insert(len(root),
+                etree_links)
     print('P9')
     return root
 
@@ -349,34 +361,22 @@ def build_links(all_edges):
     body = etree.Element('standOff')
 
     for document_edges in all_edges:
-
-
-
-        # if len(document_edges) > 1:
-        #     print('here')
-
         # mine paragraphs
         for paragraph_edges in document_edges:
             p = etree.Element('linkGrp')
-            paragraph_id = ''
             corresp_source_id = ''
             corresp_target_id = ''
-            corresp = []
-            # for sentence_edges in paragraph_edges:
-            #
+
             for token_edges in paragraph_edges:
                 if not corresp_source_id and len(token_edges['source_ids']) > 0:
                     random_source_id = token_edges['source_ids'][0]
                     corresp_source_id = '#'
-                    # corresp_source_id += '.'.join(random_source_id.split('.')[:3])
                     corresp_source_id += '.'.join(random_source_id.split('.')[:2])
-                    corresp.append(corresp_source_id)
                 if not corresp_target_id and len(token_edges['target_ids']) > 0:
                     random_target_id = token_edges['target_ids'][0]
                     corresp_target_id = '#'
                     corresp_target_id += '.'.join(random_target_id.split('.')[:2])
-                    # corresp_target_id += random_target_id.split('.')[0]
-                    corresp.append(corresp_target_id)
+
                 link = etree.Element('link')
                 # translate labels
                 labels_list = []
@@ -390,6 +390,11 @@ def build_links(all_edges):
                 link.set('target', ' '.join(['#' + source for source in token_edges['source_ids']] + ['#' + source for source in token_edges['target_ids']]))
 
                 p.append(link)
+            corresp = []
+            if corresp_source_id:
+                corresp.append(corresp_source_id)
+            if corresp_target_id:
+                corresp.append(corresp_target_id)
             p.set('type', 'CORR')
             targFunc = []
             if corresp_source_id:

@@ -238,7 +238,7 @@ def create_target(svala_data_object, source_tokenized):
             target_tokenized.append(target_sent_tokenized)
             target_sent_tokenized = []
             curr_sententence += 1
-            tok_i = 1
+            tok_i = 0
         tok_i += 1
     target_tokenized.append(target_sent_tokenized)
     return target_tokenized
@@ -256,18 +256,19 @@ def fake_svala_data(source_tokenized):
             tok_tag = 'w' if 'xpos' not in tok or tok['xpos'] != 'Z' else 'pc'
             source_svala_id = 's' + str(edge_id)
             target_svala_id = 't' + str(edge_id)
+            space_after = not ('misc' in tok and tok['misc'] == 'SpaceAfter=No')
             source_sent.append({
                 'token': tok['text'],
                 'tag': tok_tag,
                 'id': tok_id,
-                'space_after': 'misc' in tok and tok['misc'] == 'SpaceAfter=No',
+                'space_after': space_after,
                 'svala_id': source_svala_id
             })
             target_sent.append({
                 'token': tok['text'],
                 'tag': tok_tag,
                 'id': tok_id,
-                'space_after': 'misc' in tok and tok['misc'] == 'SpaceAfter=No',
+                'space_after': space_after,
                 'svala_id': target_svala_id
             })
             generated_edges[f'e-{source_svala_id}-{target_svala_id}'] = {
