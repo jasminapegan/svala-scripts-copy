@@ -193,16 +193,17 @@ def write_tei(annotated_source_divs, annotated_target_divs, document_edges, args
     etree_source = build_tei_etrees(etree_source_documents)
     etree_target = build_tei_etrees(etree_target_documents)
 
-    # print('Writting all but complete')
-    # with open(os.path.join(args.results_folder, f"source.xml"), 'w') as sf:
-    #     sf.write(etree.tostring(etree_source[0], pretty_print=True, encoding='utf-8').decode())
-    #
-    # with open(os.path.join(args.results_folder, f"target.xml"), 'w') as tf:
-    #     tf.write(etree.tostring(etree_target[0], pretty_print=True, encoding='utf-8').decode())
+    # to reduce RAM usage you may process the following in two steps, firstly write all but complete (by commenting complete tree code), secondly write only complete (by commenting "Writting all but complete" section of code and "deepcopy" function)
+    print('Writting all but complete')
+    with open(os.path.join(args.results_folder, f"source.xml"), 'w') as sf:
+        sf.write(etree.tostring(etree_source[0], pretty_print=True, encoding='utf-8').decode())
+
+    with open(os.path.join(args.results_folder, f"target.xml"), 'w') as tf:
+        tf.write(etree.tostring(etree_target[0], pretty_print=True, encoding='utf-8').decode())
 
     print('COMPLETE TREE CREATION...')
-    # complete_etree = build_complete_tei(copy.deepcopy(etree_source), copy.deepcopy(etree_target), etree_links)
-    complete_etree = build_complete_tei(etree_source, etree_target, etree_links)
+    complete_etree = build_complete_tei(copy.deepcopy(etree_source), copy.deepcopy(etree_target), etree_links)
+    # complete_etree = build_complete_tei(etree_source, etree_target, etree_links)
 
     print('WRITING COMPLETE TREE')
     with open(os.path.join(args.results_folder, f"complete.xml"), 'w') as tf:
