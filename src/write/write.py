@@ -14,12 +14,9 @@ def form_paragraphs(annotated_source_divs, metadata):
     for div_i, div_tuple in enumerate(annotated_source_divs):
         div_name, div = div_tuple
         if div_name[:-1] not in metadata:
-            # print(div_name[:-1] + "!!!!!!!!!!!!!!!!!!")
             print(div_name[:-1])
             continue
         div_metadata = metadata[div_name[:-1]]
-        # file_name = file_name.replace('/', '_')
-        # print(f'{i * 100 / folders_count} % : {file_name}')
 
         etree_source_paragraphs = []
 

@@ -295,29 +295,14 @@ def tokenize(args):
             return tokenized_source_divs, tokenized_target_divs, document_edges
 
     print('TOKENIZING...')
-    # with open(args.solar_file, 'r') as fp:
-    #     logging.info(args.solar_file)
-    #     et = ElementTree.XML(fp.read())
-
     nlp_tokenize = classla.Pipeline('sl', processors='tokenize', pos_lemma_pretag=True)
-    # filename_encountered = False
-    i = 0
     tokenized_divs = {}
-    # tokenized_source_divs = {}
-    # tokenized_target_divs = {}
-    document_edges = []
-
-    text_filename = ''
 
     all_js_filenames = [sorted(filenames) for folder, _, filenames in os.walk(args.svala_folder)][0]
 
     for text_folder, _, text_filenames in os.walk(args.raw_text):
         text_filenames = sorted(text_filenames)
         for text_filename_i, text_filename in enumerate(text_filenames):
-            # if filename_i*100/len(filenames) > 35:
-            #     print('here')
-            #     continue
-
             text_file = read_raw_text(os.path.join(args.raw_text, text_filename))
             raw_text, source_tokenized, metadocument = nlp_tokenize.processors['tokenize']._tokenizer.tokenize(
                 text_file) if text_file else ([], [], [])
@@ -338,8 +323,6 @@ def tokenize(args):
                     apply_svala_handfixes(svala_data_object)
 
                     source_sent_i, source_res = map_svala_tokenized(svala_data_object.svala_data['source'], source_tokenized, source_sent_i)
-                    # target_res = create_target(svala_data, source_tokenized)
-
 
                     target_res = create_target(svala_data_object, source_res)
 
@@ -366,8 +349,6 @@ def tokenize(args):
         paragraph_edges = []
         tokenized_source_paragraphs = []
         tokenized_target_paragraphs = []
-        # par_source = []
-        # par_target = []
         for tokenized_para in tokenized_divs[div_id]:
             paragraph_name, source_res, target_res, edges = tokenized_para
             split_para_name = paragraph_name[:-5].split('-')
@@ -392,7 +373,6 @@ def tokenize(args):
                 target_conllu = create_conllu(sen, target_sen_name)
                 target_paragraphs.append(target_conllu)
                 sen_target.append((sen, target_sen_name))
-            # paragraph_edges.append(edges)
             tokenized_source_paragraphs.append((par_name, source_paragraphs))
             tokenized_target_paragraphs.append((par_name, target_paragraphs))
             paragraph_edges.append(create_edges(edges, sen_source, sen_target))

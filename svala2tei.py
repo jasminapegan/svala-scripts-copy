@@ -246,13 +246,13 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='Read already processed xmls, erase entries without examples and limit gigafida examples to 1 per entry.')
+        description='Merges svala data, raw data and metadata into TEI format (useful for corpora like KOST).')
     parser.add_argument('--svala_folder', default='data/KOST/svala',
-                        help='input file in (gz or xml currently). If none, then just database is loaded')
+                        help='Path to directory that contains svala files.')
     parser.add_argument('--results_folder', default='data/KOST/results',
-                        help='input file in (gz or xml currently). If none, then just database is loaded')
+                        help='Path to results directory.')
     parser.add_argument('--raw_text', default='data/KOST/raw',
-                        help='input file in (gz or xml currently). If none, then just database is loaded')
+                        help='Path to directory that contains raw text files.')
     parser.add_argument('--texts_metadata', default='data/KOST/texts_metadata5.csv',
                         help='KOST metadata location')
     parser.add_argument('--authors_metadata', default='data/KOST/authors_metadata5.csv',
@@ -260,13 +260,13 @@ if __name__ == '__main__':
     parser.add_argument('--teachers_metadata', default='data/KOST/teachers_metadata.csv',
                         help='KOST teachers location')
     parser.add_argument('--translations', default='data/KOST/translations.csv',
-                        help='KOST Slovenian-English column names translations')
+                        help='KOST Slovenian-English column names translations for TEI metadata')
     parser.add_argument('--tokenization_interprocessing', default='data/processing.tokenization',
-                        help='input file in (gz or xml currently). If none, then just database is loaded')
-    parser.add_argument('--overwrite_tokenization', action='store_true', help='input file in (gz or xml currently). If none, then just database is loaded')
+                        help='Path to file that containing tokenized data.')
+    parser.add_argument('--overwrite_tokenization', action='store_true', help='Force retokenization without having to manually delete tokenization file.')
     parser.add_argument('--annotation_interprocessing', default='data/processing.annotation',
-                        help='input file in (gz or xml currently). If none, then just database is loaded')
-    parser.add_argument('--overwrite_annotation', action='store_true', help='input file in (gz or xml currently). If none, then just database is loaded')
+                        help='Path to file that containing annotated data.')
+    parser.add_argument('--overwrite_annotation', action='store_true', help='Force reannotation without having to manually delete tokenization file.')
     args = parser.parse_args()
 
     start = time.time()

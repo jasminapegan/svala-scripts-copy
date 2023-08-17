@@ -208,7 +208,6 @@ class Sentence:
 class Paragraph:
     def __init__(self, _id, _doc_id):
         self._id = _id if _id is not None else 'no-id'
-        # _doc_id += 's' if is_source else 't'
         self._doc_id = _doc_id if _doc_id is not None else ''
         self.sentences = []
 
@@ -290,14 +289,12 @@ def create_bibl(metadata):
         else:
             key = kost_translations[k]
         note.set('ana', f'#{key}')
-        # set_xml_attr(note, 'lang', 'sl')
         note.text = f'{v}'
         bibl.append(note)
     return bibl
 
 def convert_bibl(bibl):
     etree_bibl = etree.Element('bibl')
-    # etree_bibl.set('corresp', bibl.get('corresp'))
     etree_bibl.set('n', bibl.get('n'))
     for bibl_el in bibl:
         etree_bibl_el = etree.Element(bibl_el.tag)
@@ -332,25 +329,19 @@ def build_complete_tei(etree_source, etree_target, etree_links):
     print('P3')
     group.insert(len(group),
                       list(etree_source[0])[1])
-    # group.append(list(etree_source[0])[1])
     print('P4')
     group.insert(len(group),
                  list(etree_target[0])[1])
-    # group.append(list(etree_target[0])[1])
     print('P5')
     text.insert(len(text),
                  group)
-    # text.append(group)
     print('P6')
     root.insert(len(root),
                 tei_header)
-    # root.append(tei_header)
     print('P7')
-    # root.append(text)
     root.insert(len(root),
                 text)
     print('P8')
-    # root.append(etree_links)
     root.insert(len(root),
                 etree_links)
     print('P9')

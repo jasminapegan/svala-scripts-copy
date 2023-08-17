@@ -5,8 +5,6 @@ from src.read.hand_fixes import HAND_FIXES, apply_obeliks_handfixes, SVALA_HAND_
 
 def read_raw_text(path):
     print(path)
-    # if path == "data/KOST/raw/L-1819-110.txt":
-    #     print('here')
     try:
         with open(path, 'r', encoding='utf-8') as rf:
             return rf.read()
@@ -56,7 +54,6 @@ def map_svala_tokenized(svala_data_part, tokenized_paragraph, sent_i):
                             print('HAND_FIXES_MERGE:')
                             print(f", ('{tok['text'][:len(key)]}', '{tok['text'][len(key):]}'): '{tok['text']}'")
                             SVALA_HAND_FIXES_MERGE[(tok['text'][:len(key)], tok['text'][len(key):])] = tok['text']
-                            a = SVALA_HAND_FIXES_MERGE
                         else:
                             print('HAND_FIXES OLD:')
                             print(f", '{key}': ['{key[:len(tok['text'])]}', '{key[len(tok['text']):]}']")
@@ -65,10 +62,8 @@ def map_svala_tokenized(svala_data_part, tokenized_paragraph, sent_i):
                             reg = re.findall(r"[\w]+|[^\s\w]", key)
                             print(f", '{key}': {str(reg)}")
 
-                            # HAND_FIXES[key] = [key[:len(tok['text'])], key[len(tok['text']):]]
                             HAND_FIXES[key] = re.findall(r"[\w]+|[^\s\w]", key)
                         print(f'key: {key} ; tok[text]: {tok["text"]}')
-                        # raise ValueError('Word mismatch!')
 
                 if tok['text'] == HAND_FIXES[key][wierd_sign_count]:
                     wierd_sign_count += 1

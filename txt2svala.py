@@ -47,11 +47,11 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='Read already processed xmls, erase entries without examples and limit gigafida examples to 1 per entry.')
+        description='Converts raw text into svala format.')
     parser.add_argument('--input_folder', default='data/txt/input',
-                        help='input file in (gz or xml currently). If none, then just database is loaded')
+                        help='Path to folder containing raw texts.')
     parser.add_argument('--output_folder', default='data/txt/output',
-                        help='input file in (gz or xml currently). If none, then just database is loaded')
+                        help='Path to folder that will contain svala formatted texts.')
     args = parser.parse_args()
 
     start = time.time()
