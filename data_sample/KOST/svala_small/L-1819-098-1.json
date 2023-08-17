@@ -1,0 +1,551 @@
+{
+  "source": [
+    {"id": "s0", "text": "Ko "},
+    {"id": "s1", "text": "sem "},
+    {"id": "s2", "text": "imela "},
+    {"id": "s3", "text": "štirinajst "},
+    {"id": "s4", "text": "let "},
+    {"id": "s5", "text": "sem "},
+    {"id": "s6", "text": "šla "},
+    {"id": "s7", "text": "v "},
+    {"id": "s8", "text": "Španijo "},
+    {"id": "s9", "text": "z "},
+    {"id": "s10", "text": "svojo "},
+    {"id": "s11", "text": "plesno "},
+    {"id": "s12", "text": "skupino "},
+    {"id": "s13", "text": "in "},
+    {"id": "s14", "text": "to "},
+    {"id": "s15", "text": "je "},
+    {"id": "s16", "text": "še "},
+    {"id": "s17", "text": "vedno "},
+    {"id": "s18", "text": "moje "},
+    {"id": "s19", "text": "najlepše "},
+    {"id": "s20", "text": "potovanje "},
+    {"id": "s21", "text": ". "},
+    {"id": "s22", "text": "Prenočevali "},
+    {"id": "s23", "text": "smo "},
+    {"id": "s24", "text": "v "},
+    {"id": "s25", "text": "lepom "},
+    {"id": "s26", "text": "hotelu "},
+    {"id": "s27", "text": "ampak "},
+    {"id": "s28", "text": "ne "},
+    {"id": "s29", "text": "morem "},
+    {"id": "s30", "text": "se "},
+    {"id": "s31", "text": "spomniti "},
+    {"id": "s32", "text": "kako "},
+    {"id": "s33", "text": "je "},
+    {"id": "s34", "text": "ime "},
+    {"id": "s35", "text": "mesta "},
+    {"id": "s36", "text": ". "},
+    {"id": "s37", "text": "Hrana "},
+    {"id": "s38", "text": "mi "},
+    {"id": "s39", "text": "je "},
+    {"id": "s40", "text": "bila "},
+    {"id": "s41", "text": "zelo "},
+    {"id": "s42", "text": "všeč "},
+    {"id": "s43", "text": "in "},
+    {"id": "s44", "text": "spomnim "},
+    {"id": "s45", "text": "se "},
+    {"id": "s46", "text": "sladoleda "},
+    {"id": "s47", "text": ", "},
+    {"id": "s48", "text": "ki "},
+    {"id": "s49", "text": "sem "},
+    {"id": "s50", "text": "tam "},
+    {"id": "s51", "text": "jedla "},
+    {"id": "s52", "text": ". "},
+    {"id": "s53", "text": "Vsak "},
+    {"id": "s54", "text": "dan "},
+    {"id": "s55", "text": "smo "},
+    {"id": "s56", "text": "šli "},
+    {"id": "s57", "text": "na "},
+    {"id": "s58", "text": "plažo "},
+    {"id": "s59", "text": "in "},
+    {"id": "s60", "text": "nisem "},
+    {"id": "s61", "text": "skrbila "},
+    {"id": "s62", "text": "za "},
+    {"id": "s63", "text": "svoje "},
+    {"id": "s64", "text": "probleme "},
+    {"id": "s65", "text": ". "}
+  ],
+  "target": [
+    {"id": "t0", "text": "Ko "},
+    {"id": "t1", "text": "sem "},
+    {"id": "t2", "text": "imela "},
+    {"id": "t3", "text": "štirinajst "},
+    {"id": "t4", "text": "let "},
+    {"id": "t67", "text": ". "},
+    {"id": "t68", "text": "sem "},
+    {"id": "t6", "text": "šla "},
+    {"id": "t7", "text": "v "},
+    {"id": "t8", "text": "Španijo "},
+    {"id": "t70", "text": "s "},
+    {"id": "t10", "text": "svojo "},
+    {"id": "t11", "text": "plesno "},
+    {"id": "t12", "text": "skupino "},
+    {"id": "t13", "text": "in "},
+    {"id": "t14", "text": "to "},
+    {"id": "t15", "text": "je "},
+    {"id": "t16", "text": "še "},
+    {"id": "t17", "text": "vedno "},
+    {"id": "t18", "text": "moje "},
+    {"id": "t19", "text": "najlepše "},
+    {"id": "t20", "text": "potovanje "},
+    {"id": "t21", "text": ". "},
+    {"id": "t22", "text": "Prenočevali "},
+    {"id": "t23", "text": "smo "},
+    {"id": "t24", "text": "v "},
+    {"id": "t72", "text": "lepem "},
+    {"id": "t26", "text": "hotelu "},
+    {"id": "t74", "text": ", "},
+    {"id": "t75", "text": "ampak "},
+    {"id": "t28", "text": "ne "},
+    {"id": "t29", "text": "morem "},
+    {"id": "t30", "text": "se "},
+    {"id": "t31", "text": "spomniti "},
+    {"id": "t77", "text": ", "},
+    {"id": "t78", "text": "kako "},
+    {"id": "t33", "text": "je "},
+    {"id": "t34", "text": "ime "},
+    {"id": "t35", "text": "mesta "},
+    {"id": "t36", "text": ". "},
+    {"id": "t37", "text": "Hrana "},
+    {"id": "t38", "text": "mi "},
+    {"id": "t39", "text": "je "},
+    {"id": "t40", "text": "bila "},
+    {"id": "t41", "text": "zelo "},
+    {"id": "t42", "text": "všeč "},
+    {"id": "t43", "text": "in "},
+    {"id": "t44", "text": "spomnim "},
+    {"id": "t45", "text": "se "},
+    {"id": "t46", "text": "sladoleda "},
+    {"id": "t47", "text": ", "},
+    {"id": "t48", "text": "ki "},
+    {"id": "t49", "text": "sem "},
+    {"id": "t82", "text": "ga "},
+    {"id": "t81", "text": "tam "},
+    {"id": "t51", "text": "jedla "},
+    {"id": "t52", "text": ". "},
+    {"id": "t53", "text": "Vsak "},
+    {"id": "t54", "text": "dan "},
+    {"id": "t55", "text": "smo "},
+    {"id": "t56", "text": "šli "},
+    {"id": "t57", "text": "na "},
+    {"id": "t58", "text": "plažo "},
+    {"id": "t59", "text": "in "},
+    {"id": "t86", "text": "moji "},
+    {"id": "t96", "text": "problemi "},
+    {"id": "t100", "text": "me "},
+    {"id": "t106", "text": "niso "},
+    {"id": "t115", "text": "skrbeli "},
+    {"id": "t109", "text": ". "}
+  ],
+  "edges": {
+    "e-s9-t70": {
+      "id": "e-s9-t70",
+      "ids": ["s9", "t70"],
+      "labels": ["Z-CRK"],
+      "manual": true
+    },
+    "e-s60-s61-s62-s63-s64-t100-t106-t115-t86-t96": {
+      "id": "e-s60-s61-s62-s63-s64-t100-t106-t115-t86-t96",
+      "ids": [
+        "s60",
+        "s61",
+        "s62",
+        "s63",
+        "s64",
+        "t100",
+        "t106",
+        "t115",
+        "t86",
+        "t96"
+      ],
+      "labels": ["S-STR"],
+      "manual": true
+    },
+    "e-s0-t0": {
+      "id": "e-s0-t0",
+      "ids": ["s0", "t0"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s1-t1": {
+      "id": "e-s1-t1",
+      "ids": ["s1", "t1"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s2-t2": {
+      "id": "e-s2-t2",
+      "ids": ["s2", "t2"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s3-t3": {
+      "id": "e-s3-t3",
+      "ids": ["s3", "t3"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s4-t4": {
+      "id": "e-s4-t4",
+      "ids": ["s4", "t4"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s5-t68": {
+      "id": "e-s5-t68",
+      "ids": ["s5", "t68"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s6-t6": {
+      "id": "e-s6-t6",
+      "ids": ["s6", "t6"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s7-t7": {
+      "id": "e-s7-t7",
+      "ids": ["s7", "t7"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s8-t8": {
+      "id": "e-s8-t8",
+      "ids": ["s8", "t8"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s10-t10": {
+      "id": "e-s10-t10",
+      "ids": ["s10", "t10"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s11-t11": {
+      "id": "e-s11-t11",
+      "ids": ["s11", "t11"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s12-t12": {
+      "id": "e-s12-t12",
+      "ids": ["s12", "t12"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s13-t13": {
+      "id": "e-s13-t13",
+      "ids": ["s13", "t13"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s14-t14": {
+      "id": "e-s14-t14",
+      "ids": ["s14", "t14"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s15-t15": {
+      "id": "e-s15-t15",
+      "ids": ["s15", "t15"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s16-t16": {
+      "id": "e-s16-t16",
+      "ids": ["s16", "t16"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s17-t17": {
+      "id": "e-s17-t17",
+      "ids": ["s17", "t17"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s18-t18": {
+      "id": "e-s18-t18",
+      "ids": ["s18", "t18"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s19-t19": {
+      "id": "e-s19-t19",
+      "ids": ["s19", "t19"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s20-t20": {
+      "id": "e-s20-t20",
+      "ids": ["s20", "t20"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s21-t21": {
+      "id": "e-s21-t21",
+      "ids": ["s21", "t21"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s22-t22": {
+      "id": "e-s22-t22",
+      "ids": ["s22", "t22"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s23-t23": {
+      "id": "e-s23-t23",
+      "ids": ["s23", "t23"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s24-t24": {
+      "id": "e-s24-t24",
+      "ids": ["s24", "t24"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s25-t72": {
+      "id": "e-s25-t72",
+      "ids": ["s25", "t72"],
+      "labels": ["O-PRID"],
+      "manual": false
+    },
+    "e-s26-t26": {
+      "id": "e-s26-t26",
+      "ids": ["s26", "t26"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s27-t75": {
+      "id": "e-s27-t75",
+      "ids": ["s27", "t75"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s28-t28": {
+      "id": "e-s28-t28",
+      "ids": ["s28", "t28"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s29-t29": {
+      "id": "e-s29-t29",
+      "ids": ["s29", "t29"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s30-t30": {
+      "id": "e-s30-t30",
+      "ids": ["s30", "t30"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s31-t31": {
+      "id": "e-s31-t31",
+      "ids": ["s31", "t31"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s32-t78": {
+      "id": "e-s32-t78",
+      "ids": ["s32", "t78"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s33-t33": {
+      "id": "e-s33-t33",
+      "ids": ["s33", "t33"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s34-t34": {
+      "id": "e-s34-t34",
+      "ids": ["s34", "t34"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s35-t35": {
+      "id": "e-s35-t35",
+      "ids": ["s35", "t35"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s36-t36": {
+      "id": "e-s36-t36",
+      "ids": ["s36", "t36"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s37-t37": {
+      "id": "e-s37-t37",
+      "ids": ["s37", "t37"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s38-t38": {
+      "id": "e-s38-t38",
+      "ids": ["s38", "t38"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s39-t39": {
+      "id": "e-s39-t39",
+      "ids": ["s39", "t39"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s40-t40": {
+      "id": "e-s40-t40",
+      "ids": ["s40", "t40"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s41-t41": {
+      "id": "e-s41-t41",
+      "ids": ["s41", "t41"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s42-t42": {
+      "id": "e-s42-t42",
+      "ids": ["s42", "t42"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s43-t43": {
+      "id": "e-s43-t43",
+      "ids": ["s43", "t43"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s44-t44": {
+      "id": "e-s44-t44",
+      "ids": ["s44", "t44"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s45-t45": {
+      "id": "e-s45-t45",
+      "ids": ["s45", "t45"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s46-t46": {
+      "id": "e-s46-t46",
+      "ids": ["s46", "t46"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s47-t47": {
+      "id": "e-s47-t47",
+      "ids": ["s47", "t47"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s48-t48": {
+      "id": "e-s48-t48",
+      "ids": ["s48", "t48"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s49-t49": {
+      "id": "e-s49-t49",
+      "ids": ["s49", "t49"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s50-t81": {
+      "id": "e-s50-t81",
+      "ids": ["s50", "t81"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s51-t51": {
+      "id": "e-s51-t51",
+      "ids": ["s51", "t51"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s52-t52": {
+      "id": "e-s52-t52",
+      "ids": ["s52", "t52"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s53-t53": {
+      "id": "e-s53-t53",
+      "ids": ["s53", "t53"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s54-t54": {
+      "id": "e-s54-t54",
+      "ids": ["s54", "t54"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s55-t55": {
+      "id": "e-s55-t55",
+      "ids": ["s55", "t55"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s56-t56": {
+      "id": "e-s56-t56",
+      "ids": ["s56", "t56"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s57-t57": {
+      "id": "e-s57-t57",
+      "ids": ["s57", "t57"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s58-t58": {
+      "id": "e-s58-t58",
+      "ids": ["s58", "t58"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s59-t59": {
+      "id": "e-s59-t59",
+      "ids": ["s59", "t59"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s65-t109": {
+      "id": "e-s65-t109",
+      "ids": ["s65", "t109"],
+      "labels": [],
+      "manual": false
+    },
+    "e-t67": {
+      "id": "e-t67",
+      "ids": ["t67"],
+      "labels": ["Z-LOC"],
+      "manual": false
+    },
+    "e-t74": {
+      "id": "e-t74",
+      "ids": ["t74"],
+      "labels": ["Z-LOC"],
+      "manual": false
+    },
+    "e-t77": {
+      "id": "e-t77",
+      "ids": ["t77"],
+      "labels": ["Z-LOC"],
+      "manual": false
+    },
+    "e-t82": {
+      "id": "e-t82",
+      "ids": ["t82"],
+      "labels": ["S-IZP"],
+      "manual": false
+    }
+  }
+}

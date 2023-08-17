@@ -1,0 +1,184 @@
+{
+  "source": [
+    {"id": "s0", "text": "Nije "},
+    {"id": "s1", "text": "mi "},
+    {"id": "s2", "text": "všeč "},
+    {"id": "s3", "text": "vreme "},
+    {"id": "s4", "text": ". "},
+    {"id": "s5", "text": "Pogosto "},
+    {"id": "s6", "text": "dždi "},
+    {"id": "s7", "text": "ali "},
+    {"id": "s8", "text": "je "},
+    {"id": "s9", "text": "maglevito "},
+    {"id": "s10", "text": ". "},
+    {"id": "s11", "text": "Preveč "},
+    {"id": "s12", "text": "ima "},
+    {"id": "s13", "text": "promet "},
+    {"id": "s14", "text": "po "},
+    {"id": "s15", "text": "cesti "},
+    {"id": "s16", "text": ". "},
+    {"id": "s17", "text": "Hrana "},
+    {"id": "s18", "text": "je "},
+    {"id": "s19", "text": "brez "},
+    {"id": "s20", "text": "okusa "},
+    {"id": "s21", "text": ".  "}
+  ],
+  "target": [
+    {"id": "t23", "text": "Ni "},
+    {"id": "t1", "text": "mi "},
+    {"id": "t2", "text": "všeč "},
+    {"id": "t3", "text": "vreme "},
+    {"id": "t4", "text": ". "},
+    {"id": "t5", "text": "Pogosto "},
+    {"id": "t29", "text": "dežuje "},
+    {"id": "t7", "text": "ali "},
+    {"id": "t8", "text": "je "},
+    {"id": "t37", "text": "megleno "},
+    {"id": "t10", "text": ". "},
+    {"id": "t11", "text": "Preveč "},
+    {"id": "t40", "text": "je "},
+    {"id": "t45", "text": "prometa "},
+    {"id": "t46", "text": "po "},
+    {"id": "t15", "text": "cesti "},
+    {"id": "t16", "text": ". "},
+    {"id": "t17", "text": "Hrana "},
+    {"id": "t18", "text": "je "},
+    {"id": "t19", "text": "brez "},
+    {"id": "t20", "text": "okusa "},
+    {"id": "t21", "text": ".  "}
+  ],
+  "edges": {
+    "e-s12-t40": {
+      "id": "e-s12-t40",
+      "ids": ["s12", "t40"],
+      "labels": ["B-GLAG"],
+      "manual": true
+    },
+    "e-s0-t23": {
+      "id": "e-s0-t23",
+      "ids": ["s0", "t23"],
+      "labels": ["O-GLAG"],
+      "manual": false
+    },
+    "e-s1-t1": {
+      "id": "e-s1-t1",
+      "ids": ["s1", "t1"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s2-t2": {
+      "id": "e-s2-t2",
+      "ids": ["s2", "t2"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s3-t3": {
+      "id": "e-s3-t3",
+      "ids": ["s3", "t3"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s4-t4": {
+      "id": "e-s4-t4",
+      "ids": ["s4", "t4"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s5-t5": {
+      "id": "e-s5-t5",
+      "ids": ["s5", "t5"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s6-t29": {
+      "id": "e-s6-t29",
+      "ids": ["s6", "t29"],
+      "labels": ["B-GLAG"],
+      "manual": false
+    },
+    "e-s7-t7": {
+      "id": "e-s7-t7",
+      "ids": ["s7", "t7"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s8-t8": {
+      "id": "e-s8-t8",
+      "ids": ["s8", "t8"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s9-t37": {
+      "id": "e-s9-t37",
+      "ids": ["s9", "t37"],
+      "labels": ["B-PRISL"],
+      "manual": false
+    },
+    "e-s10-t10": {
+      "id": "e-s10-t10",
+      "ids": ["s10", "t10"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s11-t11": {
+      "id": "e-s11-t11",
+      "ids": ["s11", "t11"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s13-t45": {
+      "id": "e-s13-t45",
+      "ids": ["s13", "t45"],
+      "labels": ["O-SAM"],
+      "manual": false
+    },
+    "e-s14-t46": {
+      "id": "e-s14-t46",
+      "ids": ["s14", "t46"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s15-t15": {
+      "id": "e-s15-t15",
+      "ids": ["s15", "t15"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s16-t16": {
+      "id": "e-s16-t16",
+      "ids": ["s16", "t16"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s17-t17": {
+      "id": "e-s17-t17",
+      "ids": ["s17", "t17"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s18-t18": {
+      "id": "e-s18-t18",
+      "ids": ["s18", "t18"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s19-t19": {
+      "id": "e-s19-t19",
+      "ids": ["s19", "t19"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s20-t20": {
+      "id": "e-s20-t20",
+      "ids": ["s20", "t20"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s21-t21": {
+      "id": "e-s21-t21",
+      "ids": ["s21", "t21"],
+      "labels": [],
+      "manual": false
+    }
+  }
+}

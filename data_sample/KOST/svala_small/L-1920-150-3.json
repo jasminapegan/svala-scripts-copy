@@ -1,0 +1,234 @@
+{
+  "source": [
+    {"id": "s0", "text": "Kolegi "},
+    {"id": "s1", "text": "so "},
+    {"id": "s2", "text": "mi "},
+    {"id": "s3", "text": "Slovenci "},
+    {"id": "s4", "text": ", "},
+    {"id": "s5", "text": "samo "},
+    {"id": "s6", "text": "jaz "},
+    {"id": "s7", "text": "sem "},
+    {"id": "s8", "text": "iz "},
+    {"id": "s9", "text": "Makedonije "},
+    {"id": "s10", "text": ". "},
+    {"id": "s11", "text": "Oni "},
+    {"id": "s12", "text": "so "},
+    {"id": "s13", "text": "zelo "},
+    {"id": "s14", "text": "dobri "},
+    {"id": "s15", "text": ". "},
+    {"id": "s16", "text": "Pomagajo "},
+    {"id": "s17", "text": "mi "},
+    {"id": "s18", "text": ". "},
+    {"id": "s19", "text": "Slovenci "},
+    {"id": "s20", "text": "so "},
+    {"id": "s21", "text": "gostoljubivi "},
+    {"id": "s22", "text": ". "},
+    {"id": "s23", "text": "Niso "},
+    {"id": "s24", "text": "visoki "},
+    {"id": "s25", "text": "preveč "},
+    {"id": "s26", "text": "Slovenci "},
+    {"id": "s27", "text": ", "},
+    {"id": "s28", "text": "Slovenke "},
+    {"id": "s29", "text": "so "},
+    {"id": "s30", "text": "nizke "},
+    {"id": "s31", "text": ". "}
+  ],
+  "target": [
+    {"id": "t36", "text": "Moji "},
+    {"id": "t39", "text": "kolegi "},
+    {"id": "t1", "text": "so "},
+    {"id": "t40", "text": "Slovenci "},
+    {"id": "t4", "text": ", "},
+    {"id": "t5", "text": "samo "},
+    {"id": "t6", "text": "jaz "},
+    {"id": "t7", "text": "sem "},
+    {"id": "t8", "text": "iz "},
+    {"id": "t9", "text": "Makedonije "},
+    {"id": "t10", "text": ". "},
+    {"id": "t11", "text": "Oni "},
+    {"id": "t12", "text": "so "},
+    {"id": "t13", "text": "zelo "},
+    {"id": "t14", "text": "dobri "},
+    {"id": "t15", "text": ". "},
+    {"id": "t16", "text": "Pomagajo "},
+    {"id": "t17", "text": "mi "},
+    {"id": "t18", "text": ". "},
+    {"id": "t19", "text": "Slovenci "},
+    {"id": "t20", "text": "so "},
+    {"id": "t43", "text": "gostoljubni "},
+    {"id": "t45", "text": ". "},
+    {"id": "t53", "text": "Slovenci "},
+    {"id": "t55", "text": "niso "},
+    {"id": "t63", "text": "preveč "},
+    {"id": "t64", "text": "visoki "},
+    {"id": "t65", "text": ", "},
+    {"id": "t28", "text": "Slovenke "},
+    {"id": "t29", "text": "so "},
+    {"id": "t30", "text": "nizke "},
+    {"id": "t31", "text": ". "}
+  ],
+  "edges": {
+    "e-s0-s1-s2-t1-t36-t39": {
+      "id": "e-s0-s1-s2-t1-t36-t39",
+      "ids": ["s0", "s1", "s2", "t1", "t36", "t39"],
+      "labels": ["S-STR"],
+      "manual": true
+    },
+    "e-s23-s24-s25-s26-t53-t55-t63-t64": {
+      "id": "e-s23-s24-s25-s26-t53-t55-t63-t64",
+      "ids": ["s23", "s24", "s25", "s26", "t53", "t55", "t63", "t64"],
+      "labels": ["S-BR"],
+      "manual": true
+    },
+    "e-s3-t40": {
+      "id": "e-s3-t40",
+      "ids": ["s3", "t40"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s4-t4": {
+      "id": "e-s4-t4",
+      "ids": ["s4", "t4"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s5-t5": {
+      "id": "e-s5-t5",
+      "ids": ["s5", "t5"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s6-t6": {
+      "id": "e-s6-t6",
+      "ids": ["s6", "t6"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s7-t7": {
+      "id": "e-s7-t7",
+      "ids": ["s7", "t7"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s8-t8": {
+      "id": "e-s8-t8",
+      "ids": ["s8", "t8"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s9-t9": {
+      "id": "e-s9-t9",
+      "ids": ["s9", "t9"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s10-t10": {
+      "id": "e-s10-t10",
+      "ids": ["s10", "t10"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s11-t11": {
+      "id": "e-s11-t11",
+      "ids": ["s11", "t11"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s12-t12": {
+      "id": "e-s12-t12",
+      "ids": ["s12", "t12"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s13-t13": {
+      "id": "e-s13-t13",
+      "ids": ["s13", "t13"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s14-t14": {
+      "id": "e-s14-t14",
+      "ids": ["s14", "t14"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s15-t15": {
+      "id": "e-s15-t15",
+      "ids": ["s15", "t15"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s16-t16": {
+      "id": "e-s16-t16",
+      "ids": ["s16", "t16"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s17-t17": {
+      "id": "e-s17-t17",
+      "ids": ["s17", "t17"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s18-t18": {
+      "id": "e-s18-t18",
+      "ids": ["s18", "t18"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s19-t19": {
+      "id": "e-s19-t19",
+      "ids": ["s19", "t19"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s20-t20": {
+      "id": "e-s20-t20",
+      "ids": ["s20", "t20"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s21-t43": {
+      "id": "e-s21-t43",
+      "ids": ["s21", "t43"],
+      "labels": ["B-PRID"],
+      "manual": false
+    },
+    "e-s22-t45": {
+      "id": "e-s22-t45",
+      "ids": ["s22", "t45"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s27-t65": {
+      "id": "e-s27-t65",
+      "ids": ["s27", "t65"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s28-t28": {
+      "id": "e-s28-t28",
+      "ids": ["s28", "t28"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s29-t29": {
+      "id": "e-s29-t29",
+      "ids": ["s29", "t29"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s30-t30": {
+      "id": "e-s30-t30",
+      "ids": ["s30", "t30"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s31-t31": {
+      "id": "e-s31-t31",
+      "ids": ["s31", "t31"],
+      "labels": [],
+      "manual": false
+    }
+  }
+}

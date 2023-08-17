@@ -3,3 +3,6 @@ data
 __pycache__/
 venv/
 src/__pycache__/
+data_sample/KOST/results_small
+data_sample/processing.annotation
+data_sample/processing.tokenization

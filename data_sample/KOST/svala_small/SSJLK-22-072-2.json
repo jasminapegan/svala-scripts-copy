@@ -1,0 +1,208 @@
+{
+  "source": [
+    {"id": "s0", "text": "Na "},
+    {"id": "s1", "text": "58 "},
+    {"id": "s2", "text": ". "},
+    {"id": "s3", "text": "seminarju "},
+    {"id": "s4", "text": "slovenskega "},
+    {"id": "s5", "text": "jezika "},
+    {"id": "s6", "text": ", "},
+    {"id": "s7", "text": "literature "},
+    {"id": "s8", "text": "in "},
+    {"id": "s9", "text": "kulture "},
+    {"id": "s10", "text": "hotela "},
+    {"id": "s11", "text": "bi "},
+    {"id": "s12", "text": "izvedeti "},
+    {"id": "s13", "text": "več "},
+    {"id": "s14", "text": "o "},
+    {"id": "s15", "text": "slovenski "},
+    {"id": "s16", "text": "kulturi "},
+    {"id": "s17", "text": "in "},
+    {"id": "s18", "text": "izboljšati "},
+    {"id": "s19", "text": "svojo "},
+    {"id": "s20", "text": "slovenščino "},
+    {"id": "s21", "text": ", "},
+    {"id": "s22", "text": "predvsem "},
+    {"id": "s23", "text": "izgovorjavo "},
+    {"id": "s24", "text": ". "}
+  ],
+  "target": [
+    {"id": "t0", "text": "Na "},
+    {"id": "t1", "text": "58 "},
+    {"id": "t2", "text": ". "},
+    {"id": "t3", "text": "seminarju "},
+    {"id": "t4", "text": "slovenskega "},
+    {"id": "t5", "text": "jezika "},
+    {"id": "t6", "text": ", "},
+    {"id": "t7", "text": "literature "},
+    {"id": "t8", "text": "in "},
+    {"id": "t9", "text": "kulture "},
+    {"id": "t27", "text": "bi "},
+    {"id": "t28", "text": "hotela "},
+    {"id": "t29", "text": "izvedeti "},
+    {"id": "t13", "text": "več "},
+    {"id": "t14", "text": "o "},
+    {"id": "t15", "text": "slovenski "},
+    {"id": "t16", "text": "kulturi "},
+    {"id": "t17", "text": "in "},
+    {"id": "t18", "text": "izboljšati "},
+    {"id": "t19", "text": "svojo "},
+    {"id": "t20", "text": "slovenščino "},
+    {"id": "t21", "text": ", "},
+    {"id": "t22", "text": "predvsem "},
+    {"id": "t23", "text": "izgovorjavo "},
+    {"id": "t24", "text": ". "}
+  ],
+  "edges": {
+    "e-s11-t27": {
+      "id": "e-s11-t27",
+      "ids": ["s11", "t27"],
+      "labels": ["S-BR"],
+      "manual": true
+    },
+    "e-s0-t0": {
+      "id": "e-s0-t0",
+      "ids": ["s0", "t0"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s1-t1": {
+      "id": "e-s1-t1",
+      "ids": ["s1", "t1"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s2-t2": {
+      "id": "e-s2-t2",
+      "ids": ["s2", "t2"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s3-t3": {
+      "id": "e-s3-t3",
+      "ids": ["s3", "t3"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s4-t4": {
+      "id": "e-s4-t4",
+      "ids": ["s4", "t4"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s5-t5": {
+      "id": "e-s5-t5",
+      "ids": ["s5", "t5"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s6-t6": {
+      "id": "e-s6-t6",
+      "ids": ["s6", "t6"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s7-t7": {
+      "id": "e-s7-t7",
+      "ids": ["s7", "t7"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s8-t8": {
+      "id": "e-s8-t8",
+      "ids": ["s8", "t8"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s9-t9": {
+      "id": "e-s9-t9",
+      "ids": ["s9", "t9"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s10-t28": {
+      "id": "e-s10-t28",
+      "ids": ["s10", "t28"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s12-t29": {
+      "id": "e-s12-t29",
+      "ids": ["s12", "t29"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s13-t13": {
+      "id": "e-s13-t13",
+      "ids": ["s13", "t13"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s14-t14": {
+      "id": "e-s14-t14",
+      "ids": ["s14", "t14"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s15-t15": {
+      "id": "e-s15-t15",
+      "ids": ["s15", "t15"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s16-t16": {
+      "id": "e-s16-t16",
+      "ids": ["s16", "t16"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s17-t17": {
+      "id": "e-s17-t17",
+      "ids": ["s17", "t17"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s18-t18": {
+      "id": "e-s18-t18",
+      "ids": ["s18", "t18"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s19-t19": {
+      "id": "e-s19-t19",
+      "ids": ["s19", "t19"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s20-t20": {
+      "id": "e-s20-t20",
+      "ids": ["s20", "t20"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s21-t21": {
+      "id": "e-s21-t21",
+      "ids": ["s21", "t21"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s22-t22": {
+      "id": "e-s22-t22",
+      "ids": ["s22", "t22"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s23-t23": {
+      "id": "e-s23-t23",
+      "ids": ["s23", "t23"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s24-t24": {
+      "id": "e-s24-t24",
+      "ids": ["s24", "t24"],
+      "labels": [],
+      "manual": false
+    }
+  }
+}

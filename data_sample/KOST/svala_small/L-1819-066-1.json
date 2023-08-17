@@ -1,0 +1,963 @@
+{
+  "source": [
+    {"id": "s0", "text": "Pero "},
+    {"id": "s1", "text": "Antič "},
+    {"id": "s2", "text": "je "},
+    {"id": "s3", "text": "najpomembnejši "},
+    {"id": "s4", "text": "človek "},
+    {"id": "s5", "text": "v "},
+    {"id": "s6", "text": "zgodovini "},
+    {"id": "s7", "text": "sporta "},
+    {"id": "s8", "text": "v "},
+    {"id": "s9", "text": "Makedoniji "},
+    {"id": "s10", "text": ". "},
+    {"id": "s11", "text": "To "},
+    {"id": "s12", "text": "je "},
+    {"id": "s13", "text": "moje "},
+    {"id": "s14", "text": "mnenje "},
+    {"id": "s15", "text": ". "},
+    {"id": "s16", "text": "Pero "},
+    {"id": "s17", "text": "Antič "},
+    {"id": "s18", "text": "je "},
+    {"id": "s19", "text": "makedonski "},
+    {"id": "s20", "text": "reprezentant "},
+    {"id": "s21", "text": ". "},
+    {"id": "s22", "text": "On "},
+    {"id": "s23", "text": "je "},
+    {"id": "s24", "text": "prvi "},
+    {"id": "s25", "text": "makedonski "},
+    {"id": "s26", "text": "košarkar "},
+    {"id": "s27", "text": "ki "},
+    {"id": "s28", "text": "je "},
+    {"id": "s29", "text": "igral "},
+    {"id": "s30", "text": "v "},
+    {"id": "s31", "text": "NBA "},
+    {"id": "s32", "text": ". "},
+    {"id": "s33", "text": "Igral "},
+    {"id": "s34", "text": "je "},
+    {"id": "s35", "text": "za "},
+    {"id": "s36", "text": "Atlanta "},
+    {"id": "s37", "text": "Hawks "},
+    {"id": "s38", "text": "in "},
+    {"id": "s39", "text": "je "},
+    {"id": "s40", "text": "tekmoval "},
+    {"id": "s41", "text": "3 "},
+    {"id": "s42", "text": "leta "},
+    {"id": "s43", "text": ". "},
+    {"id": "s44", "text": "Tudi "},
+    {"id": "s45", "text": "je "},
+    {"id": "s46", "text": "igral "},
+    {"id": "s47", "text": "za "},
+    {"id": "s48", "text": "Crveno "},
+    {"id": "s49", "text": "Zvezdo "},
+    {"id": "s50", "text": ", "},
+    {"id": "s51", "text": "Fenerbahče "},
+    {"id": "s52", "text": ", "},
+    {"id": "s53", "text": "Olimpijakos "},
+    {"id": "s54", "text": ". "},
+    {"id": "s55", "text": "Ko "},
+    {"id": "s56", "text": "je "},
+    {"id": "s57", "text": "tekmoval "},
+    {"id": "s58", "text": "za "},
+    {"id": "s59", "text": "Olimpijakos "},
+    {"id": "s60", "text": "dvakrat "},
+    {"id": "s61", "text": "je "},
+    {"id": "s62", "text": "osvojil "},
+    {"id": "s63", "text": "Euroligo "},
+    {"id": "s64", "text": ". "},
+    {"id": "s65", "text": "Pero "},
+    {"id": "s66", "text": "Antič "},
+    {"id": "s67", "text": "je "},
+    {"id": "s68", "text": "bil "},
+    {"id": "s69", "text": "med "},
+    {"id": "s70", "text": "najboljšimi "},
+    {"id": "s71", "text": "na "},
+    {"id": "s72", "text": "Evropskem "},
+    {"id": "s73", "text": "turniru "},
+    {"id": "s74", "text": "v "},
+    {"id": "s75", "text": "košarki "},
+    {"id": "s76", "text": "in "},
+    {"id": "s77", "text": "Makedonija "},
+    {"id": "s78", "text": "je "},
+    {"id": "s79", "text": "končala "},
+    {"id": "s80", "text": "na "},
+    {"id": "s81", "text": "4 "},
+    {"id": "s82", "text": "mestu "},
+    {"id": "s83", "text": ". "},
+    {"id": "s84", "text": "V "},
+    {"id": "s85", "text": "NBA "},
+    {"id": "s86", "text": "svoj "},
+    {"id": "s87", "text": "največi "},
+    {"id": "s88", "text": "uspeh "},
+    {"id": "s89", "text": "je "},
+    {"id": "s90", "text": "imal "},
+    {"id": "s91", "text": "kot "},
+    {"id": "s92", "text": "je "},
+    {"id": "s93", "text": "prišel "},
+    {"id": "s94", "text": "do "},
+    {"id": "s95", "text": "finale "},
+    {"id": "s96", "text": "Istočne "},
+    {"id": "s97", "text": "konferencije "},
+    {"id": "s98", "text": ", "},
+    {"id": "s99", "text": "ampak "},
+    {"id": "s100", "text": "Atlanta "},
+    {"id": "s101", "text": "je "},
+    {"id": "s102", "text": "izgubilo "},
+    {"id": "s103", "text": "to "},
+    {"id": "s104", "text": "serijo "},
+    {"id": "s105", "text": ". "},
+    {"id": "s106", "text": "Pero "},
+    {"id": "s107", "text": "Antič "},
+    {"id": "s108", "text": "je "},
+    {"id": "s109", "text": "skoraj "},
+    {"id": "s110", "text": "bil "},
+    {"id": "s111", "text": "izbran "},
+    {"id": "s112", "text": "za "},
+    {"id": "s113", "text": "presednik "},
+    {"id": "s114", "text": "makedonsko "},
+    {"id": "s115", "text": "košarkarsko "},
+    {"id": "s116", "text": "federacijo "},
+    {"id": "s117", "text": ". "}
+  ],
+  "target": [
+    {"id": "t0", "text": "Pero "},
+    {"id": "t1", "text": "Antič "},
+    {"id": "t2", "text": "je "},
+    {"id": "t3", "text": "najpomembnejši "},
+    {"id": "t4", "text": "človek "},
+    {"id": "t5", "text": "v "},
+    {"id": "t6", "text": "zgodovini "},
+    {"id": "t119", "text": "športa "},
+    {"id": "t8", "text": "v "},
+    {"id": "t9", "text": "Makedoniji "},
+    {"id": "t10", "text": ". "},
+    {"id": "t11", "text": "To "},
+    {"id": "t12", "text": "je "},
+    {"id": "t13", "text": "moje "},
+    {"id": "t14", "text": "mnenje "},
+    {"id": "t15", "text": ". "},
+    {"id": "t16", "text": "Pero "},
+    {"id": "t17", "text": "Antič "},
+    {"id": "t18", "text": "je "},
+    {"id": "t19", "text": "makedonski "},
+    {"id": "t20", "text": "reprezentant "},
+    {"id": "t21", "text": ". "},
+    {"id": "t22", "text": "On "},
+    {"id": "t23", "text": "je "},
+    {"id": "t24", "text": "prvi "},
+    {"id": "t25", "text": "makedonski "},
+    {"id": "t26", "text": "košarkar "},
+    {"id": "t121", "text": ", "},
+    {"id": "t122", "text": "ki "},
+    {"id": "t28", "text": "je "},
+    {"id": "t29", "text": "igral "},
+    {"id": "t30", "text": "v "},
+    {"id": "t31", "text": "NBA "},
+    {"id": "t32", "text": ". "},
+    {"id": "t33", "text": "Igral "},
+    {"id": "t34", "text": "je "},
+    {"id": "t35", "text": "za "},
+    {"id": "t36", "text": "Atlanta "},
+    {"id": "t37", "text": "Hawks "},
+    {"id": "t38", "text": "in "},
+    {"id": "t39", "text": "je "},
+    {"id": "t40", "text": "tekmoval "},
+    {"id": "t41", "text": "3 "},
+    {"id": "t42", "text": "leta "},
+    {"id": "t43", "text": ". "},
+    {"id": "t128", "text": "Igral "},
+    {"id": "t132", "text": "je "},
+    {"id": "t135", "text": "tudi "},
+    {"id": "t137", "text": "za "},
+    {"id": "t48", "text": "Crveno "},
+    {"id": "t139", "text": "zvezdo "},
+    {"id": "t50", "text": ", "},
+    {"id": "t51", "text": "Fenerbahče "},
+    {"id": "t52", "text": ", "},
+    {"id": "t140", "text": "Olimpiakos "},
+    {"id": "t54", "text": ". "},
+    {"id": "t55", "text": "Ko "},
+    {"id": "t56", "text": "je "},
+    {"id": "t57", "text": "tekmoval "},
+    {"id": "t58", "text": "za "},
+    {"id": "t141", "text": "Olimpiakos "},
+    {"id": "t146", "text": ", "},
+    {"id": "t148", "text": "je "},
+    {"id": "t150", "text": "dvakrat "},
+    {"id": "t151", "text": "osvojil "},
+    {"id": "t207", "text": "Evroligo "},
+    {"id": "t64", "text": ". "},
+    {"id": "t65", "text": "Pero "},
+    {"id": "t66", "text": "Antič "},
+    {"id": "t67", "text": "je "},
+    {"id": "t68", "text": "bil "},
+    {"id": "t69", "text": "med "},
+    {"id": "t70", "text": "najboljšimi "},
+    {"id": "t71", "text": "na "},
+    {"id": "t153", "text": "evropskem "},
+    {"id": "t154", "text": "turnirju "},
+    {"id": "t74", "text": "v "},
+    {"id": "t75", "text": "košarki "},
+    {"id": "t76", "text": "in "},
+    {"id": "t77", "text": "Makedonija "},
+    {"id": "t78", "text": "je "},
+    {"id": "t79", "text": "končala "},
+    {"id": "t80", "text": "na "},
+    {"id": "t81", "text": "4 "},
+    {"id": "t156", "text": ". "},
+    {"id": "t157", "text": "mestu "},
+    {"id": "t83", "text": ". "},
+    {"id": "t84", "text": "V "},
+    {"id": "t85", "text": "NBA "},
+    {"id": "t161", "text": "je "},
+    {"id": "t160", "text": "svoj "},
+    {"id": "t162", "text": "največji "},
+    {"id": "t88", "text": "uspeh "},
+    {"id": "t165", "text": "imel "},
+    {"id": "t167", "text": ", "},
+    {"id": "t169", "text": "ko "},
+    {"id": "t92", "text": "je "},
+    {"id": "t93", "text": "prišel "},
+    {"id": "t94", "text": "do "},
+    {"id": "t171", "text": "finala "},
+    {"id": "t180", "text": "vzhodne "},
+    {"id": "t185", "text": "konference "},
+    {"id": "t98", "text": ", "},
+    {"id": "t99", "text": "ampak "},
+    {"id": "t100", "text": "Atlanta "},
+    {"id": "t101", "text": "je "},
+    {"id": "t102", "text": "izgubilo "},
+    {"id": "t103", "text": "to "},
+    {"id": "t104", "text": "serijo "},
+    {"id": "t105", "text": ". "},
+    {"id": "t106", "text": "Pero "},
+    {"id": "t107", "text": "Antič "},
+    {"id": "t108", "text": "je "},
+    {"id": "t189", "text": "pred "},
+    {"id": "t198", "text": "kratkim "},
+    {"id": "t192", "text": "bil "},
+    {"id": "t111", "text": "izbran "},
+    {"id": "t112", "text": "za "},
+    {"id": "t208", "text": "predsednika "},
+    {"id": "t201", "text": "makedonske "},
+    {"id": "t203", "text": "košarkarske "},
+    {"id": "t205", "text": "federacije "},
+    {"id": "t117", "text": ". "}
+  ],
+  "edges": {
+    "e-s44-s45-s46-t128-t132-t135": {
+      "id": "e-s44-s45-s46-t128-t132-t135",
+      "ids": ["s44", "s45", "s46", "t128", "t132", "t135"],
+      "labels": ["S-BR"],
+      "manual": true
+    },
+    "e-s60-s61-t148-t150": {
+      "id": "e-s60-s61-t148-t150",
+      "ids": ["s60", "s61", "t148", "t150"],
+      "labels": ["S-BR"],
+      "manual": true
+    },
+    "e-s89-t161": {
+      "id": "e-s89-t161",
+      "ids": ["s89", "t161"],
+      "labels": ["S-BR"],
+      "manual": true
+    },
+    "e-s109-t189-t198": {
+      "id": "e-s109-t189-t198",
+      "ids": ["s109", "t189", "t198"],
+      "labels": ["B-OST"],
+      "manual": true
+    },
+    "e-s0-t0": {
+      "id": "e-s0-t0",
+      "ids": ["s0", "t0"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s1-t1": {
+      "id": "e-s1-t1",
+      "ids": ["s1", "t1"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s2-t2": {
+      "id": "e-s2-t2",
+      "ids": ["s2", "t2"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s3-t3": {
+      "id": "e-s3-t3",
+      "ids": ["s3", "t3"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s4-t4": {
+      "id": "e-s4-t4",
+      "ids": ["s4", "t4"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s5-t5": {
+      "id": "e-s5-t5",
+      "ids": ["s5", "t5"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s6-t6": {
+      "id": "e-s6-t6",
+      "ids": ["s6", "t6"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s7-t119": {
+      "id": "e-s7-t119",
+      "ids": ["s7", "t119"],
+      "labels": ["Z-CRK"],
+      "manual": false
+    },
+    "e-s8-t8": {
+      "id": "e-s8-t8",
+      "ids": ["s8", "t8"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s9-t9": {
+      "id": "e-s9-t9",
+      "ids": ["s9", "t9"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s10-t10": {
+      "id": "e-s10-t10",
+      "ids": ["s10", "t10"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s11-t11": {
+      "id": "e-s11-t11",
+      "ids": ["s11", "t11"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s12-t12": {
+      "id": "e-s12-t12",
+      "ids": ["s12", "t12"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s13-t13": {
+      "id": "e-s13-t13",
+      "ids": ["s13", "t13"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s14-t14": {
+      "id": "e-s14-t14",
+      "ids": ["s14", "t14"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s15-t15": {
+      "id": "e-s15-t15",
+      "ids": ["s15", "t15"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s16-t16": {
+      "id": "e-s16-t16",
+      "ids": ["s16", "t16"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s17-t17": {
+      "id": "e-s17-t17",
+      "ids": ["s17", "t17"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s18-t18": {
+      "id": "e-s18-t18",
+      "ids": ["s18", "t18"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s19-t19": {
+      "id": "e-s19-t19",
+      "ids": ["s19", "t19"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s20-t20": {
+      "id": "e-s20-t20",
+      "ids": ["s20", "t20"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s21-t21": {
+      "id": "e-s21-t21",
+      "ids": ["s21", "t21"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s22-t22": {
+      "id": "e-s22-t22",
+      "ids": ["s22", "t22"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s23-t23": {
+      "id": "e-s23-t23",
+      "ids": ["s23", "t23"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s24-t24": {
+      "id": "e-s24-t24",
+      "ids": ["s24", "t24"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s25-t25": {
+      "id": "e-s25-t25",
+      "ids": ["s25", "t25"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s26-t26": {
+      "id": "e-s26-t26",
+      "ids": ["s26", "t26"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s27-t122": {
+      "id": "e-s27-t122",
+      "ids": ["s27", "t122"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s28-t28": {
+      "id": "e-s28-t28",
+      "ids": ["s28", "t28"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s29-t29": {
+      "id": "e-s29-t29",
+      "ids": ["s29", "t29"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s30-t30": {
+      "id": "e-s30-t30",
+      "ids": ["s30", "t30"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s31-t31": {
+      "id": "e-s31-t31",
+      "ids": ["s31", "t31"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s32-t32": {
+      "id": "e-s32-t32",
+      "ids": ["s32", "t32"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s33-t33": {
+      "id": "e-s33-t33",
+      "ids": ["s33", "t33"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s34-t34": {
+      "id": "e-s34-t34",
+      "ids": ["s34", "t34"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s35-t35": {
+      "id": "e-s35-t35",
+      "ids": ["s35", "t35"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s36-t36": {
+      "id": "e-s36-t36",
+      "ids": ["s36", "t36"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s37-t37": {
+      "id": "e-s37-t37",
+      "ids": ["s37", "t37"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s38-t38": {
+      "id": "e-s38-t38",
+      "ids": ["s38", "t38"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s39-t39": {
+      "id": "e-s39-t39",
+      "ids": ["s39", "t39"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s40-t40": {
+      "id": "e-s40-t40",
+      "ids": ["s40", "t40"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s41-t41": {
+      "id": "e-s41-t41",
+      "ids": ["s41", "t41"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s42-t42": {
+      "id": "e-s42-t42",
+      "ids": ["s42", "t42"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s43-t43": {
+      "id": "e-s43-t43",
+      "ids": ["s43", "t43"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s47-t137": {
+      "id": "e-s47-t137",
+      "ids": ["s47", "t137"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s48-t48": {
+      "id": "e-s48-t48",
+      "ids": ["s48", "t48"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s49-t139": {
+      "id": "e-s49-t139",
+      "ids": ["s49", "t139"],
+      "labels": ["Z-MV"],
+      "manual": false
+    },
+    "e-s50-t50": {
+      "id": "e-s50-t50",
+      "ids": ["s50", "t50"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s51-t51": {
+      "id": "e-s51-t51",
+      "ids": ["s51", "t51"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s52-t52": {
+      "id": "e-s52-t52",
+      "ids": ["s52", "t52"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s53-t140": {
+      "id": "e-s53-t140",
+      "ids": ["s53", "t140"],
+      "labels": ["Z-CRK"],
+      "manual": false
+    },
+    "e-s54-t54": {
+      "id": "e-s54-t54",
+      "ids": ["s54", "t54"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s55-t55": {
+      "id": "e-s55-t55",
+      "ids": ["s55", "t55"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s56-t56": {
+      "id": "e-s56-t56",
+      "ids": ["s56", "t56"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s57-t57": {
+      "id": "e-s57-t57",
+      "ids": ["s57", "t57"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s58-t58": {
+      "id": "e-s58-t58",
+      "ids": ["s58", "t58"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s59-t141": {
+      "id": "e-s59-t141",
+      "ids": ["s59", "t141"],
+      "labels": ["Z-CRK"],
+      "manual": false
+    },
+    "e-s62-t151": {
+      "id": "e-s62-t151",
+      "ids": ["s62", "t151"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s63-t207": {
+      "id": "e-s63-t207",
+      "ids": ["s63", "t207"],
+      "labels": ["Z-CRK"],
+      "manual": false
+    },
+    "e-s64-t64": {
+      "id": "e-s64-t64",
+      "ids": ["s64", "t64"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s65-t65": {
+      "id": "e-s65-t65",
+      "ids": ["s65", "t65"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s66-t66": {
+      "id": "e-s66-t66",
+      "ids": ["s66", "t66"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s67-t67": {
+      "id": "e-s67-t67",
+      "ids": ["s67", "t67"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s68-t68": {
+      "id": "e-s68-t68",
+      "ids": ["s68", "t68"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s69-t69": {
+      "id": "e-s69-t69",
+      "ids": ["s69", "t69"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s70-t70": {
+      "id": "e-s70-t70",
+      "ids": ["s70", "t70"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s71-t71": {
+      "id": "e-s71-t71",
+      "ids": ["s71", "t71"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s72-t153": {
+      "id": "e-s72-t153",
+      "ids": ["s72", "t153"],
+      "labels": ["Z-MV"],
+      "manual": false
+    },
+    "e-s73-t154": {
+      "id": "e-s73-t154",
+      "ids": ["s73", "t154"],
+      "labels": ["O-SAM"],
+      "manual": false
+    },
+    "e-s74-t74": {
+      "id": "e-s74-t74",
+      "ids": ["s74", "t74"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s75-t75": {
+      "id": "e-s75-t75",
+      "ids": ["s75", "t75"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s76-t76": {
+      "id": "e-s76-t76",
+      "ids": ["s76", "t76"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s77-t77": {
+      "id": "e-s77-t77",
+      "ids": ["s77", "t77"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s78-t78": {
+      "id": "e-s78-t78",
+      "ids": ["s78", "t78"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s79-t79": {
+      "id": "e-s79-t79",
+      "ids": ["s79", "t79"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s80-t80": {
+      "id": "e-s80-t80",
+      "ids": ["s80", "t80"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s81-t81": {
+      "id": "e-s81-t81",
+      "ids": ["s81", "t81"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s82-t157": {
+      "id": "e-s82-t157",
+      "ids": ["s82", "t157"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s83-t83": {
+      "id": "e-s83-t83",
+      "ids": ["s83", "t83"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s84-t84": {
+      "id": "e-s84-t84",
+      "ids": ["s84", "t84"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s85-t85": {
+      "id": "e-s85-t85",
+      "ids": ["s85", "t85"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s86-t160": {
+      "id": "e-s86-t160",
+      "ids": ["s86", "t160"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s87-t162": {
+      "id": "e-s87-t162",
+      "ids": ["s87", "t162"],
+      "labels": ["O-PRID"],
+      "manual": false
+    },
+    "e-s88-t88": {
+      "id": "e-s88-t88",
+      "ids": ["s88", "t88"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s90-t165": {
+      "id": "e-s90-t165",
+      "ids": ["s90", "t165"],
+      "labels": ["O-GLAG"],
+      "manual": false
+    },
+    "e-s91-t169": {
+      "id": "e-s91-t169",
+      "ids": ["s91", "t169"],
+      "labels": ["B-VEZ"],
+      "manual": false
+    },
+    "e-s92-t92": {
+      "id": "e-s92-t92",
+      "ids": ["s92", "t92"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s93-t93": {
+      "id": "e-s93-t93",
+      "ids": ["s93", "t93"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s94-t94": {
+      "id": "e-s94-t94",
+      "ids": ["s94", "t94"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s95-t171": {
+      "id": "e-s95-t171",
+      "ids": ["s95", "t171"],
+      "labels": ["O-SAM"],
+      "manual": false
+    },
+    "e-s96-t180": {
+      "id": "e-s96-t180",
+      "ids": ["s96", "t180"],
+      "labels": ["B-PRID"],
+      "manual": false
+    },
+    "e-s97-t185": {
+      "id": "e-s97-t185",
+      "ids": ["s97", "t185"],
+      "labels": ["B-SAM"],
+      "manual": false
+    },
+    "e-s98-t98": {
+      "id": "e-s98-t98",
+      "ids": ["s98", "t98"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s99-t99": {
+      "id": "e-s99-t99",
+      "ids": ["s99", "t99"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s100-t100": {
+      "id": "e-s100-t100",
+      "ids": ["s100", "t100"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s101-t101": {
+      "id": "e-s101-t101",
+      "ids": ["s101", "t101"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s102-t102": {
+      "id": "e-s102-t102",
+      "ids": ["s102", "t102"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s103-t103": {
+      "id": "e-s103-t103",
+      "ids": ["s103", "t103"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s104-t104": {
+      "id": "e-s104-t104",
+      "ids": ["s104", "t104"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s105-t105": {
+      "id": "e-s105-t105",
+      "ids": ["s105", "t105"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s106-t106": {
+      "id": "e-s106-t106",
+      "ids": ["s106", "t106"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s107-t107": {
+      "id": "e-s107-t107",
+      "ids": ["s107", "t107"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s108-t108": {
+      "id": "e-s108-t108",
+      "ids": ["s108", "t108"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s110-t192": {
+      "id": "e-s110-t192",
+      "ids": ["s110", "t192"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s111-t111": {
+      "id": "e-s111-t111",
+      "ids": ["s111", "t111"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s112-t112": {
+      "id": "e-s112-t112",
+      "ids": ["s112", "t112"],
+      "labels": [],
+      "manual": false
+    },
+    "e-s113-t208": {
+      "id": "e-s113-t208",
+      "ids": ["s113", "t208"],
+      "labels": ["O-SAM", "Z-LOC"],
+      "manual": false
+    },
+    "e-s114-t201": {
+      "id": "e-s114-t201",
+      "ids": ["s114", "t201"],
+      "labels": ["O-PRID"],
+      "manual": false
+    },
+    "e-s115-t203": {
+      "id": "e-s115-t203",
+      "ids": ["s115", "t203"],
+      "labels": ["O-PRID"],
+      "manual": false
+    },
+    "e-s116-t205": {
+      "id": "e-s116-t205",
+      "ids": ["s116", "t205"],
+      "labels": ["O-PRID"],
+      "manual": false
+    },
+    "e-s117-t117": {
+      "id": "e-s117-t117",
+      "ids": ["s117", "t117"],
+      "labels": [],
+      "manual": false
+    },
+    "e-t121": {
+      "id": "e-t121",
+      "ids": ["t121"],
+      "labels": ["Z-LOC"],
+      "manual": false
+    },
+    "e-t146": {
+      "id": "e-t146",
+      "ids": ["t146"],
+      "labels": ["Z-LOC"],
+      "manual": false
+    },
+    "e-t156": {
+      "id": "e-t156",
+      "ids": ["t156"],
+      "labels": ["Z-LOC"],
+      "manual": false
+    },
+    "e-t167": {
+      "id": "e-t167",
+      "ids": ["t167"],
+      "labels": ["Z-LOC"],
+      "manual": false
+    }
+  }
+}
