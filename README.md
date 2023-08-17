@@ -7,6 +7,7 @@
 import classla
 classla.download(lang='sl', type='standard_jos')
 ```
+- Extract/create metadata to `data_sample/KOST` folder.
 - Run `svala2tei.py` script.
 
 ### Example
