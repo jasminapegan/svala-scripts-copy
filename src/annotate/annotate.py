@@ -49,10 +49,10 @@ def annotate(tokenized_source_divs, tokenized_target_divs, args):
             annotated_target_pars.append((par_name, annotated_target_sens))
         annotated_target_divs.append((div_name, annotated_target_pars))
 
-    with open(os.path.join(args.results_folder, f"source.conllu"), 'w') as sf:
+    with open(os.path.join(args.results_folder, f"source.conllu"), 'w', encoding="utf-8") as sf:
         sf.write(complete_source_conllu)
 
-    with open(os.path.join(args.results_folder, f"target.conllu"), 'w') as sf:
+    with open(os.path.join(args.results_folder, f"target.conllu"), 'w', encoding="utf-8") as sf:
         sf.write(complete_target_conllu)
 
     with open(args.annotation_interprocessing, 'wb') as wp:

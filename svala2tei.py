@@ -8,7 +8,7 @@ from src.annotate.annotate import annotate
 from src.read.read_and_merge import tokenize
 from src.write.write import write_tei
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 def process_file(args):
     if os.path.exists(args.results_folder):

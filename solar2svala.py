@@ -186,9 +186,9 @@ def save_file(paragraph_error, output_folder_loc, error_folder_loc, paragraph, d
         if not os.path.exists(error_folder_loc):
             os.mkdir(error_folder_loc)
         file_name = paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'] + '.json' if dictionary_i == 1 else paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'] + '_P' + str(dictionary_i) + '.json'
-        with open(os.path.join(output_folder_loc, file_name), 'w') as wf:
+        with open(os.path.join(output_folder_loc, file_name), 'w', encoding='utf-8') as wf:
             json.dump(dictionary, wf, ensure_ascii=False, indent="")
-        with open(os.path.join(error_folder_loc, file_name), 'w') as wf:
+        with open(os.path.join(error_folder_loc, file_name), 'w', encoding='utf-8') as wf:
             json.dump(dictionary, wf, ensure_ascii=False, indent="")
     else:
         essay_problematic = True
@@ -196,7 +196,7 @@ def save_file(paragraph_error, output_folder_loc, error_folder_loc, paragraph, d
             os.mkdir(error_folder_loc)
         file_name = paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'] + '_problem.json' if dictionary_i == 1 else paragraph.attrib['{http://www.w3.org/XML/1998/namespace}id'] + '_P' + str(dictionary_i) + '_problem.json'
         with open(os.path.join(error_folder_loc, file_name),
-                  'w') as wf:
+                  'w', encoding='utf-8') as wf:
             json.dump(dictionary, wf, ensure_ascii=False, indent="")
 
     return essay_problematic
@@ -263,7 +263,7 @@ def process_file(et, args):
 
 
 def main(args):
-    with open(args.input_file, 'r') as fp:
+    with open(args.input_file, 'r', encoding='utf-8') as fp:
         logging.info(args.input_file)
         et = ElementTree.XML(fp.read())
         process_file(et, args)

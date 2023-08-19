@@ -53,7 +53,7 @@ def process_file(et):
 
 
 def main(args):
-    with open(args.input_file, 'r') as fp, open(args.output_file, 'w') as wf:
+    with open(args.input_file, 'r') as fp, open(args.output_file, 'w', encoding='utf-8') as wf:
         logging.info(args.input_file)
         et = ElementTree.XML(fp.read())
         wf.write(process_file(et))

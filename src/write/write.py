@@ -39,7 +39,7 @@ def form_paragraphs(annotated_source_divs, metadata):
 
 def read_metadata(args):
     texts_metadata = []
-    with open(args.texts_metadata, 'r') as file:
+    with open(args.texts_metadata, 'r', encoding='utf-8') as file:
         csvreader = csv.reader(file, delimiter='|', quotechar='"')
         column_names = []
         for i, row in enumerate(csvreader):
@@ -54,7 +54,7 @@ def read_metadata(args):
 
     # handle teachers
     teachers_metadata = {}
-    with open(args.teachers_metadata, 'r') as file:
+    with open(args.teachers_metadata, 'r', encoding='utf-8') as file:
         csvreader = csv.reader(file, delimiter='\t', quotechar='"')
         column_names = []
         for i, row in enumerate(csvreader):
@@ -70,7 +70,7 @@ def read_metadata(args):
 
     # handle authors
     authors_metadata = {}
-    with open(args.authors_metadata, 'r') as file:
+    with open(args.authors_metadata, 'r', encoding='utf-8') as file:
         csvreader = csv.reader(file, delimiter='|', quotechar='"')
         column_names = []
         for i, row in enumerate(csvreader):
@@ -95,7 +95,7 @@ def read_metadata(args):
                 authors_metadata[row_dict['Ime in priimek']] = row_dict
 
     translations = {}
-    with open(args.translations, 'r') as file:
+    with open(args.translations, 'r', encoding='utf-8') as file:
         csvreader = csv.reader(file, delimiter='\t', quotechar='"')
         for row in csvreader:
             translations[row[0]] = row[1]
@@ -162,10 +162,10 @@ def write_tei(annotated_source_divs, annotated_target_divs, document_edges, args
     print('BUILDING LINKS...')
     etree_links = build_links(document_edges)
 
-    with open(os.path.join(args.results_folder, f"links.xml"), 'w') as tf:
+    with open(os.path.join(args.results_folder, f"links.xml"), 'w', encoding='utf-8') as tf:
         tf.write(etree.tostring(etree_links, pretty_print=True, encoding='utf-8').decode())
 
-    with open(os.path.join(args.results_folder, f"links.json"), 'w') as jf:
+    with open(os.path.join(args.results_folder, f"links.json"), 'w', encoding='utf-8') as jf:
         json.dump(document_edges, jf, ensure_ascii=False, indent="  ")
 
     print('WRITTING TEI...')
@@ -195,10 +195,10 @@ def write_tei(annotated_source_divs, annotated_target_divs, document_edges, args
 
     # to reduce RAM usage you may process the following in two steps, firstly write all but complete (by commenting complete tree code), secondly write only complete (by commenting "Writting all but complete" section of code and "deepcopy" function)
     print('Writting all but complete')
-    with open(os.path.join(args.results_folder, f"source.xml"), 'w') as sf:
+    with open(os.path.join(args.results_folder, f"source.xml"), 'w', encoding='utf-8') as sf:
         sf.write(etree.tostring(etree_source[0], pretty_print=True, encoding='utf-8').decode())
 
-    with open(os.path.join(args.results_folder, f"target.xml"), 'w') as tf:
+    with open(os.path.join(args.results_folder, f"target.xml"), 'w', encoding='utf-8') as tf:
         tf.write(etree.tostring(etree_target[0], pretty_print=True, encoding='utf-8').decode())
 
     print('COMPLETE TREE CREATION...')
@@ -206,5 +206,5 @@ def write_tei(annotated_source_divs, annotated_target_divs, document_edges, args
     # complete_etree = build_complete_tei(etree_source, etree_target, etree_links)
 
     print('WRITING COMPLETE TREE')
-    with open(os.path.join(args.results_folder, f"complete.xml"), 'w') as tf:
+    with open(os.path.join(args.results_folder, f"complete.xml"), 'w', encoding='utf-8') as tf:
         tf.write(etree.tostring(complete_etree, pretty_print=True, encoding='utf-8').decode())

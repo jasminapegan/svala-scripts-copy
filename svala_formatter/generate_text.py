@@ -103,7 +103,7 @@ def write_file(is_problematic, foldername, filename, text, is_target):
         file_path = os.path.join(args.unproblematic_folder, foldername, new_filename)
     if not os.path.exists(folder_path):
         os.mkdir(folder_path)
-    with open(file_path, 'w') as wf:
+    with open(file_path, 'w', encoding='utf-8') as wf:
         wf.write(text)
 
 

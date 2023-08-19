@@ -743,7 +743,7 @@ def process_solar2_paragraph(sentences, paragraph, svala_i, svala_data, add_erro
 
 
 def read_raw_text(path):
-    with open(path, 'r') as rf:
+    with open(path, 'r', encoding='utf-8') as rf:
         return rf.read()
 
 HAND_FIXES = {'§§§pisala': ['§', '§', '§', 'pisala'], '§§§poldne': ['§', '§', '§', 'poldne'], '§§§o': ['§', '§', '§', 'o'], '§§§mimi': ['§', '§', '§', 'mimi'], '§§§nil': ['§', '§', '§', 'nil'], '§§§ela': ['§', '§', '§', 'ela'], 'sam§§§': ['sam', '§', '§', '§'], 'globač§§§': ['globač', '§', '§', '§'], 'sin.': ['sin', '.'],  '§§§oveduje': ['§', '§', '§', 'oveduje'],  'na§§§': ['na', '§', '§', '§'], '§§§ka§§§': ['§', '§', '§', 'ka', '§', '§', '§'], '§§§e§§§': ['§', '§', '§', 'e', '§', '§', '§'], '§§§': ['§', '§', '§'], 'ljubezni.': ['ljubezni', '.'], '12.': ['12', '.'], '16.': ['16', '.'], 'st.': ['st', '.'], 'S.': ['S', '.'], 'pr.': ['pr', '.'], 'n.': ['n', '.'], '19:30': ['19', ':', '30'], '9.': ['9', '.'], '6:35': ['6', ':', '35'], 'itd.': ['itd', '.'], 'Sv.': ['Sv', '.'], 'npr.': ['npr', '.'], 'sv.': ['sv', '.'], '12:00': ['12', ':', '00'], "sram'vali": ['sram', "'", 'vali'], '18:00': ['18', ':', '00'], 'J.': ['J', '.'], '5:45': ['5', ':', '45'], '17.': ['17', '.'], '9.00h': ['9', '.', '00h'], 'H.': ['H', '.'], '1.': ['1', '.'], '6.': ['6', '.'], '7:10': ['7', ':', '10'], 'g.': ['g', '.'], 'Oz.': ['Oz', '.'], '20:00': ['20', ':', '00'], '17.4.2010': ['17.', '4.', '2010'], 'ga.': ['ga', '.'], 'prof.': ['prof', '.'], '6:45': ['6', ':', '45'], '19.': ['19', '.'], '3.': ['3', '.'], 'tj.': ['tj', '.'], 'Prof.': ['Prof', '.'], '8.': ['8', '.'], '9:18': ['9', ':', '18'], 'ipd.': ['ipd', '.'], '7.': ['7', '.'], 'št.': ['št', '.'], 'oz.': ['oz', '.'], 'R.': ['R', '.'], '13:30': ['13', ':', '30'], '5.': ['5', '.']}
@@ -923,7 +923,7 @@ def tokenize(args):
             return tokenized_source_divs, tokenized_target_divs, document_edges
 
     print('TOKENIZING...')
-    with open(args.solar_file, 'r') as fp:
+    with open(args.solar_file, 'r', encoding='utf-8') as fp:
         logging.info(args.solar_file)
         et = ElementTree.XML(fp.read())
 
@@ -1050,10 +1050,10 @@ def annotate(tokenized_source_divs, tokenized_target_divs, args):
             annotated_target_pars.append(annotated_target_sens)
         annotated_target_divs.append(annotated_target_pars)
 
-    with open(os.path.join(args.results_folder, f"source.conllu"), 'w') as sf:
+    with open(os.path.join(args.results_folder, f"source.conllu"), 'w', encoding='utf-8') as sf:
         sf.write(complete_source_conllu)
 
-    with open(os.path.join(args.results_folder, f"target.conllu"), 'w') as sf:
+    with open(os.path.join(args.results_folder, f"target.conllu"), 'w', encoding='utf-8') as sf:
         sf.write(complete_target_conllu)
 
     with open(args.annotation_interprocessing, 'wb') as wp:
@@ -1066,10 +1066,10 @@ def write_tei(annotated_source_divs, annotated_target_divs, document_edges, args
     print('BUILDING LINKS...')
     etree_links = build_links(document_edges)
 
-    with open(os.path.join(args.results_folder, f"links.xml"), 'w') as tf:
+    with open(os.path.join(args.results_folder, f"links.xml"), 'w', encoding='utf-8') as tf:
         tf.write(etree.tostring(etree_links, pretty_print=True, encoding='utf-8').decode())
 
-    with open(os.path.join(args.results_folder, f"links.json"), 'w') as jf:
+    with open(os.path.join(args.results_folder, f"links.json"), 'w', encoding='utf-8') as jf:
         json.dump(document_edges, jf, ensure_ascii=False, indent="  ")
 
 
@@ -1079,7 +1079,7 @@ def write_tei(annotated_source_divs, annotated_target_divs, document_edges, args
     etree_source_divs = []
     etree_target_divs = []
 
-    with open(args.solar_file, 'r') as fp:
+    with open(args.solar_file, 'r', encoding='utf-8') as fp:
         logging.info(args.solar_file)
         et = ElementTree.XML(fp.read())
 
@@ -1164,10 +1164,10 @@ def write_tei(annotated_source_divs, annotated_target_divs, document_edges, args
     etree_target = build_tei_etrees(etree_target_documents)
 
     print('Writting all but complete')
-    with open(os.path.join(args.results_folder, f"source.xml"), 'w') as sf:
+    with open(os.path.join(args.results_folder, f"source.xml"), 'w', encoding='utf-8') as sf:
         sf.write(etree.tostring(etree_source[0], pretty_print=True, encoding='utf-8').decode())
 
-    with open(os.path.join(args.results_folder, f"target.xml"), 'w') as tf:
+    with open(os.path.join(args.results_folder, f"target.xml"), 'w', encoding='utf-8') as tf:
         tf.write(etree.tostring(etree_target[0], pretty_print=True, encoding='utf-8').decode())
 
     print('COMPLETE TREE CREATION...')
@@ -1175,7 +1175,7 @@ def write_tei(annotated_source_divs, annotated_target_divs, document_edges, args
     # complete_etree = build_complete_tei(etree_source, etree_target, etree_links)
 
     print('WRITING COMPLETE TREE')
-    with open(os.path.join(args.results_folder, f"complete.xml"), 'w') as tf:
+    with open(os.path.join(args.results_folder, f"complete.xml"), 'w', encoding='utf-8') as tf:
         tf.write(etree.tostring(complete_etree, pretty_print=True, encoding='utf-8').decode())
 
 def process_file(args):
