@@ -287,7 +287,7 @@ def fake_svala_data(source_tokenized):
     return source_res, target_res, generated_edges
 
 
-def tokenize(args):
+def tokenize(args, fake_data=True):
     if os.path.exists(args.tokenization_interprocessing) and not args.overwrite_tokenization:
         print('READING TOKENIZATION...')
         with open(args.tokenization_interprocessing, 'rb') as rp:
@@ -302,6 +302,7 @@ def tokenize(args):
 
     for text_folder, _, text_filenames in os.walk(args.raw_text):
         text_filenames = sorted(text_filenames)
+
         for text_filename_i, text_filename in enumerate(text_filenames):
             text_file = read_raw_text(os.path.join(args.raw_text, text_filename))
             raw_text, source_tokenized, metadocument = nlp_tokenize.processors['tokenize']._tokenizer.tokenize(
@@ -331,8 +332,7 @@ def tokenize(args):
 
                     tokenized_divs[text_filename].append((filename, source_res, target_res, svala_data_object.svala_data['edges']))
 
-
-            else:
+            elif fake_data:
                 filename = text_filename[:-4] + '.json'
                 source_res, target_res, generated_edges = fake_svala_data(source_tokenized)
                 if text_filename not in tokenized_divs:

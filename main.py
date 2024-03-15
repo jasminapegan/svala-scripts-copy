@@ -46,21 +46,50 @@ python svala2tei.py `
 
 """
 
+
 import svala2tei
 import argparse
 
 parser = argparse.ArgumentParser()
+"""
+parser.add_argument('--svala_folder', default='data/KOST_1_0/svala_1_0')
+parser.add_argument('--results_folder', default='data/KOST_1_0/results_1_0')
+parser.add_argument('--raw_text', default='data/KOST_1_0/raw_1_0')
+parser.add_argument('--texts_metadata', default='data/KOST_1_0/texts_metadata5.csv')
+parser.add_argument('--authors_metadata', default='data/KOST_1_0/authors_metadata5.csv')
+parser.add_argument('--teachers_metadata', default='data/KOST_1_0/teachers_metadata.csv')
+parser.add_argument('--translations', default='data/KOST_1_0/translations.csv')
+parser.add_argument('--tokenization_interprocessing', default='data/processing.tokenization')
+parser.add_argument('--overwrite_tokenization', action='store_true')
+parser.add_argument('--annotation_interprocessing', default='data/processing.annotation')
+"""
+
 parser.add_argument('--svala_folder', default='data/KOST_2_0/svala_2_0')
 parser.add_argument('--results_folder', default='data/KOST_2_0/results_2_0')
 parser.add_argument('--raw_text', default='data/KOST_2_0/raw_2_0')
-parser.add_argument('--texts_metadata', default='data/KOST_2_0/texts_metadata_2_0.csv')
-parser.add_argument('--authors_metadata', default='data/KOST_2_0/authors_metadata_2_0.csv')
+parser.add_argument('--texts_metadata', default='data/KOST_2_0/texts_metadata_2_0_new.csv')
+parser.add_argument('--authors_metadata', default='data/KOST_2_0/authors_metadata_2_0_new_1.csv')
 parser.add_argument('--teachers_metadata', default='data/KOST_2_0/teachers_metadata_2_0.csv')
 parser.add_argument('--translations', default='data/KOST_2_0/translations_2_0.csv')
 parser.add_argument('--tokenization_interprocessing', default='data/processing.tokenization')
 parser.add_argument('--overwrite_tokenization', action='store_true')
 parser.add_argument('--annotation_interprocessing', default='data/processing.annotation')
 parser.add_argument('--overwrite_annotation', action='store_true')
+""" 
+
+parser.add_argument('--svala_folder', default='data_sample/test/svala')
+parser.add_argument('--results_folder', default='data_sample/test/results')
+parser.add_argument('--raw_text', default='data_sample/test/raw')
+parser.add_argument('--texts_metadata', default='data_sample/test/texts_metadata_2_0_new.csv')
+parser.add_argument('--authors_metadata', default='data_sample/test/authors_metadata_2_0_new_1.csv')
+parser.add_argument('--teachers_metadata', default='data_sample/test/teachers_metadata_2_0.csv')
+parser.add_argument('--translations', default='data_sample/test/translations_2_0.csv')
+parser.add_argument('--tokenization_interprocessing', default='data_sample/test/processing.tokenization')
+parser.add_argument('--overwrite_tokenization', action='store_true')
+parser.add_argument('--annotation_interprocessing', default='data_sample/test/processing.annotation')
+parser.add_argument('--overwrite_annotation', action='store_true')
+
+"""
 args = parser.parse_args()
 
 svala2tei.main(args)

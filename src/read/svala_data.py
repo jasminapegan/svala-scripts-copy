@@ -1,11 +1,12 @@
 from collections import deque
 
 from src.read.hand_fixes import SVALA_HAND_FIXES_MERGE
-
+from src.read.read import replace_nonstandard_characters
 
 class SvalaData():
     def __init__(self, svala_data):
         for el in svala_data['source']:
+            el['text'] = replace_nonstandard_characters(el['text']).strip()
             el['text'] = el['text'].strip()
             if el['text'] == '':
                 print('What?')

@@ -125,6 +125,7 @@ class Sentence:
 
         # JOS-SYN translations from English to Slovene
         self.syn_map = get_syn_map()
+        print(self.syn_map)
 
     def add_item(self, word_id, token, lemma, upos, upos_other, xpos, head, deprel, no_space_after, ner):
         self.items.append([word_id, token, lemma, upos, upos_other, xpos, head, deprel, no_space_after, ner])

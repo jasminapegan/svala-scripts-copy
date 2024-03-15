@@ -3,18 +3,40 @@ import re
 from src.read.hand_fixes import HAND_FIXES, apply_obeliks_handfixes, SVALA_HAND_FIXES_MERGE
 
 
+def replace_nonstandard_characters(text):
+    replace_chars = {
+        'а': 'a',
+        'і': 'i',
+        'о': 'o',
+        'с': 'c',
+        'ﾻ': '"',
+        'ﾫ': '"',
+        'М': 'M',
+        'ј': 'j',
+        'р': 'p',
+        'В': 'B',
+        'Р': 'P',
+        '😉': ';)',
+        '😊': ':)',
+        '☹': ':('
+    }
+    for key in replace_chars:
+        text = text.replace(key, replace_chars[key])
+        #text = ' '.join(text.split())  # remove duplicate spaces
+    return text
+
 def read_raw_text(path):
     print(path)
     try:
         with open(path, 'r', encoding='utf-8') as rf:
-            return rf.read()
+            return replace_nonstandard_characters(rf.read())
     except:
         try:
             with open(path, 'r', encoding='utf-16') as rf:
-                return rf.read()
+                return replace_nonstandard_characters(rf.read())
         except:
             with open(path, 'r', encoding="windows-1250") as rf:
-                return rf.read()
+                return replace_nonstandard_characters(rf.read())
 
 
 
@@ -30,6 +52,7 @@ def map_svala_tokenized(svala_data_part, tokenized_paragraph, sent_i):
         sentence_res = []
         sentence_id = 0
         for tok in sentence:
+            tok['text'] = tok['text']
             tag = 'pc' if 'xpos' in tok and tok['xpos'] == 'Z' else 'w'
             if 'misc' in tok:
                 assert tok['misc'] == 'SpaceAfter=No'
@@ -49,6 +72,34 @@ def map_svala_tokenized(svala_data_part, tokenized_paragraph, sent_i):
                         HAND_FIXES[key] = ['§', '§', '§', key[3:]]
                     elif key.endswith('§§§'):
                         HAND_FIXES[key] = [key[:-3], '§', '§', '§']
+                    elif key[-1] == '.' and key[:-1].isnumeric():
+                        HAND_FIXES[key] = [key[:-1], '.']
+                    elif ':' in key and len(key.split(':')) == 2:
+                        nums = key.split(':')
+                        if nums[0].isnumeric() and nums[1].isnumeric():
+                            HAND_FIXES[key] = [nums[0], ':', nums[1]]
+                        elif nums[-1] == 'h' and nums[0].isnumeric() and nums[1][:-1].isnumeric():
+                            HAND_FIXES[key] = [nums[0], ':', nums[1]]
+                    elif len(key.split('.')) == 2 and key[-1] != '.' and key[0] != '.':
+                        nums = key.split('.')
+                        if nums[0].isnumeric() and nums[1].isnumeric():
+                            HAND_FIXES[key] = [nums[0], '.', nums[1]]
+                        elif nums[-1] == '%' and nums[0].isnumeric() and nums[1][:-1].isnumeric():
+                            HAND_FIXES[key] = [nums[0], '.', nums[1]]
+                    elif ',' in key and len(key.split(',')) == 2:
+                        nums = key.split(',')
+                        if nums[0].isnumeric() and nums[1].isnumeric():
+                            HAND_FIXES[key] = [nums[0], ',', nums[1]]
+                        elif nums[-1] == '%' and nums[0].isnumeric() and nums[1][:-1].isnumeric():
+                            HAND_FIXES[key] = [nums[0], ',', nums[1]]
+                    elif len(key.split('.')) == 3:
+                        nums = key.split('.')
+                        if nums[0].isnumeric() and nums[1].isnumeric() and nums[2].isnumeric():
+                            HAND_FIXES[key] = [nums[0], '.', nums[1], '.', nums[2]]
+                        elif nums[-1] == '%' and nums[0].isnumeric() and nums[1][:-1].isnumeric():
+                            HAND_FIXES[key] = [nums[0], '.', nums[1]]
+                    elif len(key) == 2 and key[-1] == '.' and key[0].isupper():
+                        HAND_FIXES[key] = [key[0], '.']
                     else:
                         if len(key) < len(tok['text']):
                             print('HAND_FIXES_MERGE:')
@@ -72,12 +123,30 @@ def map_svala_tokenized(svala_data_part, tokenized_paragraph, sent_i):
                     else:
                         tok['text'] = key
                         wierd_sign_count = 0
-                elif key in ['[XKrajX]']:
+                elif key.lower() in ['[xkrajx]']:
                     tok['text'] = '[XKrajX]'
-                elif key in ['[XImeX]']:
+                elif key.lower() in ['[ximex]']:
                     tok['text'] = '[XImeX]'
+                elif key.lower() in ['[xpriimekx]']:
+                    tok['text'] = '[XPriimekX]'
+                elif key.lower() in ['[xdatumx]']:
+                    tok['text'] = '[XDatumX]'
+                elif key.lower() in ['[xjezikx]']:
+                    tok['text'] = '[XJezikX]'
+                elif key.lower() in ['[xstudijskasmerx]', '[xstudijskassmerx]', '[xštudijskasmerx]']:
+                    tok['text'] = '[XStudijskaSmerX]'
+                elif key.lower() in ['[xfakultetax]']:
+                    tok['text'] = '[XFakultetaX]'
+                elif key.lower() in ['[xenaslovx]']:
+                    tok['text'] = '[XEnaslovX]'
+                elif key.lower() in ['[xsvojilnipridevnikx]']:
+                    tok['text'] = '[XSvojilniPridevnikX]'
+                elif key.lower() in ['[xpodjetjex]']:
+                    tok['text'] = '[XPodjetjeX]'
+                elif key.lower() in ['[xnaslovx]']:
+                    tok['text'] = '[XNaslovX]'
                 else:
-                    print(f'key: {key} ; tok[text]: {tok["text"]}')
+                    print(f'key: "{key}" ; tok[text]: "{tok["text"]}"')
                     raise 'Word mismatch!'
             sentence_id += 1
             sentence_res.append({'token': tok['text'], 'tag': tag, 'id': sentence_id, 'space_after': space_after, 'svala_id': svala_data_part[svala_data_i]['id']})

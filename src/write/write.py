@@ -11,10 +11,11 @@ from src.create_tei import construct_sentence_from_list, \
 
 def form_paragraphs(annotated_source_divs, metadata):
     etree_source_divs = []
+    div_name = "#DIV_NAME#"
     for div_i, div_tuple in enumerate(annotated_source_divs):
         div_name, div = div_tuple
         if div_name[:-1] not in metadata:
-            print(div_name[:-1])
+            print("Not in metadata:", div_name[:-1])
             continue
         div_metadata = metadata[div_name[:-1]]
 
@@ -39,8 +40,9 @@ def form_paragraphs(annotated_source_divs, metadata):
 
 def read_metadata(args):
     texts_metadata = []
-    with open(args.texts_metadata, 'r', encoding='utf-8') as file:
-        csvreader = csv.reader(file, delimiter='|', quotechar='"')
+    with open(args.texts_metadata, 'r', encoding='utf-8-sig') as file:
+        #csvreader = csv.reader(file, delimiter='|', quotechar='"')
+        csvreader = csv.reader(file, delimiter=',', quotechar='"')
         column_names = []
         for i, row in enumerate(csvreader):
             if i == 0:
@@ -54,7 +56,7 @@ def read_metadata(args):
 
     # handle teachers
     teachers_metadata = {}
-    with open(args.teachers_metadata, 'r', encoding='utf-8') as file:
+    with open(args.teachers_metadata, 'r', encoding='utf-8-sig') as file:
         csvreader = csv.reader(file, delimiter='\t', quotechar='"')
         column_names = []
         for i, row in enumerate(csvreader):
@@ -70,8 +72,9 @@ def read_metadata(args):
 
     # handle authors
     authors_metadata = {}
-    with open(args.authors_metadata, 'r', encoding='utf-8') as file:
-        csvreader = csv.reader(file, delimiter='|', quotechar='"')
+    with open(args.authors_metadata, 'r', encoding='utf-8-sig') as file:
+        #csvreader = csv.reader(file, delimiter='|', quotechar='"')
+        csvreader = csv.reader(file, delimiter=',', quotechar='"')
         column_names = []
         for i, row in enumerate(csvreader):
             if i == 0:
@@ -95,7 +98,7 @@ def read_metadata(args):
                 authors_metadata[row_dict['Ime in priimek']] = row_dict
 
     translations = {}
-    with open(args.translations, 'r', encoding='utf-8') as file:
+    with open(args.translations, 'r', encoding='utf-8-sig') as file:
         csvreader = csv.reader(file, delimiter='\t', quotechar='"')
         for row in csvreader:
             translations[row[0]] = row[1]
@@ -108,10 +111,13 @@ def process_metadata(args):
 
     metadata = {}
     for document_metadata in texts_metadata:
+        if not document_metadata:
+            print(document_metadata)
+            continue
         document_metadata['Tvorec'] = document_metadata['Tvorec'].strip()
         if document_metadata['Tvorec'] not in authors_metadata:
             if document_metadata['Tvorec']:
-                print(document_metadata['Tvorec'])
+                print("Missing author data:", document_metadata['Tvorec'], document_metadata)
             continue
         author_metadata = authors_metadata[document_metadata['Tvorec']]
         metadata_el = {}
@@ -154,6 +160,8 @@ def process_metadata(args):
             else:
                 raise Exception(f'{attribute_name_sl} not found!')
 
+        if metadata_el['Text ID'] == "STU14-2112-024":
+            print(1)
         metadata[metadata_el['Text ID']] = metadata_el
 
     return metadata
