@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.DEBUG)
 def process_file(args):
     if os.path.exists(args.results_folder):
         shutil.rmtree(args.results_folder)
-    os.mkdir(args.results_folder)
+    os.makedirs(args.results_folder)
 
     # READ AND MERGE svala tokenization, solar2 tokenization and obeliks tokenization
     tokenized_source_divs, tokenized_target_divs, document_edges = tokenize(args)
