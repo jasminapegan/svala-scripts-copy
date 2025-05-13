@@ -294,7 +294,7 @@ def tokenize(args, fake_data=True):
             tokenized_source_divs, tokenized_target_divs, document_edges = pickle.load(rp)
             return tokenized_source_divs, tokenized_target_divs, document_edges
 
-    print('TOKENIZING...')
+    print('TOKENIZING...', args.svala_folder)
     nlp_tokenize = classla.Pipeline('sl', processors='tokenize', pos_lemma_pretag=True)
     tokenized_divs = {}
 

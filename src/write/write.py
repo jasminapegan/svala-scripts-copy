@@ -7,6 +7,7 @@ import conllu
 
 from src.create_tei import construct_sentence_from_list, \
     construct_paragraph_from_list, TeiDocument, build_tei_etrees, build_links, build_complete_tei, convert_bibl
+from src.validate.validate_xml import validate_xml
 
 
 def form_paragraphs(annotated_source_divs, metadata):
@@ -41,8 +42,8 @@ def form_paragraphs(annotated_source_divs, metadata):
 def read_metadata(args):
     texts_metadata = []
     with open(args.texts_metadata, 'r', encoding='utf-8-sig') as file:
-        #csvreader = csv.reader(file, delimiter='|', quotechar='"')
-        csvreader = csv.reader(file, delimiter=',', quotechar='"')
+        csvreader = csv.reader(file, delimiter='|', quotechar='"')
+        #csvreader = csv.reader(file, delimiter=',', quotechar='"')
         column_names = []
         for i, row in enumerate(csvreader):
             if i == 0:
@@ -73,8 +74,8 @@ def read_metadata(args):
     # handle authors
     authors_metadata = {}
     with open(args.authors_metadata, 'r', encoding='utf-8-sig') as file:
-        #csvreader = csv.reader(file, delimiter='|', quotechar='"')
-        csvreader = csv.reader(file, delimiter=',', quotechar='"')
+        csvreader = csv.reader(file, delimiter='|', quotechar='"')
+        #csvreader = csv.reader(file, delimiter=',', quotechar='"')
         column_names = []
         for i, row in enumerate(csvreader):
             if i == 0:
@@ -214,5 +215,12 @@ def write_tei(annotated_source_divs, annotated_target_divs, document_edges, args
     # complete_etree = build_complete_tei(etree_source, etree_target, etree_links)
 
     print('WRITING COMPLETE TREE')
-    with open(os.path.join(args.results_folder, f"complete.xml"), 'w', encoding='utf-8') as tf:
+    complete_filepath = os.path.join(args.results_folder, f"complete.xml")
+    with open(complete_filepath, 'w', encoding='utf-8') as tf:
         tf.write(etree.tostring(complete_etree, pretty_print=True, encoding='utf-8').decode())
+
+    print('VALIDATING TEI FILE')
+    if validate_xml(complete_filepath):
+        print('SUCCESS:', complete_filepath)
+    else:
+        print('INVALID TEI FILE:', complete_filepath)

@@ -125,7 +125,6 @@ class Sentence:
 
         # JOS-SYN translations from English to Slovene
         self.syn_map = get_syn_map()
-        print(self.syn_map)
 
     def add_item(self, word_id, token, lemma, upos, upos_other, xpos, head, deprel, no_space_after, ner):
         self.items.append([word_id, token, lemma, upos, upos_other, xpos, head, deprel, no_space_after, ner])
@@ -194,7 +193,7 @@ class Sentence:
 
             # handle links
             link = etree.Element(f'link')
-            link.attrib['ana'] = f'jos-syn:{self.syn_map[deprel]}'
+            link.attrib['ana'] = f'jos-syn:{self.syn_map[deprel] if deprel in self.syn_map.keys() else deprel}' # if not in map assume it is already slo
             link.attrib['target'] = f'#{xml_id}.{head} #{xml_id}.{word_id}' if head != 0 else f'#{xml_id} #{xml_id}.{word_id}'
             linkGrp.append(link)
 
