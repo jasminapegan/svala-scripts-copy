@@ -42,7 +42,11 @@ def process_file(file, args):
 
 def main(args):
     for file in os.listdir(args.input_folder):
-        process_file(file, args)
+        try:
+            process_file(file, args)
+        except Exception as e:
+            #print(f'Skipping file {file} on path {args.input_folder} - Failed to decode txt file:\n {e}')
+            raise Exception(f'Failed to process txt file {file} on path {args.input_folder}:\n {e}')
 
 
 if __name__ == '__main__':

@@ -1,25 +1,12 @@
 import re
 
-from src.read.hand_fixes import HAND_FIXES, apply_obeliks_handfixes, SVALA_HAND_FIXES_MERGE
+from src.read.hand_fixes import apply_obeliks_handfixes
+from constants.svala_hand_fixes_merge import SVALA_HAND_FIXES_MERGE
+from constants.hand_fixes import HAND_FIXES
+from constants.replacements import replace_chars
 
 
 def replace_nonstandard_characters(text):
-    replace_chars = {
-        'а': 'a',
-        'і': 'i',
-        'о': 'o',
-        'с': 'c',
-        'ﾻ': '"',
-        'ﾫ': '"',
-        'М': 'M',
-        'ј': 'j',
-        'р': 'p',
-        'В': 'B',
-        'Р': 'P',
-        '😉': ';)',
-        '😊': ':)',
-        '☹': ':('
-    }
     for key in replace_chars:
         text = text.replace(key, replace_chars[key])
         #text = ' '.join(text.split())  # remove duplicate spaces
@@ -35,8 +22,12 @@ def read_raw_text(path):
             with open(path, 'r', encoding='utf-16') as rf:
                 return replace_nonstandard_characters(rf.read())
         except:
-            with open(path, 'r', encoding="windows-1250") as rf:
-                return replace_nonstandard_characters(rf.read())
+            try:
+                with open(path, 'r', encoding="windows-1250") as rf:
+                    return replace_nonstandard_characters(rf.read())
+            except:
+                with open(path, 'r', encoding="windows-1252") as rf:
+                    return replace_nonstandard_characters(rf.read())
 
 
 
@@ -115,6 +106,10 @@ def map_svala_tokenized(svala_data_part, tokenized_paragraph, sent_i):
 
                             HAND_FIXES[key] = re.findall(r"[\w]+|[^\s\w]", key)
                         print(f'key: {key} ; tok[text]: {tok["text"]}')
+
+                if key not in HAND_FIXES.keys():
+                    print('Sentence:', ' '.join([s['text'] for s in sentence]))
+                    raise Exception(f"Key {key} not in HAND_FIXES. Possible replacement: {tok['text']},{key}")
 
                 if tok['text'] == HAND_FIXES[key][wierd_sign_count]:
                     wierd_sign_count += 1

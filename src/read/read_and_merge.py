@@ -5,6 +5,7 @@ import pickle
 import queue
 import string
 from collections import deque
+from line_profiler_pycharm import profile
 
 import classla
 
@@ -286,8 +287,8 @@ def fake_svala_data(source_tokenized):
 
     return source_res, target_res, generated_edges
 
-
-def tokenize(args, fake_data=True):
+@profile
+def tokenize(args, fake_data=True, tokenizer=None):
     if os.path.exists(args.tokenization_interprocessing) and not args.overwrite_tokenization:
         print('READING TOKENIZATION...')
         with open(args.tokenization_interprocessing, 'rb') as rp:
@@ -295,7 +296,9 @@ def tokenize(args, fake_data=True):
             return tokenized_source_divs, tokenized_target_divs, document_edges
 
     print('TOKENIZING...', args.svala_folder)
-    nlp_tokenize = classla.Pipeline('sl', processors='tokenize', pos_lemma_pretag=True)
+    if tokenizer is None:
+        print('Loading tokenizer...')
+        tokenizer = classla.Pipeline('sl', processors='tokenize', pos_lemma_pretag=True)
     tokenized_divs = {}
 
     all_js_filenames = [sorted(filenames) for folder, _, filenames in os.walk(args.svala_folder)][0]
@@ -305,7 +308,7 @@ def tokenize(args, fake_data=True):
 
         for text_filename_i, text_filename in enumerate(text_filenames):
             text_file = read_raw_text(os.path.join(args.raw_text, text_filename))
-            raw_text, source_tokenized, metadocument = nlp_tokenize.processors['tokenize']._tokenizer.tokenize(
+            raw_text, source_tokenized, metadocument = tokenizer.processors['tokenize']._tokenizer.tokenize(
                 text_file) if text_file else ([], [], [])
             source_sent_i = 0
 

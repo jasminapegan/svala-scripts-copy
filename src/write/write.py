@@ -141,7 +141,7 @@ def process_metadata(args):
                     curr_school.append(author_metadata["Trenutno šolanje - Ime šole"])
                 if author_metadata["Trenutno šolanje - Fakulteta"]:
                     curr_school.append(author_metadata["Trenutno šolanje - Fakulteta"])
-                metadata_el['Current school'] = ', '.join(curr_school)
+                metadata_el['    '] = ', '.join(curr_school)
             elif attribute_name_sl == 'Stopnja študija':
                 metadata_el[attribute_name_en] = author_metadata['Trenutno šolanje - Stopnja študija']
             elif attribute_name_sl == 'Leto študija':
@@ -161,8 +161,6 @@ def process_metadata(args):
             else:
                 raise Exception(f'{attribute_name_sl} not found!')
 
-        if metadata_el['Text ID'] == "STU14-2112-024":
-            print(1)
         metadata[metadata_el['Text ID']] = metadata_el
 
     return metadata

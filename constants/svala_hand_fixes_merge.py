@@ -1,0 +1,3 @@
+SVALA_HAND_FIXES_MERGE = {("oz", "."): "oz.", ("Npr", "."): "Npr.", ("npr", "."): "npr.", ("m", "."): "m.", ("itn", "."): "itn.",
+("max", "."): "max.", ("cca", "."): "cca.", ("n", "."): "n.",
+("sv", "."): "sv.", ("Bolha", ".com"): "Bolha.com", ("1901", "."): "1901."}

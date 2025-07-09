@@ -1,16 +1,19 @@
 import os
 import pickle
 import classla
+from line_profiler_pycharm import profile
 
-
-def annotate(tokenized_source_divs, tokenized_target_divs, args):
+@profile
+def annotate(tokenized_source_divs, tokenized_target_divs, args, annotator=None):
     if os.path.exists(args.annotation_interprocessing) and not args.overwrite_annotation:
         print('READING ANNOTATIONS...')
         with open(args.annotation_interprocessing, 'rb') as rp:
             annotated_source_divs, annotated_target_divs = pickle.load(rp)
             return annotated_source_divs, annotated_target_divs
 
-    nlp = classla.Pipeline('sl', pos_use_lexicon=True, pos_lemma_pretag=False, tokenize_pretokenized="conllu",
+    if annotator is None:
+        print('Loading annotator ...')
+        annotator = classla.Pipeline('sl', pos_use_lexicon=True, pos_lemma_pretag=False, tokenize_pretokenized="conllu",
                            type='standard_jos')
 
     annotated_source_divs = []
@@ -24,7 +27,7 @@ def annotate(tokenized_source_divs, tokenized_target_divs, args):
             par_name, par = par_tuple
             annotated_source_sens = []
             for sen in par:
-                source_conllu_annotated = nlp(sen).to_conll() if sen else ''
+                source_conllu_annotated = annotator(sen).to_conll() if sen else ''
                 annotated_source_sens.append(source_conllu_annotated)
                 complete_source_conllu += source_conllu_annotated
             annotated_source_pars.append((par_name, annotated_source_sens))
@@ -43,7 +46,7 @@ def annotate(tokenized_source_divs, tokenized_target_divs, args):
             for sen in par:
                 # if sen.count('\n') <= 2:
                 #     print('HERE!!!!')
-                target_conllu_annotated = nlp(sen).to_conll() if sen and sen.count('\n') > 2 else ''
+                target_conllu_annotated = annotator(sen).to_conll() if sen and sen.count('\n') > 2 else ''
                 annotated_target_sens.append(target_conllu_annotated)
                 complete_target_conllu += target_conllu_annotated
             annotated_target_pars.append((par_name, annotated_target_sens))
