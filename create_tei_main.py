@@ -4,6 +4,7 @@ import logging
 import os
 import sys
 import time
+import traceback
 
 import classla
 
@@ -109,28 +110,23 @@ def handfix_options(auto_replace):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Merges svala data, raw data and metadata into TEI format (useful for corpora like KOST).')
-    parser.add_argument('--txt_folder', default=None, #'data_sample/test/raw_1_0',
+    parser.add_argument('--txt_folder', default='data/KOST test/Neoznacena besedila',
                         help='TXT files location, only set if creating TEI from TXT')
-    parser.add_argument('--svala_folder', default='data_sample/test/svala_1_0',
+    parser.add_argument('--svala_folder', default='data/KOST test/svala_1_0',
                         help='Path to directory that contains svala files.')
-    parser.add_argument('--results_folder', default='data_sample/test/results_1_0',
+    parser.add_argument('--results_folder', default='data/KOST test/results_1_0',
                         help='Path to results directory.')
-    parser.add_argument('--raw_text', default='data_sample/test/raw_1_0',
+    parser.add_argument('--raw_text', default='data/KOST test/Neoznacena besedila',
                         help='Path to directory that contains raw text files.')
-    parser.add_argument('--texts_metadata', default='data_sample/test/texts_metadata5.csv',
+    parser.add_argument('--metadata_excel', default='data/KOST test/KOST 2.0, 25-08.xlsm',
                         help='KOST metadata location')
-    parser.add_argument('--authors_metadata', default='data_sample/test/authors_metadata5.csv',
-                        help='KOST authors location')
-    parser.add_argument('--teachers_metadata', default='data_sample/test/teachers_metadata.csv',
-                        help='KOST teachers location')
-    parser.add_argument('--translations', default='data_sample/test/translations.csv',
-                        help='KOST Slovenian-English column names translations for TEI metadata')
-    parser.add_argument('--tokenization_interprocessing', default='data_sample/test/processing.tokenization',
+    parser.add_argument('--tokenization_interprocessing', default='data/KOST test/processing.tokenization',
                         help='Path to file that containing tokenized data.')
     parser.add_argument('--overwrite_tokenization', action='store_true', help='Force retokenization without having to manually delete tokenization file.')
-    parser.add_argument('--annotation_interprocessing', default='data_sample/test/processing.annotation',
+    parser.add_argument('--annotation_interprocessing', default='data/KOST test/processing.annotation',
                         help='Path to file that containing annotated data.')
     parser.add_argument('--overwrite_annotation', action='store_true', help='Force reannotation without having to manually delete tokenization file.')
+
     args = parser.parse_args()
 
     start = time.time()
@@ -144,10 +140,19 @@ if __name__ == '__main__':
             auto_replace = None
             if 'Possible replacement' in str(e):
                 auto_replace = tuple(str(e).split('Possible replacement: ')[1].strip().split(','))
+            elif 'Not in metadata' in str(e):
+                print(f'''Check metadata excel for metadata and author of text {str(e).split(":")[1]}. Common reasons:
+- missing author metadata
+- missing text metadata
+- typo in author name
+Edit the metadata excel and press any key to continue.''')
+                os.system(f'excel.exe \"{args.metadata_excel}\"')
+                option = sys.stdin.read(1).strip()
+                continue
 
             print(f'''
     Failed to create TEI:
-    {e}
+    {traceback.format_exc()}
     
     Select option:
     A - add to exceptions: 
@@ -176,7 +181,12 @@ if __name__ == '__main__':
             elif option.lower() == 'e':
                 print('Opening in editor ...')
                 filename = get_filename(str(e), args)
-                os.system(f'notepad.exe {filename}')
+
+                if not filename:
+                    print(f"file {filename} not found")
+                    continue
+
+                os.system(f'notepad.exe \"{filename}\"')
 
             elif option.lower() == 'q':
                 print('Quitting ...')

@@ -7,7 +7,7 @@ from line_profiler_pycharm import profile
 
 from src.annotate.annotate import annotate
 from src.read.read_and_merge import tokenize
-from src.write.write import write_tei
+from src.write.write import write_tei, process_metadata
 
 logging.basicConfig(level=logging.DEBUG)
 @profile
