@@ -11,11 +11,13 @@ import classla
 from constants import replacements, svala_hand_fixes_merge, obeliks_hand_fixes_merge
 import svala2tei
 import txt2svala
+from line_profiler_pycharm import profile
 
 from constants import hand_fixes
 
 logging.basicConfig(level=logging.DEBUG)
 
+@profile
 def main(args):
     start = time.time()
 

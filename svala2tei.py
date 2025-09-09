@@ -3,12 +3,14 @@ import logging
 import os
 import shutil
 import time
+from line_profiler_pycharm import profile
 
 from src.annotate.annotate import annotate
 from src.read.read_and_merge import tokenize
 from src.write.write import write_tei, process_metadata
 
 logging.basicConfig(level=logging.DEBUG)
+@profile
 def process_file(args, annotator=None, tokenizer=None):
     if os.path.exists(args.results_folder):
         shutil.rmtree(args.results_folder)
