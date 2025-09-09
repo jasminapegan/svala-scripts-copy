@@ -1,9 +1,7 @@
 import os
 import pickle
 import classla
-from line_profiler_pycharm import profile
 
-@profile
 def annotate(tokenized_source_divs, tokenized_target_divs, args, annotator=None):
     if os.path.exists(args.annotation_interprocessing) and not args.overwrite_annotation:
         print('READING ANNOTATIONS...')
