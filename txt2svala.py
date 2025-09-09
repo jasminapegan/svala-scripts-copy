@@ -28,24 +28,24 @@ def paragraph_to_svala(paragraph):
     return {"source": source, "target": target, "edges": edges}
 
 
-def process_file(file, args):
+def process_file(file, input_folder, output_folder):
     file_path = os.path.join(args.input_folder, file)
-    if os.path.exists(args.output_folder):
-        shutil.rmtree(args.output_folder)
-    os.mkdir(args.output_folder)
+    if os.path.exists(output_folder):
+        shutil.rmtree(output_folder)
+    os.mkdir(output_folder)
     print(file_path)
     with open(file_path, 'r', encoding='utf-8') as fp:
         for i, line in enumerate(fp):
             tokenized = [token.split('\t')[1] for token in obeliks.run(line).split('\n') if len(token.split('\t')) > 1]
             dictionary = paragraph_to_svala(tokenized)
-            with open(os.path.join(args.output_folder, file.strip('.txt') + '-' + str(i+1) + '.json'), 'w', encoding='utf-8') as wf:
+            with open(os.path.join(output_folder, file.strip('.txt') + '-' + str(i+1) + '.json'), 'w', encoding='utf-8') as wf:
                 json.dump(dictionary, wf, ensure_ascii=False, indent="")
 
 def main(input_folder, output_folder):
     for file in os.listdir(input_folder):
         if os.path.isfile(os.path.join(input_folder, file)):
             try:
-                process_file(file, args)
+                process_file(file, input_folder, output_folder)
             except Exception as e:
                 #print(f'Skipping file {file} on path {args.input_folder} - Failed to decode txt file:\n {e}')
                 raise Exception(f'Failed to process txt file {file} on path {input_folder}:\n {e}')
