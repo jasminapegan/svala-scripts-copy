@@ -24,14 +24,9 @@ def main(args):
                                  type='standard_jos', use_gpu=True)
     tokenizer = classla.Pipeline('sl', processors='tokenize', pos_lemma_pretag=True, use_gpu=True)
 
-    parser_txt2svala = argparse.ArgumentParser(description='Converts raw text into svala format.')
-    parser_txt2svala.add_argument('--input_folder', default=args.txt_folder)
-    parser_txt2svala.add_argument('--output_folder', default=args.svala_folder)
-    args_txt2svala = parser_txt2svala.parse_args()
-
     if args.txt_folder is not None:
         print('CONVERTING TXT > SVALA ...')
-        txt2svala.main(args_txt2svala)
+        txt2svala.main(args.txt_folder, args.svala_folder)
 
     svala2tei.main(args, annotator=annotator, tokenizer=tokenizer)
 
