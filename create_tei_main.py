@@ -106,22 +106,23 @@ def handfix_options(auto_replace):
 
 
 if __name__ == '__main__':
+    base_dir = 'data/KOST'
     parser = argparse.ArgumentParser(
         description='Merges svala data, raw data and metadata into TEI format (useful for corpora like KOST).')
-    parser.add_argument('--txt_folder', default='data/a/Neoznacena besedila',
+    parser.add_argument('--txt_folder', default=f'{base_dir}/Neoznacena besedila',
                         help='TXT files location, only set if creating TEI from TXT')
-    parser.add_argument('--svala_folder', default='data/a/svala_1_0',
+    parser.add_argument('--svala_folder', default=f'{base_dir}/svala_1_0',
                         help='Path to directory that contains svala files.')
-    parser.add_argument('--results_folder', default='data/a/results_1_0',
+    parser.add_argument('--results_folder', default=f'{base_dir}/results_1_0',
                         help='Path to results directory.')
-    parser.add_argument('--raw_text', default='data/a/Neoznacena besedila',
+    parser.add_argument('--raw_text', default=f'{base_dir}/Neoznacena besedila',
                         help='Path to directory that contains raw text files.')
-    parser.add_argument('--metadata_excel', default='data/a/KOST 2.0, 25-08.xlsm',
+    parser.add_argument('--metadata_excel', default=f'{base_dir}/KOST 2.0, 25-08.xlsm',
                         help='KOST metadata location')
-    parser.add_argument('--tokenization_interprocessing', default='data/a/processing.tokenization',
+    parser.add_argument('--tokenization_interprocessing', default=f'{base_dir}/processing.tokenization',
                         help='Path to file that containing tokenized data.')
     parser.add_argument('--overwrite_tokenization', action='store_true', help='Force retokenization without having to manually delete tokenization file.')
-    parser.add_argument('--annotation_interprocessing', default='data/a/processing.annotation',
+    parser.add_argument('--annotation_interprocessing', default=f'{base_dir}/processing.annotation',
                         help='Path to file that containing annotated data.')
     parser.add_argument('--overwrite_annotation', action='store_true', help='Force reannotation without having to manually delete tokenization file.')
 
