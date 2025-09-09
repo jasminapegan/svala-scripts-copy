@@ -5,7 +5,6 @@ import pickle
 import queue
 import string
 from collections import deque
-from line_profiler_pycharm import profile
 
 import classla
 
@@ -287,7 +286,6 @@ def fake_svala_data(source_tokenized):
 
     return source_res, target_res, generated_edges
 
-@profile
 def tokenize(args, fake_data=True, tokenizer=None):
     if os.path.exists(args.tokenization_interprocessing) and not args.overwrite_tokenization:
         print('READING TOKENIZATION...')
