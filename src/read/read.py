@@ -13,7 +13,7 @@ def replace_nonstandard_characters(text):
     return text
 
 def read_raw_text(path):
-    print(path)
+    print("Reading text:", path)
     try:
         with open(path, 'r', encoding='utf-8') as rf:
             return replace_nonstandard_characters(rf.read())

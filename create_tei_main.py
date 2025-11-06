@@ -19,19 +19,22 @@ logging.basicConfig(level=logging.DEBUG)
 def main(args):
     start = time.time()
 
+    if args.txt_folder is not None:
+        print('CONVERTING TXT > SVALA ...')
+        if args.svala_folder is None:
+            raise Exception('Path to svala_folder is not set!')
+
+        args_txt2svala = argparse.Namespace(
+            input_folder=args.txt_folder,
+            output_folder=args.svala_folder
+        )
+        txt2svala.main(args_txt2svala)
+
     # preload nlp annotator and tokenizer for speed
+    print("Loading annotator and tokenizer ...")
     annotator = classla.Pipeline('sl', pos_use_lexicon=True, pos_lemma_pretag=False, tokenize_pretokenized="conllu",
                                  type='standard_jos', use_gpu=True)
     tokenizer = classla.Pipeline('sl', processors='tokenize', pos_lemma_pretag=True, use_gpu=True)
-
-    parser_txt2svala = argparse.ArgumentParser(description='Converts raw text into svala format.')
-    parser_txt2svala.add_argument('--input_folder', default=args.txt_folder)
-    parser_txt2svala.add_argument('--output_folder', default=args.svala_folder)
-    args_txt2svala = parser_txt2svala.parse_args()
-
-    if args.txt_folder is not None:
-        print('CONVERTING TXT > SVALA ...')
-        txt2svala.main(args_txt2svala)
 
     svala2tei.main(args, annotator=annotator, tokenizer=tokenizer)
 
@@ -44,6 +47,7 @@ def get_filename(exception, args):
             return os.path.join(args.txt_folder, x)
         elif x.endswith('.json'):
             return os.path.join(args.svala_folder, x)
+
 
 def persist_dictionary(filename: str, dictionary: dict, variable: str):
     with open(filename, 'w') as f:

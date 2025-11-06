@@ -47,7 +47,7 @@ def apply_svala_handfixes(svala_data_object):
         if len(key) not in hand_fix_mask:
             hand_fix_mask.append(len(key))
 
-    remember_length = max(hand_fix_mask)
+    remember_length = max(hand_fix_mask, default=0)
     q = deque()
 
     i = 0
