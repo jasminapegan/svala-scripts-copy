@@ -3,3 +3,4 @@ conllu~=4.5.2
 lxml~=5.4.0
 cjvt-conversion-utils @ git+https://gitea.cjvt.si/generic/conversion_utils@master
 openpyxl
+charset-normalizer

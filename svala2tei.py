@@ -6,16 +6,16 @@ import time
 
 from src.annotate.annotate import annotate
 from src.read.read_and_merge import tokenize
-from src.write.write import write_tei, process_metadata
+from src.write.write import write_tei
 
 logging.basicConfig(level=logging.DEBUG)
-def process_file(args, annotator=None, tokenizer=None):
+def process_file(args, annotator=None, tokenizer=None, fake_missing_data=False):
     if os.path.exists(args.results_folder):
         shutil.rmtree(args.results_folder)
     os.makedirs(args.results_folder)
 
     # READ AND MERGE svala tokenization, solar2 tokenization and obeliks tokenization
-    tokenized_source_divs, tokenized_target_divs, document_edges = tokenize(args, tokenizer=tokenizer)
+    tokenized_source_divs, tokenized_target_divs, document_edges = tokenize(args, tokenizer=tokenizer, fake_missing_data=fake_missing_data)
 
     # ANNOTATE WITH CLASSLA
     annotated_source_divs, annotated_target_divs = annotate(tokenized_source_divs, tokenized_target_divs, args,
@@ -25,8 +25,8 @@ def process_file(args, annotator=None, tokenizer=None):
     write_tei(annotated_source_divs, annotated_target_divs, document_edges, args)
 
 
-def main(args, annotator=None, tokenizer=None):
-    process_file(args, annotator=annotator, tokenizer=tokenizer)
+def main(args, annotator=None, tokenizer=None, fake_missing_data=False):
+    process_file(args, annotator=annotator, tokenizer=tokenizer, fake_missing_data=fake_missing_data)
 
 
 if __name__ == '__main__':

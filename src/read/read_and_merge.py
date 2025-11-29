@@ -286,7 +286,7 @@ def fake_svala_data(source_tokenized):
 
     return source_res, target_res, generated_edges
 
-def tokenize(args, fake_data=True, tokenizer=None):
+def tokenize(args, fake_missing_data=False, tokenizer=None):
     if os.path.exists(args.tokenization_interprocessing) and not args.overwrite_tokenization:
         print('READING TOKENIZATION...')
         with open(args.tokenization_interprocessing, 'rb') as rp:
@@ -305,7 +305,9 @@ def tokenize(args, fake_data=True, tokenizer=None):
         text_filenames = sorted(text_filenames)
 
         for text_filename_i, text_filename in enumerate(text_filenames):
-            text_file = read_raw_text(os.path.join(args.raw_text, text_filename))
+            raw_file = os.path.join(args.raw_text, text_filename)
+            current_file = raw_file
+            text_file = read_raw_text(raw_file)
             raw_text, source_tokenized, metadocument = tokenizer.processors['tokenize']._tokenizer.tokenize(
                 text_file) if text_file else ([], [], [])
             source_sent_i = 0
@@ -316,7 +318,7 @@ def tokenize(args, fake_data=True, tokenizer=None):
                 for filename in filenames:
                     svala_path = os.path.join(args.svala_folder, filename)
                     jf = open(svala_path, encoding='utf-8')
-                    print(svala_path)
+                    current_file = svala_path
                     svala_data = json.load(jf)
                     jf.close()
 
@@ -324,7 +326,7 @@ def tokenize(args, fake_data=True, tokenizer=None):
 
                     apply_svala_handfixes(svala_data_object)
 
-                    source_sent_i, source_res = map_svala_tokenized(svala_data_object.svala_data['source'], source_tokenized, source_sent_i)
+                    source_sent_i, source_res = map_svala_tokenized(svala_data_object.svala_data['source'], source_tokenized, source_sent_i, filename=filename)
 
                     target_res = create_target(svala_data_object, source_res)
 
@@ -333,20 +335,22 @@ def tokenize(args, fake_data=True, tokenizer=None):
 
                     tokenized_divs[text_filename].append((filename, source_res, target_res, svala_data_object.svala_data['edges']))
 
-            elif fake_data:
+            elif fake_missing_data:
                 filename = text_filename[:-4] + '.json'
                 source_res, target_res, generated_edges = fake_svala_data(source_tokenized)
                 if text_filename not in tokenized_divs:
                     tokenized_divs[text_filename] = []
                 tokenized_divs[text_filename].append((filename, source_res, target_res, generated_edges))
 
-            logging.info(f'Tokenizing at {text_filename_i * 100 / len(text_filenames)} %')
+            if text_filename_i % 10 == 0:
+                logging.info(f'Tokenizing at {text_filename_i * 100 / len(text_filenames)} %')
 
     tokenized_source_divs = []
     tokenized_target_divs = []
     document_edges = []
 
     for div_id in tokenized_divs.keys():
+        current_file = div_id
         paragraph_edges = []
         tokenized_source_paragraphs = []
         tokenized_target_paragraphs = []

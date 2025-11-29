@@ -4,6 +4,7 @@ from src.read.hand_fixes import apply_obeliks_handfixes
 from constants.svala_hand_fixes_merge import SVALA_HAND_FIXES_MERGE
 from constants.hand_fixes import HAND_FIXES
 from constants.replacements import replace_chars
+from charset_normalizer import detect
 
 
 def replace_nonstandard_characters(text):
@@ -13,25 +14,12 @@ def replace_nonstandard_characters(text):
     return text
 
 def read_raw_text(path):
-    print("Reading text:", path)
-    try:
-        with open(path, 'r', encoding='utf-8') as rf:
-            return replace_nonstandard_characters(rf.read())
-    except:
-        try:
-            with open(path, 'r', encoding='utf-16') as rf:
-                return replace_nonstandard_characters(rf.read())
-        except:
-            try:
-                with open(path, 'r', encoding="windows-1250") as rf:
-                    return replace_nonstandard_characters(rf.read())
-            except:
-                with open(path, 'r', encoding="windows-1252") as rf:
-                    return replace_nonstandard_characters(rf.read())
+    with open(path, 'rb') as bf:
+        detected_encoding = detect(bf.read(), de)['encoding']
+    with open(path, 'r', encoding=detected_encoding) as rf:
+        return replace_nonstandard_characters(rf.read())
 
-
-
-def map_svala_tokenized(svala_data_part, tokenized_paragraph, sent_i):
+def map_svala_tokenized(svala_data_part, tokenized_paragraph, sent_i, filename=None):
     # apply handfixes for obeliks
     apply_obeliks_handfixes(tokenized_paragraph)
 
@@ -42,7 +30,7 @@ def map_svala_tokenized(svala_data_part, tokenized_paragraph, sent_i):
         sentence = tokenized_paragraph[i]
         sentence_res = []
         sentence_id = 0
-        for tok in sentence:
+        for tok_i, tok in enumerate(sentence):
             tok['text'] = tok['text']
             tag = 'pc' if 'xpos' in tok and tok['xpos'] == 'Z' else 'w'
             if 'misc' in tok:
@@ -141,8 +129,9 @@ def map_svala_tokenized(svala_data_part, tokenized_paragraph, sent_i):
                 elif key.lower() in ['[xnaslovx]']:
                     tok['text'] = '[XNaslovX]'
                 else:
+                    svala_id = svala_data_part[svala_data_i]['id']
                     print(f'key: "{key}" ; tok[text]: "{tok["text"]}"')
-                    raise 'Word mismatch!'
+                    raise Exception(f'Word mismatch in {filename} at {svala_id}: {key}, {tok["text"]}{sentence[tok_i+1]["text"]}')
             sentence_id += 1
             sentence_res.append({'token': tok['text'], 'tag': tag, 'id': sentence_id, 'space_after': space_after, 'svala_id': svala_data_part[svala_data_i]['id']})
             svala_data_i += 1
