@@ -1,4 +1,6 @@
-classla==1.1.0
-conllu==4.5.2
-lxml==4.6.3
-conversion-utils @ git+https://gitea.cjvt.si/generic/conversion_utils@master
+classla~=2.2.1
+conllu~=4.5.2
+lxml~=5.4.0
+cjvt-conversion-utils @ git+https://gitea.cjvt.si/generic/conversion_utils@master
+openpyxl
+charset-normalizer

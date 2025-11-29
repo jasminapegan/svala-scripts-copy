@@ -1,12 +1,15 @@
+import argparse
 import copy
 import csv
 import json
 import os
 from lxml import etree
 import conllu
+from openpyxl import load_workbook
 
 from src.create_tei import construct_sentence_from_list, \
     construct_paragraph_from_list, TeiDocument, build_tei_etrees, build_links, build_complete_tei, convert_bibl
+from src.validate.validate_xml import validate_xml
 
 
 def form_paragraphs(annotated_source_divs, metadata):
@@ -15,8 +18,7 @@ def form_paragraphs(annotated_source_divs, metadata):
     for div_i, div_tuple in enumerate(annotated_source_divs):
         div_name, div = div_tuple
         if div_name[:-1] not in metadata:
-            print("Not in metadata:", div_name[:-1])
-            continue
+            raise Exception("Not in metadata:", div_name[:-1])
         div_metadata = metadata[div_name[:-1]]
 
         etree_source_paragraphs = []
@@ -38,11 +40,10 @@ def form_paragraphs(annotated_source_divs, metadata):
     return etree_source_divs, div_name
 
 
-def read_metadata(args):
+def read_metadata(args, delimiter='|'):
     texts_metadata = []
     with open(args.texts_metadata, 'r', encoding='utf-8-sig') as file:
-        #csvreader = csv.reader(file, delimiter='|', quotechar='"')
-        csvreader = csv.reader(file, delimiter=',', quotechar='"')
+        csvreader = csv.reader(file, delimiter=delimiter, quotechar='"')
         column_names = []
         for i, row in enumerate(csvreader):
             if i == 0:
@@ -51,7 +52,11 @@ def read_metadata(args):
             else:
                 row_dict = {}
                 for j, content in enumerate(row):
-                    row_dict[column_names[j]] = content.strip()
+                    if j in range(len(column_names) - 1): # and content.strip():
+                        row_dict[column_names[j]] = content.strip()
+                    #else:
+                    #    print('fail', row)
+                    #    print(j, column_names)
                 texts_metadata.append(row_dict)
 
     # handle teachers
@@ -73,8 +78,8 @@ def read_metadata(args):
     # handle authors
     authors_metadata = {}
     with open(args.authors_metadata, 'r', encoding='utf-8-sig') as file:
-        #csvreader = csv.reader(file, delimiter='|', quotechar='"')
-        csvreader = csv.reader(file, delimiter=',', quotechar='"')
+        csvreader = csv.reader(file, delimiter=delimiter, quotechar='"')
+        #csvreader = csv.reader(file, delimiter=',', quotechar='"')
         column_names = []
         for i, row in enumerate(csvreader):
             if i == 0:
@@ -106,8 +111,98 @@ def read_metadata(args):
     return texts_metadata, authors_metadata, teachers_metadata, translations
 
 
+def cell_to_str(cell):
+    if cell is None or cell.value is None:
+        return ''
+    elif cell.data_type == 's':
+        return cell.value
+    if cell.data_type == 'n':
+        return str(cell.value)
+    elif cell.data_type == 'd':
+        return cell.value.strftime('%d/%m/%Y')
+    else:
+        raise Exception(f'Error converting cell value to string: {cell.value}')
+
+def read_metadata_from_excel(args):
+    excel = load_workbook(args.metadata_excel, data_only=True)
+
+    # parse texts sheet
+    texts_sheet = excel['L+ besedila']
+    texts_metadata = []
+    column_names = []
+
+    for i, row in enumerate(texts_sheet.iter_rows(values_only=False)):
+        if i == 0:
+            column_names = [cell_to_str(cell) for cell in row]
+            continue
+        elif not cell_to_str(row[0]):
+            continue
+        else:
+            row_dict = {}
+            for j, content in enumerate(row):
+                if j in range(len(column_names) - 1):
+                    row_dict[column_names[j]] = cell_to_str(content)
+            texts_metadata.append(row_dict)
+
+    # parse teachers sheet
+    teachers_sheet = excel['Kode učiteljev']
+    teachers_metadata = {}
+    column_names = []
+    for i, row in enumerate(teachers_sheet.iter_rows(values_only=False)):
+        if i == 0:
+            column_names = [cell_to_str(cell) for cell in row]
+            continue
+        elif not cell_to_str(row[0]):
+            continue
+        else:
+            row_dict = {}
+            for j, content in enumerate(row):
+                row_dict[column_names[j]] = cell_to_str(content)
+            row_dict['Ime in priimek'] = row_dict['Ime in priimek'].strip()
+            teachers_metadata[row_dict['Ime in priimek']] = row_dict
+
+    # parse authors sheet
+    authors_sheet = excel['L+ tvorci']
+    authors_metadata = {}
+    column_names = []
+    for i, row in enumerate(authors_sheet.iter_rows(values_only=False)):
+        if i == 0:
+            column_names = [cell_to_str(cell) for cell in row]
+            continue
+        elif i == 1:
+            active_column_name = ''
+            for j, sub_name in enumerate(row):
+                sub_name = cell_to_str(sub_name)
+                if column_names[j]:
+                    active_column_name = column_names[j]
+                if sub_name:
+                    column_names[j] = f'{active_column_name} - {sub_name}'
+            continue
+        elif i == 2:
+            continue
+        elif not cell_to_str(row[0]):
+            continue
+        else:
+            row_dict = {}
+            for j, content in enumerate(row):
+                row_dict[column_names[j]] = cell_to_str(content)
+            row_dict['Ime in priimek'] = row_dict['Ime in priimek'].strip()
+            authors_metadata[row_dict['Ime in priimek']] = row_dict
+
+    # parse translations sheet
+    translations_sheet = excel['Prevod kategorij v ang.']
+    translations = {}
+    for i, row in enumerate(translations_sheet.iter_rows(values_only=False)):
+        if i < 3:
+            continue
+        if cell_to_str(row[0]):
+            translations[cell_to_str(row[0])] = cell_to_str(row[1])
+
+    return texts_metadata, authors_metadata, teachers_metadata, translations
+
+
 def process_metadata(args):
-    texts_metadata, authors_metadata, teachers_metadata, translations = read_metadata(args)
+    texts_metadata, authors_metadata, teachers_metadata, translations = read_metadata_from_excel(args)
 
     metadata = {}
     for document_metadata in texts_metadata:
@@ -140,7 +235,7 @@ def process_metadata(args):
                     curr_school.append(author_metadata["Trenutno šolanje - Ime šole"])
                 if author_metadata["Trenutno šolanje - Fakulteta"]:
                     curr_school.append(author_metadata["Trenutno šolanje - Fakulteta"])
-                metadata_el['Current school'] = ', '.join(curr_school)
+                metadata_el['    '] = ', '.join(curr_school)
             elif attribute_name_sl == 'Stopnja študija':
                 metadata_el[attribute_name_en] = author_metadata['Trenutno šolanje - Stopnja študija']
             elif attribute_name_sl == 'Leto študija':
@@ -160,8 +255,6 @@ def process_metadata(args):
             else:
                 raise Exception(f'{attribute_name_sl} not found!')
 
-        if metadata_el['Text ID'] == "STU14-2112-024":
-            print(1)
         metadata[metadata_el['Text ID']] = metadata_el
 
     return metadata
@@ -214,5 +307,23 @@ def write_tei(annotated_source_divs, annotated_target_divs, document_edges, args
     # complete_etree = build_complete_tei(etree_source, etree_target, etree_links)
 
     print('WRITING COMPLETE TREE')
-    with open(os.path.join(args.results_folder, f"complete.xml"), 'w', encoding='utf-8') as tf:
+    complete_filepath = os.path.join(args.results_folder, f"complete.xml")
+    with open(complete_filepath, 'w', encoding='utf-8') as tf:
         tf.write(etree.tostring(complete_etree, pretty_print=True, encoding='utf-8').decode())
+
+    print('VALIDATING TEI FILE')
+    if validate_xml(complete_filepath):
+        # check if all links have matching text
+        print('SUCCESS:', complete_filepath)
+    else:
+        print('INVALID TEI FILE:', complete_filepath)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='Merges svala data, raw data and metadata into TEI format (useful for corpora like KOST).')
+    parser.add_argument('--metadata_excel', default='D:\projects\KOST\svala-scripts/data/KOST test/KOST 2.0, 25-08.xlsm',
+                        help='KOST metadata location')
+    args = parser.parse_args()
+
+    read_metadata_from_excel(args)

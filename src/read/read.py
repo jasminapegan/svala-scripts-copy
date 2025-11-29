@@ -1,46 +1,25 @@
 import re
 
-from src.read.hand_fixes import HAND_FIXES, apply_obeliks_handfixes, SVALA_HAND_FIXES_MERGE
+from src.read.hand_fixes import apply_obeliks_handfixes
+from constants.svala_hand_fixes_merge import SVALA_HAND_FIXES_MERGE
+from constants.hand_fixes import HAND_FIXES
+from constants.replacements import replace_chars
+from charset_normalizer import detect
 
 
 def replace_nonstandard_characters(text):
-    replace_chars = {
-        'а': 'a',
-        'і': 'i',
-        'о': 'o',
-        'с': 'c',
-        'ﾻ': '"',
-        'ﾫ': '"',
-        'М': 'M',
-        'ј': 'j',
-        'р': 'p',
-        'В': 'B',
-        'Р': 'P',
-        '😉': ';)',
-        '😊': ':)',
-        '☹': ':('
-    }
     for key in replace_chars:
         text = text.replace(key, replace_chars[key])
         #text = ' '.join(text.split())  # remove duplicate spaces
     return text
 
 def read_raw_text(path):
-    print(path)
-    try:
-        with open(path, 'r', encoding='utf-8') as rf:
-            return replace_nonstandard_characters(rf.read())
-    except:
-        try:
-            with open(path, 'r', encoding='utf-16') as rf:
-                return replace_nonstandard_characters(rf.read())
-        except:
-            with open(path, 'r', encoding="windows-1250") as rf:
-                return replace_nonstandard_characters(rf.read())
+    with open(path, 'rb') as bf:
+        detected_encoding = detect(bf.read(), de)['encoding']
+    with open(path, 'r', encoding=detected_encoding) as rf:
+        return replace_nonstandard_characters(rf.read())
 
-
-
-def map_svala_tokenized(svala_data_part, tokenized_paragraph, sent_i):
+def map_svala_tokenized(svala_data_part, tokenized_paragraph, sent_i, filename=None):
     # apply handfixes for obeliks
     apply_obeliks_handfixes(tokenized_paragraph)
 
@@ -51,7 +30,7 @@ def map_svala_tokenized(svala_data_part, tokenized_paragraph, sent_i):
         sentence = tokenized_paragraph[i]
         sentence_res = []
         sentence_id = 0
-        for tok in sentence:
+        for tok_i, tok in enumerate(sentence):
             tok['text'] = tok['text']
             tag = 'pc' if 'xpos' in tok and tok['xpos'] == 'Z' else 'w'
             if 'misc' in tok:
@@ -116,6 +95,10 @@ def map_svala_tokenized(svala_data_part, tokenized_paragraph, sent_i):
                             HAND_FIXES[key] = re.findall(r"[\w]+|[^\s\w]", key)
                         print(f'key: {key} ; tok[text]: {tok["text"]}')
 
+                if key not in HAND_FIXES.keys():
+                    print('Sentence:', ' '.join([s['text'] for s in sentence]))
+                    raise Exception(f"Key {key} not in HAND_FIXES. Possible replacement: {tok['text']},{key}")
+
                 if tok['text'] == HAND_FIXES[key][wierd_sign_count]:
                     wierd_sign_count += 1
                     if wierd_sign_count < len(HAND_FIXES[key]):
@@ -146,8 +129,9 @@ def map_svala_tokenized(svala_data_part, tokenized_paragraph, sent_i):
                 elif key.lower() in ['[xnaslovx]']:
                     tok['text'] = '[XNaslovX]'
                 else:
+                    svala_id = svala_data_part[svala_data_i]['id']
                     print(f'key: "{key}" ; tok[text]: "{tok["text"]}"')
-                    raise 'Word mismatch!'
+                    raise Exception(f'Word mismatch in {filename} at {svala_id}: {key}, {tok["text"]}{sentence[tok_i+1]["text"]}')
             sentence_id += 1
             sentence_res.append({'token': tok['text'], 'tag': tag, 'id': sentence_id, 'space_after': space_after, 'svala_id': svala_data_part[svala_data_i]['id']})
             svala_data_i += 1
